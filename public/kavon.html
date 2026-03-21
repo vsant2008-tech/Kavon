@@ -154,10 +154,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
   border-radius:9px;font-size:1rem;color:var(--text-muted);transition:background .15s;}
 .lm-close:hover{background:var(--sky-mid);}
 
-.lm-body{display:grid;grid-template-columns:1fr 320px;gap:0;}
+.lm-body{display:flex;flex-direction:column;gap:0;}
 
 /* chart panel */
-.chart-panel{padding:1.5rem 1.5rem 1.5rem 2rem;border-right:1px solid var(--border);}
+.chart-panel{padding:1.5rem 1.5rem 1.5rem 2rem;border-bottom:1px solid var(--border);}
 .chart-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
 .price-display{display:flex;align-items:baseline;gap:.6rem;}
 .price-current{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;color:var(--text-dark);}
@@ -179,10 +179,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 .chart-progress-fill{height:100%;background:var(--blue-bright);border-radius:3px;transition:width .1s linear;}
 
 /* data side panel */
-.data-panel{padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;background:var(--off-white);border-radius:0 0 22px 0;}
+.data-panel{padding:1.5rem 2rem;display:flex;flex-direction:column;gap:1.1rem;background:var(--off-white);border-radius:0 0 22px 22px;}
 
 .dp-section-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);margin-bottom:.6rem;}
-.indicator-grid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;}
+.indicator-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.55rem;}
 .ind-box{background:var(--white);border-radius:9px;padding:.65rem .8rem;border:1px solid var(--border);}
 .ind-label{font-size:.62rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
 .ind-value{font-family:'DM Mono',monospace;font-size:.92rem;font-weight:600;color:var(--text-dark);margin-top:.18rem;}
@@ -295,8 +295,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 .hero-stat-label{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:.15rem;}
 
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
-@media(max-width:1000px){.lm-body{grid-template-columns:1fr;}.data-panel{border-radius:0 0 22px 22px;}
-  .lessons-grid{grid-template-columns:repeat(2,1fr);}.dash-layout{grid-template-columns:1fr;}}
+@media(max-width:1000px){.lessons-grid{grid-template-columns:repeat(2,1fr);}.dash-layout{grid-template-columns:1fr;}}
 @media(max-width:640px){.lessons-grid{grid-template-columns:1fr;}.decision-btns{flex-direction:column;}.pnl-reveal{grid-template-columns:1fr 1fr;}}
 
 /* scrollbar */
@@ -639,7 +638,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
     <button class="nav-tab" onclick="showPage('home')">Home</button>
     <button class="nav-tab active" onclick="showPage('dashboard')">Dashboard</button>
     <button class="nav-tab" onclick="showPage('lessons')">Lessons</button>
-    <button class="nav-tab" onclick="showPage('waitlist')" style="background:var(--blue-bright);color:#fff;margin-left:.4rem;">Join Waitlist</button>
   </div>
   <div class="nav-right">
     <div class="portfolio-pill">
@@ -660,7 +658,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
       <p>Kavon teaches students real market skills using historical data and AI feedback — $10,000 in paper money to start. No live trading. No risk. Just real learning.</p>
       <div class="hero-btns">
         <button class="btn-primary" onclick="showPage('lessons')">Start Learning Free →</button>
-        <button class="btn-ghost" onclick="showPage('waitlist')">Join the Waitlist</button>
       </div>
       <div class="hero-stats">
         <div><div class="hero-stat-num">$10K</div><div class="hero-stat-label">Starting Paper Money</div></div>
@@ -671,49 +668,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
   </section>
 </div>
 
-<!-- ══ WAITLIST PAGE ═════════════════════════════════════════════════════════ -->
-<div class="page" id="page-waitlist">
-  <div class="waitlist-page">
-    <div class="waitlist-card">
-      <button class="waitlist-back" onclick="showPage('home')">← Back to Home</button>
-      <h2>Join the Waitlist</h2>
-      <p>Kavon is launching soon. Be among the first students to learn trading the right way — with AI coaching, real market data, and zero financial risk.</p>
-      <div id="wlForm">
-        <div class="wl-form-group">
-          <label class="wl-label">Your Name</label>
-          <input type="text" class="wl-input" id="wlName" placeholder="First and last name">
-        </div>
-        <div class="wl-form-group">
-          <label class="wl-label">Email Address</label>
-          <input type="email" class="wl-input" id="wlEmail" placeholder="your@email.com">
-        </div>
-        <div class="wl-form-group">
-          <label class="wl-label">I am a...</label>
-          <select class="wl-input" id="wlRole" style="cursor:pointer;">
-            <option value="">Select your role</option>
-            <option>High school student</option>
-            <option>College student</option>
-            <option>Recent graduate</option>
-            <option>Teacher / Educator</option>
-            <option>Parent</option>
-            <option>Other</option>
-          </select>
-        </div>
-        <div class="wl-form-group">
-          <label class="wl-label">Message / What you'd like to see (optional)</label>
-          <textarea class="wl-input wl-textarea" id="wlMessage" placeholder="Tell us what excites you about Kavon, features you'd love to see, or anything else on your mind..."></textarea>
-        </div>
-        <button class="wl-submit" onclick="submitWaitlist()">Reserve My Spot →</button>
-      </div>
-      <div class="wl-success" id="wlSuccess">
-        <div class="wl-success-icon">🎉</div>
-        <h3>You're on the list!</h3>
-        <p>Thanks for joining. We'll reach out to <span id="wlConfirmEmail" style="color:var(--blue-light);font-weight:600;"></span> when Kavon launches. In the meantime, try the demo lessons!</p>
-        <button class="wl-submit" style="margin-top:1.5rem;" onclick="showPage('lessons')">Try Demo Lessons →</button>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ══ DASHBOARD PAGE ═══════════════════════════════════════════════════════ -->
 <div class="page" id="page-dashboard">
@@ -734,6 +688,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
           <div class="pm-item"><div class="pm-val" id="pmWinRate">—</div><div class="pm-label">Win Rate</div></div>
           <div class="pm-item"><div class="pm-val" id="pmBestTrade">—</div><div class="pm-label">Best Trade</div></div>
         </div>
+      </div>
+
+      <!-- Try a Lesson CTA -->
+      <div style="margin:1.5rem 0;">
+        <button class="btn-primary" onclick="showPage('lessons')" style="width:100%;padding:1rem;font-size:.95rem;">Try a Lesson →</button>
       </div>
 
       <!-- Portfolio Chart -->
@@ -3319,18 +3278,6 @@ function generateSmartAnswer(q, l) {
   return fallbacks[Math.floor(Math.random()*fallbacks.length)];
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// WAITLIST
-// ═══════════════════════════════════════════════════════════════════════════
-function submitWaitlist() {
-  const name = document.getElementById('wlName').value.trim();
-  const email = document.getElementById('wlEmail').value.trim();
-  if(!name) { alert('Please enter your name.'); return; }
-  if(!email || !email.includes('@')) { alert('Please enter a valid email address.'); return; }
-  document.getElementById('wlForm').style.display = 'none';
-  document.getElementById('wlSuccess').style.display = 'block';
-  document.getElementById('wlConfirmEmail').textContent = email;
-}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INIT
@@ -3396,8 +3343,7 @@ window.addEventListener('DOMContentLoaded', ()=>{
       </div>
     </div>
     <div class="limit-actions">
-      <button class="limit-btn limit-btn-primary" onclick="closeLimitPopup('popupLocked');showPage('waitlist')">Join Waitlist — Unlock All →</button>
-      <button class="limit-btn limit-btn-ghost" onclick="closeLimitPopup('popupLocked');showPage('dashboard')">View My Portfolio</button>
+      <button class="limit-btn limit-btn-primary" onclick="closeLimitPopup('popupLocked');showPage('dashboard')">View My Portfolio</button>
     </div>
   </div>
 </div>
