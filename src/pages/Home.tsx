@@ -69,18 +69,12 @@ export default function Home() {
           <p className="text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
             Learn to trade like a pro with interactive lessons, real-time simulations, and personalized AI guidance.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <button
               onClick={() => handleProtectedAction('study')}
               className="px-8 py-3 text-base font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
             >
               Start Learning Free
-            </button>
-            <button
-              onClick={() => handleProtectedAction('simulation')}
-              className="px-8 py-3 text-base font-semibold text-slate-700 bg-white border-2 border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
-            >
-              Try Live Simulation
             </button>
           </div>
         </div>
