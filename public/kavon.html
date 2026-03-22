@@ -3254,9 +3254,8 @@ function generateSmartAnswer(q, l) {
 
   // Sentiment / fear & greed
   if(/sentiment|fear|greed|crowd|retail|panic/.test(q)) {
-    const sentWord = l.sentimentScore>75?'Extreme Greed':l.sentimentScore>55?'Greed':l.sentimentScore>45?'Neutral':l.sentimentScore>25?'Fear':'Extreme Fear';
-    const sentDetail = l.sentimentScore>75?'Extreme greed means retail investors are euphoric — momentum can keep pushing higher but it also signals a potential top if the catalyst disappoints.':l.sentimentScore<30?'Extreme fear means most investors had already sold or were panicking. When fear is this high, the correct trade is often contrarian — but only if there is a real catalyst to reverse it.':'Neutral sentiment meant the market was waiting for a catalyst to decide direction — which is exactly what the news provided.';
-    return `The investor sentiment score was ${l.sentimentScore}/100 — ${sentWord}. ${sentDetail} The correct answer here was ${right}.`;
+    const sentWord = l.sentimentScore > 75 ? 'very greedy' : l.sentimentScore > 55 ? 'greedy' : l.sentimentScore > 45 ? 'neutral' : l.sentimentScore > 25 ? 'fearful' : 'very fearful';
+    return `Right now the market is feeling ${sentWord} about ${l.ticker} — scoring ${l.sentimentScore} out of 100. Think of sentiment like the mood of a crowd. When everyone is excited and buying, prices get pushed up fast. When everyone is scared, prices drop.\n\nAt ${l.sentimentScore}/100, most traders were feeling ${sentWord === 'very greedy' || sentWord === 'greedy' ? 'confident and optimistic — which sounds good, but when too many people are already betting the same way, even small bad news can cause a big sell-off' : 'nervous — which actually means most people had already sold, so the stock could be ready to bounce if anything positive happens'}.\n\nThat's why the correct call here was to ${right}.`;
   }
 
   // News / catalyst explanation
