@@ -309,33 +309,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--sky-mid);border-radius:3px;}
 
-/* ── ASK AI MODAL ────────────────────────────────────────────── */
-.ai-chat-modal{position:fixed;bottom:2rem;right:2rem;width:420px;max-height:600px;
-  background:var(--white);border-radius:16px;box-shadow:0 8px 32px rgba(10,22,40,.2);
-  border:2px solid var(--border);display:none;flex-direction:column;z-index:600;}
-.ai-chat-modal.active{display:flex;}
-.ai-chat-header{padding:1rem 1.2rem;border-bottom:1px solid var(--border);
-  display:flex;justify-content:space-between;align-items:center;}
-.ai-chat-title{font-size:.95rem;font-weight:700;color:var(--text-dark);display:flex;align-items:center;gap:.5rem;}
-.ai-chat-close{background:var(--off-white);border:none;cursor:pointer;width:28px;height:28px;
-  border-radius:7px;font-size:.85rem;color:var(--text-muted);transition:background .15s;}
-.ai-chat-close:hover{background:var(--sky-mid);}
-.ai-chat-messages{flex:1;padding:1rem 1.2rem;overflow-y:auto;max-height:400px;display:flex;flex-direction:column;gap:.8rem;}
-.ai-chat-messages::-webkit-scrollbar{width:4px;}
-.ai-chat-messages::-webkit-scrollbar-thumb{background:var(--sky-mid);border-radius:2px;}
-.ai-chat-msg{padding:.75rem 1rem;border-radius:10px;font-size:.85rem;line-height:1.6;max-width:85%;}
-.ai-chat-msg-user{background:var(--blue-bright);color:#fff;align-self:flex-end;margin-left:auto;}
-.ai-chat-msg-ai{background:var(--off-white);color:var(--text-dark);align-self:flex-start;}
-.ai-chat-input-wrap{padding:1rem 1.2rem;border-top:1px solid var(--border);display:flex;gap:.6rem;}
-.ai-chat-input{flex:1;padding:.7rem .9rem;border:1.5px solid var(--border);border-radius:9px;
-  font-size:.85rem;font-family:'Sora',sans-serif;outline:none;transition:border .2s;}
-.ai-chat-input:focus{border-color:var(--blue-bright);}
-.ai-chat-send{padding:.7rem 1.2rem;border-radius:9px;background:var(--blue-bright);color:#fff;
-  border:none;font-size:.85rem;font-weight:700;cursor:pointer;transition:background .15s;
-  font-family:'Sora',sans-serif;}
-.ai-chat-send:hover{background:var(--blue);}
-.ai-chat-send:disabled{background:var(--sky-mid);color:var(--text-muted);cursor:default;}
-
 /* ── MODULE TABS ─────────────────────────────────────────────── */
 .module-tabs-wrap{margin-bottom:1.4rem;}
 .module-tabs{display:flex;gap:1rem;margin-bottom:1rem;}
@@ -974,7 +947,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
               </span>
               <span id="hintCountLabel">3 hints remaining</span>
             </div>
-            <button class="ask-ai-btn" id="askAiBtn" onclick="openAiChat()" style="display:none;">
+            <button class="ask-ai-btn" id="askAiBtn" onclick="openKavonAIModal()">
               <span>🤖</span>
               <span>Ask Kavon</span>
             </button>
@@ -1156,24 +1129,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
       </div>
       <div style="font-size:.68rem;color:var(--text-muted);margin-top:.5rem;text-align:center;">Powered by Kavon AI · Answers based on this specific trade's data</div>
     </div>
-  </div>
-</div>
-
-<!-- AI CHAT MODAL (for study mode) -->
-<div class="ai-chat-modal" id="aiChatModal">
-  <div class="ai-chat-header">
-    <div class="ai-chat-title">
-      <span>🤖</span>
-      <span>Ask Kavon</span>
-    </div>
-    <button class="ai-chat-close" onclick="closeAiChat()">✕</button>
-  </div>
-  <div class="ai-chat-messages" id="aiChatMessages">
-    <div class="ai-chat-msg ai-chat-msg-ai">Hi! I'm Kavon. I'm here to help you analyze this trade. Ask me anything about the market data, technical indicators, or what signals to look for.</div>
-  </div>
-  <div class="ai-chat-input-wrap">
-    <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Ask a question..." onkeydown="if(event.key==='Enter')sendAiMessage()">
-    <button class="ai-chat-send" id="aiChatSend" onclick="sendAiMessage()">Send</button>
   </div>
 </div>
 
@@ -3351,66 +3306,42 @@ function generateSmartAnswer(q, l) {
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// AI CHAT MODAL (for study mode)
+// KAVON AI (React Component Integration)
 // ═══════════════════════════════════════════════════════════════════════════
-function openAiChat() {
-  const modal = document.getElementById('aiChatModal');
-  if(modal) modal.classList.add('active');
-}
+function openKavonAIModal() {
+  const lesson = STATE.currentLesson;
+  if (!lesson) return;
 
-function closeAiChat() {
-  const modal = document.getElementById('aiChatModal');
-  if(modal) modal.classList.remove('active');
-}
+  const hasDecided = STATE.lastChoice !== null;
+  const mode = hasDecided ? 'review' : 'pre';
 
-function sendAiMessage() {
-  const input = document.getElementById('aiChatInput');
-  const messagesContainer = document.getElementById('aiChatMessages');
-  const sendBtn = document.getElementById('aiChatSend');
+  const context = {
+    ticker: lesson.ticker,
+    companyName: lesson.company,
+    date: lesson.date,
+    cutoffTime: lesson.cutoffTime,
+    sentiment: {
+      label: lesson.sentimentScore >= 70 ? 'Bullish' : lesson.sentimentScore >= 40 ? 'Neutral' : 'Bearish',
+      score: lesson.sentimentScore
+    },
+    news: lesson.news?.map(n => n.headline) || [],
+    sector: lesson.sector || 'Technology',
+    rsi: lesson.rsi,
+    macd: lesson.macd,
+    ma50: lesson.ma50,
+    analystBuy: lesson.analysts?.buy || 0,
+    analystHold: lesson.analysts?.hold || 0,
+    analystSell: lesson.analysts?.sell || 0,
+    volume: lesson.volume,
+    userDecision: hasDecided ? {
+      action: STATE.lastChoice,
+      amount: STATE.betSize || 2500
+    } : null
+  };
 
-  if(!input || !messagesContainer) return;
-
-  const question = input.value.trim();
-  if(!question) return;
-
-  // Add user message
-  const userMsg = document.createElement('div');
-  userMsg.className = 'ai-chat-msg ai-chat-msg-user';
-  userMsg.textContent = question;
-  messagesContainer.appendChild(userMsg);
-
-  // Clear input and disable button
-  input.value = '';
-  if(sendBtn) sendBtn.disabled = true;
-
-  // Scroll to bottom
-  messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-  // Generate AI response after a short delay
-  setTimeout(() => {
-    const lesson = STATE.currentLesson;
-    let aiResponse = '';
-
-    if(lesson) {
-      // Use the existing generateAIAnswer function
-      const decision = 'buy'; // Default for study mode context
-      aiResponse = generateAIAnswer(question, decision, lesson);
-    } else {
-      aiResponse = "I can help you analyze trades when you're viewing a lesson. Open a lesson to get started!";
-    }
-
-    const aiMsg = document.createElement('div');
-    aiMsg.className = 'ai-chat-msg ai-chat-msg-ai';
-    aiMsg.textContent = aiResponse;
-    messagesContainer.appendChild(aiMsg);
-
-    // Scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-
-    // Re-enable button
-    if(sendBtn) sendBtn.disabled = false;
-    input.focus();
-  }, 800);
+  if (window.openKavonAI) {
+    window.openKavonAI(context, mode);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3481,6 +3412,32 @@ window.addEventListener('DOMContentLoaded', ()=>{
     </div>
   </div>
 </div>
+
+<!-- React Mount Point for KavonAI Component -->
+<div id="kavon-ai-root"></div>
+
+<script type="module">
+  import React from 'react';
+  import ReactDOM from 'react-dom/client';
+  import KavonAI from './src/components/KavonAI.jsx';
+
+  // Global function to open KavonAI with context
+  window.openKavonAI = function(context, mode = 'pre') {
+    const root = document.getElementById('kavon-ai-root');
+    if (!root) return;
+
+    const reactRoot = ReactDOM.createRoot(root);
+    reactRoot.render(
+      React.createElement(KavonAI, {
+        context: context,
+        mode: mode,
+        onClose: () => {
+          reactRoot.unmount();
+        }
+      })
+    );
+  };
+</script>
 
 </body>
 </html>
