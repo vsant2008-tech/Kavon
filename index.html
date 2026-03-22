@@ -159,6 +159,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 /* chart panel */
 .chart-panel{padding:1.5rem 2rem;border-bottom:1px solid var(--border);}
 .chart-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
+.decision-btn{background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;border:none;
+  padding:.65rem 1.4rem;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer;
+  transition:all .2s ease;box-shadow:0 2px 8px rgba(0,91,255,.25);}
+.decision-btn:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,91,255,.35);}
 .price-display{display:flex;align-items:baseline;gap:.6rem;}
 .price-current{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;color:var(--text-dark);}
 .price-change-badge{font-family:'DM Mono',monospace;font-size:.85rem;font-weight:600;
@@ -913,7 +917,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
             <span class="price-current" id="modalPrice">$0.00</span>
             <span class="price-change-badge badge-up" id="modalChangeBadge">+0.00%</span>
           </div>
-          <div style="display:flex;align-items:center;gap:.6rem;">
+          <div style="display:flex;align-items:center;gap:.8rem;">
+            <button class="decision-btn" onclick="scrollToDecision()">Make a Decision</button>
             <div style="font-size:.72rem;color:var(--text-muted);font-family:'DM Mono',monospace;" id="modalTimeDisplay">9:30 AM</div>
             <div class="live-pill"><div class="live-dot"></div><span id="livePillText">LIVE REPLAY</span></div>
           </div>
@@ -2563,6 +2568,16 @@ function makeDecision(choice) {
   ).join('');
 
   document.getElementById('aiFeedback').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCROLL TO DECISION
+// ═══════════════════════════════════════════════════════════════════════════
+function scrollToDecision() {
+  const decisionZone = document.getElementById('decisionZone');
+  if (decisionZone) {
+    decisionZone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
