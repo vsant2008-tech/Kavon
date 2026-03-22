@@ -1,15 +1,16 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/Login';
+import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
+import Study from './pages/Study';
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Home />} />
           <Route
             path="/dashboard"
             element={
@@ -18,7 +19,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route
+            path="/study"
+            element={
+              <ProtectedRoute>
+                <Study />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
