@@ -10,6 +10,12 @@ export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
+  useEffect(() => {
     if (searchParams.get('login') === 'true') {
       setShowLoginModal(true);
       setSearchParams({});
