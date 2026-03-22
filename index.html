@@ -154,10 +154,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
   border-radius:9px;font-size:1rem;color:var(--text-muted);transition:background .15s;}
 .lm-close:hover{background:var(--sky-mid);}
 
-.lm-body{display:grid;grid-template-columns:1fr 320px;gap:0;}
+.lm-body{display:flex;flex-direction:column;gap:0;}
 
 /* chart panel */
-.chart-panel{padding:1.5rem 1.5rem 1.5rem 2rem;border-right:1px solid var(--border);}
+.chart-panel{padding:1.5rem 2rem;border-bottom:1px solid var(--border);}
 .chart-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;}
 .price-display{display:flex;align-items:baseline;gap:.6rem;}
 .price-current{font-family:'DM Mono',monospace;font-size:1.8rem;font-weight:500;color:var(--text-dark);}
@@ -179,7 +179,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 .chart-progress-fill{height:100%;background:var(--blue-bright);border-radius:3px;transition:width .1s linear;}
 
 /* data side panel */
-.data-panel{padding:1.5rem;display:flex;flex-direction:column;gap:1.1rem;background:var(--off-white);border-radius:0 0 22px 0;}
+.data-panel{padding:2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;background:var(--off-white);}
 
 .dp-section-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);margin-bottom:.6rem;}
 .indicator-grid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;}
@@ -295,7 +295,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 .hero-stat-label{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:.15rem;}
 
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
-@media(max-width:1000px){.lm-body{grid-template-columns:1fr;}.data-panel{border-radius:0 0 22px 22px;}
+@media(max-width:1000px){.data-panel{grid-template-columns:1fr;}
   .lessons-grid{grid-template-columns:repeat(2,1fr);}.dash-layout{grid-template-columns:1fr;}}
 @media(max-width:640px){.lessons-grid{grid-template-columns:1fr;}.decision-btns{flex-direction:column;}.pnl-reveal{grid-template-columns:1fr 1fr;}}
 
@@ -303,6 +303,33 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--sky-mid);border-radius:3px;}
+
+/* ── ASK AI MODAL ────────────────────────────────────────────── */
+.ai-chat-modal{position:fixed;bottom:2rem;right:2rem;width:420px;max-height:600px;
+  background:var(--white);border-radius:16px;box-shadow:0 8px 32px rgba(10,22,40,.2);
+  border:2px solid var(--border);display:none;flex-direction:column;z-index:600;}
+.ai-chat-modal.active{display:flex;}
+.ai-chat-header{padding:1rem 1.2rem;border-bottom:1px solid var(--border);
+  display:flex;justify-content:space-between;align-items:center;}
+.ai-chat-title{font-size:.95rem;font-weight:700;color:var(--text-dark);display:flex;align-items:center;gap:.5rem;}
+.ai-chat-close{background:var(--off-white);border:none;cursor:pointer;width:28px;height:28px;
+  border-radius:7px;font-size:.85rem;color:var(--text-muted);transition:background .15s;}
+.ai-chat-close:hover{background:var(--sky-mid);}
+.ai-chat-messages{flex:1;padding:1rem 1.2rem;overflow-y:auto;max-height:400px;display:flex;flex-direction:column;gap:.8rem;}
+.ai-chat-messages::-webkit-scrollbar{width:4px;}
+.ai-chat-messages::-webkit-scrollbar-thumb{background:var(--sky-mid);border-radius:2px;}
+.ai-chat-msg{padding:.75rem 1rem;border-radius:10px;font-size:.85rem;line-height:1.6;max-width:85%;}
+.ai-chat-msg-user{background:var(--blue-bright);color:#fff;align-self:flex-end;margin-left:auto;}
+.ai-chat-msg-ai{background:var(--off-white);color:var(--text-dark);align-self:flex-start;}
+.ai-chat-input-wrap{padding:1rem 1.2rem;border-top:1px solid var(--border);display:flex;gap:.6rem;}
+.ai-chat-input{flex:1;padding:.7rem .9rem;border:1.5px solid var(--border);border-radius:9px;
+  font-size:.85rem;font-family:'Sora',sans-serif;outline:none;transition:border .2s;}
+.ai-chat-input:focus{border-color:var(--blue-bright);}
+.ai-chat-send{padding:.7rem 1.2rem;border-radius:9px;background:var(--blue-bright);color:#fff;
+  border:none;font-size:.85rem;font-weight:700;cursor:pointer;transition:background .15s;
+  font-family:'Sora',sans-serif;}
+.ai-chat-send:hover{background:var(--blue);}
+.ai-chat-send:disabled{background:var(--sky-mid);color:var(--text-muted);cursor:default;}
 
 /* ── MODULE TABS ─────────────────────────────────────────────── */
 .module-tabs-wrap{margin-bottom:1.4rem;}
@@ -400,6 +427,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 .hint-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;
   padding:.55rem .9rem;background:linear-gradient(135deg,#fffde7,#fff8e1);
   border:1.5px solid #ffe082;border-radius:10px;margin-bottom:.75rem;flex-wrap:wrap;}
+.ask-ai-btn{display:flex;align-items:center;gap:.4rem;padding:.38rem .9rem;
+  border-radius:8px;border:2px solid var(--blue-bright);background:#e3f2fd;
+  color:var(--blue);font-size:.8rem;font-weight:700;cursor:pointer;
+  font-family:'Sora',sans-serif;transition:all .15s;}
+.ask-ai-btn:hover{background:#bbdefb;border-color:var(--blue);transform:translateY(-1px);}
 .hint-left{display:flex;align-items:center;gap:.8rem;}
 .hint-btn{display:flex;align-items:center;gap:.4rem;padding:.38rem .9rem;
   border-radius:8px;border:2px solid #f9a825;background:#fff8e1;
@@ -936,6 +968,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
               </span>
               <span id="hintCountLabel">3 hints remaining</span>
             </div>
+            <button class="ask-ai-btn" id="askAiBtn" onclick="openAiChat()" style="display:none;">
+              <span>🤖</span>
+              <span>Ask AI</span>
+            </button>
           </div>
           <div class="hint-pattern-badge" id="hintPatternBadge" style="display:none;"></div>
         </div>
@@ -1114,6 +1150,24 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
       </div>
       <div style="font-size:.68rem;color:var(--text-muted);margin-top:.5rem;text-align:center;">Powered by Kavon AI · Answers based on this specific trade's data</div>
     </div>
+  </div>
+</div>
+
+<!-- AI CHAT MODAL (for study mode) -->
+<div class="ai-chat-modal" id="aiChatModal">
+  <div class="ai-chat-header">
+    <div class="ai-chat-title">
+      <span>🤖</span>
+      <span>Ask AI Coach</span>
+    </div>
+    <button class="ai-chat-close" onclick="closeAiChat()">✕</button>
+  </div>
+  <div class="ai-chat-messages" id="aiChatMessages">
+    <div class="ai-chat-msg ai-chat-msg-ai">Hi! I'm here to help you analyze this trade. Ask me anything about the market data, technical indicators, or what signals to look for.</div>
+  </div>
+  <div class="ai-chat-input-wrap">
+    <input type="text" class="ai-chat-input" id="aiChatInput" placeholder="Ask a question..." onkeydown="if(event.key==='Enter')sendAiMessage()">
+    <button class="ai-chat-send" id="aiChatSend" onclick="sendAiMessage()">Send</button>
   </div>
 </div>
 
@@ -1934,6 +1988,9 @@ function openLesson(idx, mode) {
     if(replayBar) replayBar.style.display = 'none';
     if(liveSimBar) liveSimBar.style.display = 'flex';
     if(hintBar) hintBar.style.display = 'none';
+    // Hide Ask AI button in live mode
+    const askAiBtn = document.getElementById('askAiBtn');
+    if(askAiBtn) askAiBtn.style.display = 'none';
     STATE.replaySpeed = 4;
     // Show position size block
     const posBlock = document.querySelector('.pos-size-block');
@@ -1944,6 +2001,9 @@ function openLesson(idx, mode) {
     if(replayBar) replayBar.style.display = '';
     if(liveSimBar) liveSimBar.style.display = 'none';
     if(hintBar) hintBar.style.display = '';
+    // Show Ask AI button in study mode
+    const askAiBtn = document.getElementById('askAiBtn');
+    if(askAiBtn) askAiBtn.style.display = 'flex';
     // Hide position size block — no money in study mode
     const posBlock = document.querySelector('.pos-size-block');
     if(posBlock) posBlock.style.display = 'none';
@@ -3273,6 +3333,69 @@ function generateSmartAnswer(q, l) {
   return fallbacks[Math.floor(Math.random()*fallbacks.length)];
 }
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AI CHAT MODAL (for study mode)
+// ═══════════════════════════════════════════════════════════════════════════
+function openAiChat() {
+  const modal = document.getElementById('aiChatModal');
+  if(modal) modal.classList.add('active');
+}
+
+function closeAiChat() {
+  const modal = document.getElementById('aiChatModal');
+  if(modal) modal.classList.remove('active');
+}
+
+function sendAiMessage() {
+  const input = document.getElementById('aiChatInput');
+  const messagesContainer = document.getElementById('aiChatMessages');
+  const sendBtn = document.getElementById('aiChatSend');
+
+  if(!input || !messagesContainer) return;
+
+  const question = input.value.trim();
+  if(!question) return;
+
+  // Add user message
+  const userMsg = document.createElement('div');
+  userMsg.className = 'ai-chat-msg ai-chat-msg-user';
+  userMsg.textContent = question;
+  messagesContainer.appendChild(userMsg);
+
+  // Clear input and disable button
+  input.value = '';
+  if(sendBtn) sendBtn.disabled = true;
+
+  // Scroll to bottom
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+  // Generate AI response after a short delay
+  setTimeout(() => {
+    const lesson = STATE.currentLesson;
+    let aiResponse = '';
+
+    if(lesson) {
+      // Use the existing generateAIAnswer function
+      const decision = 'buy'; // Default for study mode context
+      aiResponse = generateAIAnswer(question, decision, lesson);
+    } else {
+      aiResponse = "I can help you analyze trades when you're viewing a lesson. Open a lesson to get started!";
+    }
+
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'ai-chat-msg ai-chat-msg-ai';
+    aiMsg.textContent = aiResponse;
+    messagesContainer.appendChild(aiMsg);
+
+    // Scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+    // Re-enable button
+    if(sendBtn) sendBtn.disabled = false;
+    input.focus();
+  }, 800);
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // INIT
