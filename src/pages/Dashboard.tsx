@@ -18,7 +18,7 @@ export default function Dashboard() {
               Access your interactive trading lessons and improve your skills
             </p>
             <a
-              href="/kavon.html"
+              href="/trading.html"
               className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
               Start Learning
