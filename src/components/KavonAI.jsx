@@ -16,12 +16,23 @@ ${newsBlock}
 `.trim();
 
   if (mode === 'pre') {
+    const difficulty = ctx.difficulty ?? 'intermediate';
+    let difficultyInstructions = '';
+
+    if (difficulty === 'beginner') {
+      difficultyInstructions = 'Respond like you\'re explaining to someone who has never traded before — no jargon, no terms like RSI/MACD/greed score, use everyday analogies. Max 2 sentences plus one simple question.';
+    } else if (difficulty === 'intermediate') {
+      difficultyInstructions = 'You can use basic terms like "bullish", "analyst ratings", "momentum" but keep it conversational. 3 sentences max.';
+    } else if (difficulty === 'advanced') {
+      difficultyInstructions = 'Use full trading language, RSI, MACD, sentiment scores, risk/reward. 3-4 sentences.';
+    }
+
     return `You are Kavon AI, a trading education coach inside the Kavon platform.
 
 ${sharedContext}
 
 YOUR RULES — PRE-DECISION MODE:
-Keep all responses to 2-3 sentences maximum. Be conversational and simple — like a knowledgeable friend, not a professor. End every response with one short rhetorical question that makes the user think. Never use bullet points, bold text, or headers. Speak plainly.`;
+${difficultyInstructions} Be conversational and simple — like a knowledgeable friend, not a professor. End every response with one short rhetorical question that makes the user think. Never use bullet points, bold text, or headers. Speak plainly.`;
   }
 
   const decisionNote = ctx.userDecision
