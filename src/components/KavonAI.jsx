@@ -97,6 +97,9 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
     setLoading(true);
     try {
       const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
+      console.log('[KavonAI] API Key loaded:', apiKey ? `${apiKey.substring(0, 15)}...` : 'MISSING');
+      console.log('[KavonAI] Sending request to Anthropic API...');
+
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -112,10 +115,19 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
           messages: nextHistory,
         }),
       });
+
+      console.log('[KavonAI] Response status:', res.status);
       const data = await res.json();
-      const reply = data.content?.find(b => b.type === 'text')?.text ?? 'No response.';
-      setHistory(h => [...h, { role: 'assistant', content: reply }]);
+      console.log('[KavonAI] Response data:', data);
+
+      if (data.error) {
+        setHistory(h => [...h, { role: 'assistant', content: `API Error: ${data.error.message || JSON.stringify(data.error)}` }]);
+      } else {
+        const reply = data.content?.find(b => b.type === 'text')?.text ?? 'No response.';
+        setHistory(h => [...h, { role: 'assistant', content: reply }]);
+      }
     } catch (err) {
+      console.error('[KavonAI] Error:', err);
       setHistory(h => [...h, { role: 'assistant', content: `Error: ${err.message}` }]);
     } finally {
       setLoading(false);
