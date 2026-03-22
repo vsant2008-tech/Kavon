@@ -3148,6 +3148,37 @@ function sendQAText(text) {
   }, 300);
 }
 
+function formatAIResponse(text) {
+  if(!text) return '';
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  let chunks = text.split(/(?=\(\d+\))/);
+  const splitAtQuestions = str => {
+    const sentences = str.split(/(?<=[.!?])\s+(?=[A-Z"])/);
+    const groups = [];
+    let current = [];
+    sentences.forEach(s => {
+      current.push(s.trim());
+      if(s.trim().endsWith('?') && current.length > 1) {
+        const q = current.pop();
+        if(current.length) groups.push(current.join(' '));
+        groups.push(q);
+        current = [];
+      }
+    });
+    if(current.length) groups.push(current.join(' '));
+    return groups;
+  };
+  const paragraphs = [];
+  chunks.forEach(chunk => {
+    chunk = chunk.trim();
+    if(!chunk) return;
+    splitAtQuestions(chunk).forEach(p => { p = p.trim(); if(p) paragraphs.push(p); });
+  });
+  return paragraphs.filter(p => p.length > 0)
+    .map((p, i) => `<p class="ai-p${i === 0 ? ' ai-p-first' : ''}">${esc(p)}</p>`)
+    .join('');
+}
+
 function generateSmartAnswer(q, l) {
   const correct = STATE.lastCorrect;
   const chose = STATE.lastChoice;
