@@ -179,44 +179,45 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 .chart-progress-fill{height:100%;background:var(--blue-bright);border-radius:3px;transition:width .1s linear;}
 
 /* data side panel */
-.data-panel{padding:2rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;background:var(--off-white);}
+.data-panel{padding:2rem;display:flex;flex-direction:column;gap:2rem;background:var(--off-white);}
+.data-panel-section{background:var(--white);border-radius:12px;padding:1.2rem 1.4rem;border:1px solid var(--border);}
 
-.dp-section-title{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue);margin-bottom:.6rem;}
-.indicator-grid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;}
-.ind-box{background:var(--white);border-radius:9px;padding:.65rem .8rem;border:1px solid var(--border);}
-.ind-label{font-size:.62rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
-.ind-value{font-family:'DM Mono',monospace;font-size:.92rem;font-weight:600;color:var(--text-dark);margin-top:.18rem;}
+.dp-section-title{font-size:.78rem;font-weight:700;color:var(--text-dark);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem;}
+.indicator-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.7rem;}
+.ind-box{background:var(--off-white);border-radius:9px;padding:.75rem .9rem;border:1px solid var(--border);}
+.ind-label{font-size:.65rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem;}
+.ind-value{font-family:'DM Mono',monospace;font-size:1rem;font-weight:600;color:var(--text-dark);}
 .ind-value.up{color:var(--green);}
 .ind-value.down{color:var(--red);}
 .ind-value.neutral{color:var(--gold);}
 
 /* sentiment bar */
-.sentiment-track{height:8px;border-radius:8px;background:linear-gradient(90deg,var(--red) 0%,#ff9800 30%,var(--gold) 50%,#8bc34a 70%,var(--green) 100%);
-  position:relative;margin:.5rem 0;}
-.sentiment-needle{position:absolute;top:-3px;width:14px;height:14px;border-radius:50%;
-  background:#fff;border:2px solid var(--navy);transform:translateX(-50%);transition:left .6s ease;}
-.sentiment-labels{display:flex;justify-content:space-between;font-size:.6rem;color:var(--text-muted);font-weight:600;}
+.sentiment-track{height:10px;border-radius:10px;background:linear-gradient(90deg,var(--red) 0%,#ff9800 30%,var(--gold) 50%,#8bc34a 70%,var(--green) 100%);
+  position:relative;margin:.8rem 0;}
+.sentiment-needle{position:absolute;top:-4px;width:18px;height:18px;border-radius:50%;
+  background:#fff;border:3px solid var(--navy);transform:translateX(-50%);transition:left .6s ease;box-shadow:0 2px 8px rgba(0,0,0,.15);}
+.sentiment-labels{display:flex;justify-content:space-between;font-size:.65rem;color:var(--text-muted);font-weight:600;margin-top:.6rem;}
 
 /* news feed */
-.news-list{display:flex;flex-direction:column;gap:.5rem;}
-.news-item{background:var(--white);border-radius:9px;padding:.7rem;border:1px solid var(--border);}
-.news-source{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--blue);margin-bottom:.2rem;}
-.news-headline{font-size:.75rem;line-height:1.5;color:var(--text-dark);font-weight:500;}
-.news-sentiment{display:inline-flex;align-items:center;gap:.3rem;font-size:.62rem;font-weight:700;
-  padding:.15rem .45rem;border-radius:4px;margin-top:.3rem;}
+.news-list{display:flex;flex-direction:column;gap:.7rem;}
+.news-item{background:var(--off-white);border-radius:10px;padding:.9rem 1rem;border:1px solid var(--border);}
+.news-source{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--blue);margin-bottom:.35rem;}
+.news-headline{font-size:.82rem;line-height:1.5;color:var(--text-dark);font-weight:500;}
+.news-sentiment{display:inline-flex;align-items:center;gap:.3rem;font-size:.65rem;font-weight:700;
+  padding:.2rem .5rem;border-radius:5px;margin-top:.4rem;}
 .ns-bull{background:var(--green-light);color:#2e7d32;}
 .ns-bear{background:var(--red-light);color:#c62828;}
 .ns-neu{background:var(--sky);color:var(--blue);}
 
 /* analyst ratings */
-.ratings-bar{display:flex;border-radius:8px;overflow:hidden;height:24px;margin:.5rem 0;}
+.ratings-bar{display:flex;border-radius:10px;overflow:hidden;height:32px;margin:.8rem 0;}
 .rb-buy{background:var(--green);display:flex;align-items:center;justify-content:center;
-  font-size:.68rem;font-weight:700;color:#fff;}
+  font-size:.75rem;font-weight:700;color:#fff;}
 .rb-hold{background:var(--gold);display:flex;align-items:center;justify-content:center;
-  font-size:.68rem;font-weight:700;color:#333;}
+  font-size:.75rem;font-weight:700;color:#333;}
 .rb-sell{background:var(--red);display:flex;align-items:center;justify-content:center;
-  font-size:.68rem;font-weight:700;color:#fff;}
-.ratings-labels{display:flex;justify-content:space-between;font-size:.65rem;color:var(--text-muted);}
+  font-size:.75rem;font-weight:700;color:#fff;}
+.ratings-labels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--text-muted);font-weight:600;margin-top:.5rem;}
 
 /* decision zone */
 .decision-zone{padding:1.5rem 2rem;border-top:1px solid var(--border);}
@@ -988,8 +989,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
       <!-- Data Panel -->
       <div class="data-panel">
         <!-- Price data -->
-        <div>
-          <div class="dp-section-title">📊 Market Data</div>
+        <div class="data-panel-section">
+          <div class="dp-section-title"><span>📊</span><span>Market Data</span></div>
           <div class="indicator-grid">
             <div class="ind-box"><div class="ind-label">Open</div><div class="ind-value" id="dpOpen">—</div></div>
             <div class="ind-box"><div class="ind-label">Volume</div><div class="ind-value" id="dpVolume">—</div></div>
@@ -1001,8 +1002,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
         </div>
 
         <!-- Technical indicators -->
-        <div>
-          <div class="dp-section-title">📉 Technical Indicators</div>
+        <div class="data-panel-section">
+          <div class="dp-section-title"><span>📉</span><span>Technical Indicators</span></div>
           <div class="indicator-grid">
             <div class="ind-box"><div class="ind-label">RSI (14)</div><div class="ind-value" id="dpRSI">—</div></div>
             <div class="ind-box"><div class="ind-label">MACD</div><div class="ind-value" id="dpMACD">—</div></div>
@@ -1012,18 +1013,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
         </div>
 
         <!-- Sentiment -->
-        <div>
-          <div class="dp-section-title">🧠 Investor Sentiment</div>
+        <div class="data-panel-section">
+          <div class="dp-section-title"><span>🧠</span><span>Investor Sentiment</span></div>
           <div class="sentiment-track">
             <div class="sentiment-needle" id="sentimentNeedle" style="left:50%"></div>
           </div>
           <div class="sentiment-labels"><span>Extreme Fear</span><span>Neutral</span><span>Extreme Greed</span></div>
-          <div style="text-align:center;font-size:.75rem;font-weight:700;margin-top:.4rem;" id="sentimentLabel">—</div>
+          <div style="text-align:center;font-size:.8rem;font-weight:700;margin-top:.5rem;" id="sentimentLabel">—</div>
         </div>
 
         <!-- Analyst ratings -->
-        <div>
-          <div class="dp-section-title">🏦 Analyst Ratings</div>
+        <div class="data-panel-section">
+          <div class="dp-section-title"><span>🏦</span><span>Analyst Ratings</span></div>
           <div class="ratings-bar" id="ratingsBar">
             <div class="rb-buy" id="rBuy" style="width:0%">Buy</div>
             <div class="rb-hold" id="rHold" style="width:0%">Hold</div>
@@ -1033,8 +1034,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
         </div>
 
         <!-- News -->
-        <div>
-          <div class="dp-section-title">📰 News & Catalysts</div>
+        <div class="data-panel-section">
+          <div class="dp-section-title"><span>📰</span><span>News & Catalysts</span></div>
           <div class="news-list" id="dpNewsList"></div>
         </div>
       </div>
