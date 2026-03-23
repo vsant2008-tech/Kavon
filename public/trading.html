@@ -3306,8 +3306,275 @@ function generateSmartAnswer(q, l) {
 
 
 // ═══════════════════════════════════════════════════════════════════════════
-// KAVON AI (React Component Integration)
+// KAVON AI (Vanilla JavaScript Implementation)
 // ═══════════════════════════════════════════════════════════════════════════
+const KavonAI = {
+  currentContext: null,
+  currentMode: 'pre',
+  history: [],
+  loading: false,
+  started: false,
+
+  buildSystemPrompt(ctx, mode) {
+    const newsBlock = (ctx.news ?? []).map((n, i) => `  ${i + 1}. ${n}`).join('\n') || '  No major news at this time.';
+    const sharedContext = `
+SCENARIO CONTEXT — THIS IS YOUR ENTIRE KNOWLEDGE BOUNDARY:
+- Stock: ${ctx.ticker} (${ctx.companyName ?? ctx.ticker})
+- Scenario date/time: ${ctx.date} at ${ctx.cutoffTime} ET
+- Investor sentiment: ${ctx.sentiment?.label ?? 'Neutral'} (${ctx.sentiment?.score ?? 50}/100 greed)
+- News & catalysts known at cutoff:
+${newsBlock}
+- Sector / market conditions: ${ctx.sector ?? 'General market'}
+- Technical: RSI ${ctx.rsi ?? '—'}, MACD ${ctx.macd ?? '—'}, 50-Day MA ${ctx.ma50 ?? '—'}
+- Analyst ratings: ${ctx.analystBuy ?? 0} Buy / ${ctx.analystHold ?? 0} Hold / ${ctx.analystSell ?? 0} Sell
+- Volume: ${ctx.volume ?? 'Not specified'}
+`.trim();
+
+    if (mode === 'pre') {
+      const difficulty = ctx.difficulty ?? 'intermediate';
+      let difficultyInstructions = '';
+
+      if (difficulty === 'beginner') {
+        difficultyInstructions = 'Respond like you\'re explaining to someone who has never traded before — no jargon, no terms like RSI/MACD/greed score, use everyday analogies. Max 2 sentences plus one simple question.';
+      } else if (difficulty === 'intermediate') {
+        difficultyInstructions = 'You can use basic terms like "bullish", "analyst ratings", "momentum" but keep it conversational. 3 sentences max.';
+      } else if (difficulty === 'advanced') {
+        difficultyInstructions = 'Use full trading language, RSI, MACD, sentiment scores, risk/reward. 3-4 sentences.';
+      }
+
+      return `You are Kavon AI, a trading education coach inside the Kavon platform.
+
+${sharedContext}
+
+YOUR RULES — PRE-DECISION MODE:
+${difficultyInstructions} Be conversational and simple — like a knowledgeable friend, not a professor. End every response with one short rhetorical question that makes the user think. Never use bullet points, bold text, or headers. Speak plainly.`;
+    }
+
+    const decisionNote = ctx.userDecision
+      ? `\nUser's decision: ${ctx.userDecision.action} · $${ctx.userDecision.amount} position`
+      : '';
+
+    return `You are Kavon AI, a trading education coach inside the Kavon platform.
+
+${sharedContext}${decisionNote}
+
+YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
+1. The user has made their decision. Discuss what the signals meant analytically.
+2. Do NOT reveal specific price outcomes — the lesson handles that.
+3. Discuss what each indicator was saying and what the risk/reward looked like.
+4. ${mode === 'learn' ? 'Learn Mode: be thorough. Explain concepts fully, define terms, teach the why.' : 'Review Mode: focus on decision quality — did the signals support the call?'}
+5. If asked something unrelated, redirect back to the ${ctx.ticker} scenario.
+6. Reference actual numbers from context. Never speak in generalities when you have real data.
+7. Tone: ${mode === 'learn' ? 'patient educator unpacking a real case study' : 'analytical peer reviewing a trade together'}.`;
+  },
+
+  getChips(ctx, mode) {
+    const t = ctx.ticker ?? 'this stock';
+    if (mode === 'pre') return [
+      `What is the sentiment telling us about ${t} right now?`,
+      `Which news headline matters most here?`,
+      `What do the analyst ratings suggest?`,
+      `What signals should I focus on before deciding?`,
+    ];
+    if (mode === 'learn') return [
+      `Explain what the RSI reading means for ${t}`,
+      `How do I interpret the analyst rating split?`,
+      `What does investor sentiment score actually measure?`,
+      `Walk me through how to read this setup`,
+    ];
+    return [
+      `What were the strongest signals in this scenario?`,
+      `How significant were those news catalysts?`,
+      `What would an experienced trader have focused on?`,
+      `Was the risk/reward favorable here?`,
+    ];
+  },
+
+  async sendMessage(text) {
+    if (!text.trim() || this.loading) return;
+
+    this.started = true;
+    this.history.push({ role: 'user', content: text });
+    this.loading = true;
+    this.render();
+
+    try {
+      const apiKey = 'sk-ant-api03-sJp3c_HJPbJFO0SV8pUa-aB0QSvRXSyNOe6KwfH53u5bwlZb1xcTqzQnmb7v_aoBECsZMpRNQ4aJ1Z-8tP5lEg-XTWQfgAA';
+
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 600,
+          system: this.buildSystemPrompt(this.currentContext, this.currentMode),
+          messages: this.history,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (data.error) {
+        this.history.push({ role: 'assistant', content: `API Error: ${data.error.message || JSON.stringify(data.error)}` });
+      } else {
+        const reply = data.content?.find(b => b.type === 'text')?.text ?? 'No response.';
+        this.history.push({ role: 'assistant', content: reply });
+      }
+    } catch (err) {
+      this.history.push({ role: 'assistant', content: `Error: ${err.message}` });
+    } finally {
+      this.loading = false;
+      this.render();
+    }
+  },
+
+  render() {
+    const root = document.getElementById('kavon-ai-root');
+    if (!root) return;
+
+    const chips = this.getChips(this.currentContext, this.currentMode);
+    const modeLabel = this.currentMode === 'pre' ? 'PRE-DECISION' : this.currentMode === 'learn' ? 'LEARN MODE' : 'POST-DECISION';
+    const isPreMode = this.currentMode === 'pre';
+
+    root.innerHTML = `
+      <div id="kavon-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;">
+        <div style="width:460px;max-width:100%;height:640px;background:#0e1318;border:1px solid #1e2d3d;border-radius:20px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.8);">
+
+          <div style="background:#131920;border-bottom:1px solid #1e2d3d;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:30px;height:30px;background:linear-gradient(135deg,#00d4ff,#0077ff);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#080b10;flex-shrink:0;">K</div>
+              <div>
+                <div style="font-weight:700;font-size:14px;color:#dde6f0;letter-spacing:0.04em;">Kavon AI</div>
+                <div style="font-size:11px;color:#7a9ab8;margin-top:1px;font-family:monospace;">${this.currentContext?.ticker} · ${this.currentContext?.date} · ${this.currentContext?.cutoffTime}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:10px;padding:3px 8px;border-radius:4px;font-family:monospace;letter-spacing:0.08em;font-weight:500;background:${isPreMode ? 'rgba(255,209,102,0.12)' : 'rgba(0,229,160,0.1)'};color:${isPreMode ? '#ffd166' : '#00e5a0'};border:1px solid ${isPreMode ? 'rgba(255,209,102,0.25)' : 'rgba(0,229,160,0.2)'};">
+                ${modeLabel}
+              </span>
+              <button onclick="KavonAI.close()" style="background:none;border:none;color:#3d5470;font-size:16px;cursor:pointer;padding:2px 6px;">✕</button>
+            </div>
+          </div>
+
+          <div id="kavon-messages" style="flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px;">
+            ${!this.started ? `
+              <div style="display:flex;flex-direction:column;gap:12px;">
+                <div style="font-weight:700;font-size:15px;color:#dde6f0;line-height:1.4;">
+                  ${this.currentMode === 'pre' ? `Analyze ${this.currentContext?.ticker} at the cutoff` : this.currentMode === 'learn' ? `Learn from this ${this.currentContext?.ticker} scenario` : `Review your ${this.currentContext?.ticker} decision`}
+                </div>
+                <div style="font-size:13px;color:#7a9ab8;line-height:1.6;">
+                  ${this.currentMode === 'pre'
+                    ? `Ask me about what was visible at ${this.currentContext?.cutoffTime} on ${this.currentContext?.date}. I won't reveal anything after the cutoff.`
+                    : this.currentMode === 'learn'
+                    ? `Ask me anything — I'll explain the signals, concepts, and reasoning in full depth.`
+                    : `Now that you've committed, let's break down what the data was saying.`}
+                </div>
+                <div style="height:1px;background:#1e2d3d;"></div>
+                <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#3d5470;font-family:monospace;">Suggested questions</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                  ${chips.map(c => `<button onclick="KavonAI.sendMessage('${c.replace(/'/g, "\\'")}')" style="font-size:12px;padding:6px 11px;background:#1a2230;border:1px solid #243345;border-radius:6px;color:#7a9ab8;cursor:pointer;text-align:left;line-height:1.3;">${c}</button>`).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            ${this.history.map(m => `
+              <div style="display:flex;flex-direction:column;max-width:90%;${m.role === 'user' ? 'align-self:flex-end;align-items:flex-end;' : 'align-self:flex-start;align-items:flex-start;'}">
+                <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#3d5470;margin-bottom:4px;padding:0 3px;font-family:monospace;">${m.role === 'user' ? 'You' : 'Kavon AI'}</div>
+                <div style="padding:10px 13px;border-radius:10px;font-size:13.5px;line-height:1.65;color:#dde6f0;word-break:break-word;white-space:pre-wrap;${m.role === 'user' ? 'background:#0f2340;border:1px solid #1a3a5e;border-bottom-right-radius:3px;color:#c8dff5;' : 'background:#131920;border:1px solid #1e2d3d;border-bottom-left-radius:3px;'}">
+                  ${m.content}
+                </div>
+              </div>
+            `).join('')}
+
+            ${this.loading ? `
+              <div style="display:flex;flex-direction:column;max-width:90%;align-self:flex-start;align-items:flex-start;">
+                <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#3d5470;margin-bottom:4px;padding:0 3px;font-family:monospace;">Kavon AI</div>
+                <div style="background:#131920;border:1px solid #1e2d3d;border-bottom-left-radius:3px;padding:10px 13px;border-radius:10px;display:flex;gap:5px;align-items:center;">
+                  <span style="display:inline-block;width:6px;height:6px;background:#3d5470;border-radius:50%;animation:blink 1.2s ease-in-out infinite;"></span>
+                  <span style="display:inline-block;width:6px;height:6px;background:#3d5470;border-radius:50%;animation:blink 1.2s ease-in-out infinite;animation-delay:150ms;"></span>
+                  <span style="display:inline-block;width:6px;height:6px;background:#3d5470;border-radius:50%;animation:blink 1.2s ease-in-out infinite;animation-delay:300ms;"></span>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+
+          <div style="border-top:1px solid #1e2d3d;padding:12px 14px 14px;background:#0e1318;flex-shrink:0;">
+            <div style="display:flex;gap:8px;align-items:flex-end;background:#131920;border:1px solid #243345;border-radius:10px;padding:9px 10px;">
+              <textarea id="kavon-input" placeholder="Ask about ${this.currentContext?.ticker ?? 'this stock'} at the cutoff…" rows="1" style="flex:1;background:transparent;border:none;outline:none;font-size:13px;color:#dde6f0;resize:none;max-height:100px;min-height:20px;line-height:1.5;" ${this.loading ? 'disabled' : ''}></textarea>
+              <button id="kavon-send" onclick="KavonAI.handleSend()" ${this.loading ? 'disabled' : ''} style="width:30px;height:30px;background:linear-gradient(135deg,#00d4ff,#0077ff);border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="#080b10">
+                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+              </button>
+            </div>
+            <div style="margin-top:7px;font-size:9px;color:#3d5470;font-family:monospace;letter-spacing:0.04em;">
+              Context-locked · ${this.currentContext?.date} ${this.currentContext?.cutoffTime}
+              ${this.currentMode === 'pre' ? '<span style="color:rgba(255,77,109,0.5);"> · future data off-limits</span>' : ''}
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <style>
+        @keyframes blink {
+          0%, 100% { opacity: 0.2; }
+          50% { opacity: 1; }
+        }
+      </style>
+    `;
+
+    const messagesDiv = document.getElementById('kavon-messages');
+    if (messagesDiv) {
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+
+    const overlay = document.getElementById('kavon-overlay');
+    if (overlay) {
+      overlay.onclick = (e) => {
+        if (e.target === overlay) this.close();
+      };
+    }
+
+    const input = document.getElementById('kavon-input');
+    if (input) {
+      input.onkeydown = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          this.handleSend();
+        }
+      };
+    }
+  },
+
+  handleSend() {
+    const input = document.getElementById('kavon-input');
+    if (input && input.value.trim()) {
+      this.sendMessage(input.value);
+      input.value = '';
+    }
+  },
+
+  open(context, mode = 'pre') {
+    this.currentContext = context;
+    this.currentMode = mode;
+    this.history = [];
+    this.loading = false;
+    this.started = false;
+    this.render();
+  },
+
+  close() {
+    const root = document.getElementById('kavon-ai-root');
+    if (root) root.innerHTML = '';
+  }
+};
+
 function openKavonAIModal() {
   const lesson = STATE.currentLesson;
   if (!lesson) return;
@@ -3339,9 +3606,7 @@ function openKavonAIModal() {
     } : null
   };
 
-  if (window.openKavonAI) {
-    window.openKavonAI(context, mode);
-  }
+  KavonAI.open(context, mode);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3413,31 +3678,8 @@ window.addEventListener('DOMContentLoaded', ()=>{
   </div>
 </div>
 
-<!-- React Mount Point for KavonAI Component -->
+<!-- Kavon AI Mount Point -->
 <div id="kavon-ai-root"></div>
-
-<script type="module">
-  import React from 'react';
-  import ReactDOM from 'react-dom/client';
-  import KavonAI from '../src/components/KavonAI.jsx';
-
-  // Global function to open KavonAI with context
-  window.openKavonAI = function(context, mode = 'pre') {
-    const root = document.getElementById('kavon-ai-root');
-    if (!root) return;
-
-    const reactRoot = ReactDOM.createRoot(root);
-    reactRoot.render(
-      React.createElement(KavonAI, {
-        context: context,
-        mode: mode,
-        onClose: () => {
-          reactRoot.unmount();
-        }
-      })
-    );
-  };
-</script>
 
 </body>
 </html>
