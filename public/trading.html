@@ -3399,7 +3399,14 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
     this.render();
 
     try {
-      const apiKey = 'sk-ant-api03-sJp3c_HJPbJFO0SV8pUa-aB0QSvRXSyNOe6KwfH53u5bwlZb1xcTqzQnmb7v_aoBECsZMpRNQ4aJ1Z-8tP5lEg-XTWQfgAA';
+      const apiKey = window.KAVON_CONFIG?.anthropicApiKey;
+
+      if (!apiKey) {
+        this.history.push({ role: 'assistant', content: 'Configuration Error: Anthropic API key not found. Please check your environment setup.' });
+        this.loading = false;
+        this.render();
+        return;
+      }
 
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -3680,6 +3687,11 @@ window.addEventListener('DOMContentLoaded', ()=>{
 
 <!-- Kavon AI Mount Point -->
 <div id="kavon-ai-root"></div>
+
+<script type="module">
+  import { config } from '../src/config.js';
+  window.KAVON_CONFIG = config;
+</script>
 
 </body>
 </html>
