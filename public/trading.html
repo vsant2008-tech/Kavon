@@ -3440,6 +3440,22 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
     }
   },
 
+  formatResponseText(text) {
+    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    let paragraphs = [];
+    let currentParagraph = [];
+
+    sentences.forEach((sentence, idx) => {
+      currentParagraph.push(sentence.trim());
+      if ((idx + 1) % 2 === 0 || idx === sentences.length - 1) {
+        paragraphs.push(currentParagraph.join(' '));
+        currentParagraph = [];
+      }
+    });
+
+    return paragraphs.map(p => `<p style="margin-bottom:12px;text-align:left;">${p}</p>`).join('');
+  },
+
   render() {
     const root = document.getElementById('kavon-ai-root');
     if (!root) return;
@@ -3492,8 +3508,8 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
             ${this.history.map(m => `
               <div style="display:flex;flex-direction:column;max-width:90%;${m.role === 'user' ? 'align-self:flex-end;align-items:flex-end;' : 'align-self:flex-start;align-items:flex-start;'}">
                 <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#3d5470;margin-bottom:4px;padding:0 3px;font-family:monospace;">${m.role === 'user' ? 'You' : 'Kavon AI'}</div>
-                <div style="padding:10px 13px;border-radius:10px;font-size:13.5px;line-height:1.65;color:#dde6f0;word-break:break-word;white-space:pre-wrap;${m.role === 'user' ? 'background:#0f2340;border:1px solid #1a3a5e;border-bottom-right-radius:3px;color:#c8dff5;' : 'background:#131920;border:1px solid #1e2d3d;border-bottom-left-radius:3px;'}">
-                  ${m.content}
+                <div style="padding:${m.role === 'user' ? '10px 13px' : '14px 16px'};border-radius:10px;font-size:13.5px;line-height:1.75;color:#dde6f0;word-break:break-word;${m.role === 'user' ? 'background:#0f2340;border:1px solid #1a3a5e;border-bottom-right-radius:3px;color:#c8dff5;white-space:pre-wrap;' : 'background:#131920;border:1px solid #1e2d3d;border-bottom-left-radius:3px;'}">
+                  ${m.role === 'user' ? m.content : this.formatResponseText(m.content)}
                 </div>
               </div>
             `).join('')}
