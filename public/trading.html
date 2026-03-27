@@ -3275,6 +3275,14 @@ const KavonAI = {
   history: [],
   loading: false,
   started: false,
+  validationMode: false,
+  validationState: {
+    correctAnswers: 0,
+    requiredCorrect: 1,
+    canClose: false,
+    isCorrect: false,
+    userChoice: null
+  },
 
   buildSystemPrompt(ctx, mode) {
     const newsBlock = (ctx.news ?? []).map((n, i) => `  ${i + 1}. ${n}`).join('\n') || '  No major news at this time.';
@@ -3309,6 +3317,81 @@ ${sharedContext}
 
 YOUR RULES — PRE-DECISION MODE:
 ${difficultyInstructions} Be conversational and simple — like a knowledgeable friend, not a professor. End every response with one short rhetorical question that makes the user think. Never use bullet points, bold text, or headers. Speak plainly.`;
+    }
+
+    // VALIDATION MODE - Learning through questions
+    if (mode === 'validation') {
+      const difficulty = ctx.difficulty ?? 'intermediate';
+      const wasCorrect = ctx.userDecision?.wasCorrect ?? false;
+      const userChoice = ctx.userDecision?.action ?? 'unknown';
+      const correctAnswer = ctx.correctAnswer ?? 'unknown';
+      const actualMove = ctx.actualMove ?? 'unknown';
+
+      let difficultyGuidance = '';
+      if (difficulty === 'beginner') {
+        difficultyGuidance = 'Use ZERO jargon. Ask simple yes/no or multiple choice questions. Maximum 2 sentences before each question. Talk like texting a friend.';
+      } else if (difficulty === 'intermediate') {
+        difficultyGuidance = 'Use basic trading terms. Ask short-answer style questions. 2-3 sentences before each question.';
+      } else {
+        difficultyGuidance = 'Use full trading terminology. Ask "what would you do if X changed?" style analytical questions. 3-4 sentences before each question.';
+      }
+
+      const decisionNote = `\nUser chose: ${userChoice.toUpperCase()}
+Correct answer was: ${correctAnswer.toUpperCase()}
+User was: ${wasCorrect ? 'CORRECT' : 'WRONG'}
+Actual outcome: ${actualMove}`;
+
+      if (wasCorrect) {
+        return `You are Kavon AI, a Socratic trading coach testing understanding.
+
+${sharedContext}${decisionNote}
+
+YOUR MISSION: The user got it RIGHT, but you need to verify they understood WHY.
+
+CONVERSATION FLOW:
+1. FIRST MESSAGE: Say something like "Nice call — but let's make sure it was for the right reasons." Then ask ONE focused question about WHY ${correctAnswer} was correct. ${difficultyGuidance}
+
+2. EVALUATE THEIR ANSWER:
+   - If they demonstrate understanding of the KEY reason (${difficulty === 'beginner' ? 'they saw prices going up/down or positive/negative news' : difficulty === 'intermediate' ? 'they identified the main catalyst or technical signal' : 'they understood the risk/reward, multiple confirming signals, or institutional positioning'}), respond with brief praise and signal completion with the exact phrase: "LEARNING_COMPLETE"
+   - If they give a wrong or superficial answer, explain the real reason briefly and ask ONE follow-up question to confirm understanding.
+
+3. SECOND ATTEMPT: If they answer incorrectly again, explain it more directly and ask a simpler confirming question. After this, accept any reasonable attempt and say "LEARNING_COMPLETE"
+
+CRITICAL RULES:
+- Ask ONE question at a time
+- Keep explanations BRIEF (1-2 sentences max)
+- When they demonstrate understanding, END with the exact text "LEARNING_COMPLETE"
+- ${difficultyGuidance}
+- Never reveal the actual price outcome
+- Stay focused ONLY on the decision quality and reasoning`;
+      } else {
+        return `You are Kavon AI, a Socratic trading coach helping users learn from mistakes.
+
+${sharedContext}${decisionNote}
+
+YOUR MISSION: The user got it WRONG. Help them understand what they missed through guided questions.
+
+CONVERSATION FLOW:
+1. FIRST MESSAGE: Say "Let's figure out what happened here." Then ask: "Did you make your decision because of [A], [B], or [C]?" where A/B/C are the 3 most likely reasons someone would make this mistake given the context. ${difficultyGuidance}
+
+2. EVALUATE THEIR ANSWER:
+   - Acknowledge their reasoning, then explain what they MISSED about the actual key signal
+   - Ask ONE follow-up question to confirm they now understand the signal they overlooked
+
+3. CHECK UNDERSTANDING:
+   - If they answer correctly, briefly reinforce the lesson and say "LEARNING_COMPLETE"
+   - If still confused, explain again from a different angle and ask a simpler yes/no question
+
+4. FINAL ATTEMPT: After 2 rounds, accept any reasonable understanding and say "LEARNING_COMPLETE"
+
+CRITICAL RULES:
+- Ask ONE question at a time
+- Keep explanations BRIEF (2-3 sentences max)
+- When they demonstrate understanding, END with "LEARNING_COMPLETE"
+- ${difficultyGuidance}
+- Be encouraging but honest about mistakes
+- Focus on the ONE key thing they missed, not everything`;
+      }
     }
 
     const decisionNote = ctx.userDecision
@@ -3376,11 +3459,14 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
     ];
   },
 
-  async sendMessage(text) {
+  async sendMessage(text, isInitial = false) {
     if (!text.trim() || this.loading) return;
 
-    this.started = true;
-    this.history.push({ role: 'user', content: text });
+    if (!isInitial) {
+      this.started = true;
+      this.history.push({ role: 'user', content: text });
+    }
+
     this.loading = true;
     this.render();
 
@@ -3417,6 +3503,11 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
       } else {
         const reply = data.content?.find(b => b.type === 'text')?.text ?? 'No response.';
         this.history.push({ role: 'assistant', content: reply });
+
+        // Check for learning completion in validation mode
+        if (this.validationMode && reply.includes('LEARNING_COMPLETE')) {
+          this.validationState.canClose = true;
+        }
       }
     } catch (err) {
       this.history.push({ role: 'assistant', content: `Error: ${err.message}` });
@@ -3446,12 +3537,13 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
     const root = document.getElementById('kavon-ai-root');
     if (!root) return;
 
-    const chips = this.getChips(this.currentContext, this.currentMode);
-    const modeLabel = this.currentMode === 'pre' ? 'PRE-DECISION' : this.currentMode === 'learn' ? 'LEARN MODE' : 'POST-DECISION';
+    const chips = this.validationMode ? [] : this.getChips(this.currentContext, this.currentMode);
+    const modeLabel = this.validationMode ? 'LEARNING CHECK' : this.currentMode === 'pre' ? 'PRE-DECISION' : this.currentMode === 'learn' ? 'LEARN MODE' : 'POST-DECISION';
     const isPreMode = this.currentMode === 'pre';
+    const canClose = !this.validationMode || this.validationState.canClose;
 
     root.innerHTML = `
-      <div id="kavon-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;">
+      <div id="kavon-overlay" style="position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:9999;padding:16px;" ${!canClose ? 'onclick="event.stopPropagation()"' : ''}>
         <div style="width:460px;max-width:100%;height:640px;background:#0e1318;border:1px solid #1e2d3d;border-radius:20px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.8);">
 
           <div style="background:#131920;border-bottom:1px solid #1e2d3d;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
@@ -3463,10 +3555,10 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
-              <span style="font-size:10px;padding:3px 8px;border-radius:4px;font-family:monospace;letter-spacing:0.08em;font-weight:500;background:${isPreMode ? 'rgba(255,209,102,0.12)' : 'rgba(0,229,160,0.1)'};color:${isPreMode ? '#ffd166' : '#00e5a0'};border:1px solid ${isPreMode ? 'rgba(255,209,102,0.25)' : 'rgba(0,229,160,0.2)'};">
+              <span style="font-size:10px;padding:3px 8px;border-radius:4px;font-family:monospace;letter-spacing:0.08em;font-weight:500;background:${this.validationMode ? 'rgba(147,51,234,0.12)' : isPreMode ? 'rgba(255,209,102,0.12)' : 'rgba(0,229,160,0.1)'};color:${this.validationMode ? '#a78bfa' : isPreMode ? '#ffd166' : '#00e5a0'};border:1px solid ${this.validationMode ? 'rgba(147,51,234,0.25)' : isPreMode ? 'rgba(255,209,102,0.25)' : 'rgba(0,229,160,0.2)'};">
                 ${modeLabel}
               </span>
-              <button onclick="KavonAI.close()" style="background:none;border:none;color:#3d5470;font-size:16px;cursor:pointer;padding:2px 6px;">✕</button>
+              ${canClose ? `<button onclick="KavonAI.close()" style="background:none;border:none;color:#3d5470;font-size:16px;cursor:pointer;padding:2px 6px;">✕</button>` : ''}
             </div>
           </div>
 
@@ -3513,8 +3605,14 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
           </div>
 
           <div style="border-top:1px solid #1e2d3d;padding:12px 14px 14px;background:#0e1318;flex-shrink:0;">
+            ${this.validationState.canClose ? `
+              <button onclick="KavonAI.close()" style="width:100%;padding:12px;background:linear-gradient(135deg,#00e5a0,#00c28a);border:none;border-radius:10px;color:#0e1318;font-weight:700;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;font-family:'Sora',sans-serif;">
+                <span style="font-size:16px;">✓</span>
+                <span>Got it — next lesson</span>
+              </button>
+            ` : ''}
             <div style="display:flex;gap:8px;align-items:flex-end;background:#131920;border:1px solid #243345;border-radius:10px;padding:9px 10px;">
-              <textarea id="kavon-input" placeholder="Ask about ${this.currentContext?.ticker ?? 'this stock'} at the cutoff…" rows="1" style="flex:1;background:transparent;border:none;outline:none;font-size:13px;color:#dde6f0;resize:none;max-height:100px;min-height:20px;line-height:1.5;" ${this.loading ? 'disabled' : ''}></textarea>
+              <textarea id="kavon-input" placeholder="${this.validationMode ? 'Type your answer...' : `Ask about ${this.currentContext?.ticker ?? 'this stock'} at the cutoff…`}" rows="1" style="flex:1;background:transparent;border:none;outline:none;font-size:13px;color:#dde6f0;resize:none;max-height:100px;min-height:20px;line-height:1.5;" ${this.loading ? 'disabled' : ''}></textarea>
               <button id="kavon-send" onclick="KavonAI.handleSend()" ${this.loading ? 'disabled' : ''} style="width:30px;height:30px;background:linear-gradient(135deg,#00d4ff,#0077ff);border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="#080b10">
                   <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
@@ -3522,8 +3620,8 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
               </button>
             </div>
             <div style="margin-top:7px;font-size:9px;color:#3d5470;font-family:monospace;letter-spacing:0.04em;">
-              Context-locked · ${this.currentContext?.date} ${this.currentContext?.cutoffTime}
-              ${this.currentMode === 'pre' ? '<span style="color:rgba(255,77,109,0.5);"> · future data off-limits</span>' : ''}
+              ${this.validationMode ? 'Answer the questions to complete this lesson' : `Context-locked · ${this.currentContext?.date} ${this.currentContext?.cutoffTime}`}
+              ${!this.validationMode && this.currentMode === 'pre' ? '<span style="color:rgba(255,77,109,0.5);"> · future data off-limits</span>' : ''}
             </div>
           </div>
 
@@ -3544,7 +3642,7 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
     }
 
     const overlay = document.getElementById('kavon-overlay');
-    if (overlay) {
+    if (overlay && canClose) {
       overlay.onclick = (e) => {
         if (e.target === overlay) this.close();
       };
@@ -3569,33 +3667,63 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
     }
   },
 
-  open(context, mode = 'pre') {
+  open(context, mode = 'pre', isValidation = false) {
     this.currentContext = context;
     this.currentMode = mode;
     this.history = [];
     this.loading = false;
     this.started = false;
-    this.render();
+    this.validationMode = isValidation;
+    this.validationState = {
+      correctAnswers: 0,
+      requiredCorrect: 1,
+      canClose: false,
+      isCorrect: context.userDecision?.wasCorrect ?? false,
+      userChoice: context.userDecision?.action ?? null
+    };
+
+    // Auto-start conversation in validation mode
+    if (isValidation) {
+      this.render();
+      setTimeout(() => {
+        this.sendMessage('START_VALIDATION', true);
+      }, 100);
+    } else {
+      this.render();
+    }
   },
 
   close() {
+    // Don't allow closing in validation mode until learning is complete
+    if (this.validationMode && !this.validationState.canClose) {
+      return;
+    }
     const root = document.getElementById('kavon-ai-root');
     if (root) root.innerHTML = '';
+    this.validationMode = false;
+    this.validationState = {
+      correctAnswers: 0,
+      requiredCorrect: 1,
+      canClose: false,
+      isCorrect: false,
+      userChoice: null
+    };
   }
 };
 
-function openKavonAIModal() {
+function openKavonAIModal(validationMode = false) {
   const lesson = STATE.currentLesson;
   if (!lesson) return;
 
   const hasDecided = STATE.lastChoice !== null;
-  const mode = hasDecided ? 'review' : 'pre';
+  const mode = validationMode ? 'validation' : hasDecided ? 'review' : 'pre';
 
   const context = {
     ticker: lesson.ticker,
     companyName: lesson.company,
     date: lesson.date,
     cutoffTime: lesson.cutoffTime,
+    difficulty: lesson.diff,
     sentiment: {
       label: lesson.sentimentScore >= 70 ? 'Bullish' : lesson.sentimentScore >= 40 ? 'Neutral' : 'Bearish',
       score: lesson.sentimentScore
@@ -3609,13 +3737,16 @@ function openKavonAIModal() {
     analystHold: lesson.analysts?.hold || 0,
     analystSell: lesson.analysts?.sell || 0,
     volume: lesson.volume,
+    correctAnswer: lesson.correctAnswer,
+    actualMove: (lesson.change > 0 ? '+' : '') + lesson.change + '%',
     userDecision: hasDecided ? {
       action: STATE.lastChoice,
-      amount: STATE.betSize || 2500
+      amount: STATE.betSize || 2500,
+      wasCorrect: STATE.lastCorrect
     } : null
   };
 
-  KavonAI.open(context, mode);
+  KavonAI.open(context, mode, validationMode);
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3851,9 +3982,10 @@ function scheduleAutoOpenKavonAI() {
   }
 
   const lesson = STATE.currentLesson;
-  if (lesson && lesson.diff === 'beginner') {
+  if (lesson) {
     autoOpenTimer = setTimeout(() => {
-      openKavonAIModal();
+      // Open in validation mode for learning check
+      openKavonAIModal(true);
     }, 2000);
   }
 }
