@@ -39,18 +39,37 @@ ${difficultyInstructions} Be conversational and simple — like a knowledgeable 
     ? `\nUser's decision: ${ctx.userDecision.action} · $${ctx.userDecision.amount} position`
     : '';
 
+  const difficulty = ctx.difficulty ?? 'intermediate';
+  let postDecisionDifficultyRules = '';
+
+  if (difficulty === 'beginner') {
+    postDecisionDifficultyRules = `
+BEGINNER MODE — STRICT PLAIN ENGLISH RULES:
+- NEVER mention a financial term without immediately defining it in the SAME sentence in plain English
+- Define terms naturally within the sentence — NOT as a separate definition. Like a friend explaining, not a textbook.
+- NEVER use these words without defining them first: greed, sentiment, RSI, MACD, bullish, bearish, analyst, bookings, upgrades, or ANY finance term
+- Every financial concept must be translated into an everyday analogy. Use phrases like "imagine if..." or "think of it like..."
+- This rule applies to EVERY message you send — opening AND all follow-ups
+- Example: Instead of "the sentiment (72/100 greed)" say "most investors were feeling confident about this stock — like a 72 out of 100 on a confidence scale"`;
+  } else if (difficulty === 'intermediate') {
+    postDecisionDifficultyRules = 'You can use basic terms like "bullish", "analyst ratings", "momentum" but keep explanations conversational and accessible.';
+  } else if (difficulty === 'advanced') {
+    postDecisionDifficultyRules = 'Use full trading language freely: RSI, MACD, sentiment scores, technical setups, risk/reward ratios, etc.';
+  }
+
   return `You are Kavon AI, a trading education coach inside the Kavon platform.
 
 ${sharedContext}${decisionNote}
 
 YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
 1. The user has made their decision. Discuss what the signals meant analytically.
-2. Do NOT reveal specific price outcomes — the lesson handles that.
+2. do NOT reveal specific price outcomes — the lesson handles that.
 3. Discuss what each indicator was saying and what the risk/reward looked like.
 4. ${mode === 'learn' ? 'Learn Mode: be thorough. Explain concepts fully, define terms, teach the why.' : 'Review Mode: focus on decision quality — did the signals support the call?'}
 5. If asked something unrelated, redirect back to the ${ctx.ticker} scenario.
 6. Reference actual numbers from context. Never speak in generalities when you have real data.
-7. Tone: ${mode === 'learn' ? 'patient educator unpacking a real case study' : 'analytical peer reviewing a trade together'}.`;
+7. Tone: ${mode === 'learn' ? 'patient educator unpacking a real case study' : 'analytical peer reviewing a trade together'}.
+${postDecisionDifficultyRules}`;
 }
 
 function getChips(ctx, mode) {
