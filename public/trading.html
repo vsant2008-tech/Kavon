@@ -1134,27 +1134,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
       <div class="ai-actions">
         <button class="ai-btn ai-btn-primary" onclick="closeModal();showPage('dashboard')">View Dashboard →</button>
         <button class="ai-btn ai-btn-ghost" onclick="closeModal()">← Back to Lessons</button>
+        <button class="ask-ai-btn" id="askKavonAfterDecision" onclick="openKavonAIModal()" style="display:none;margin-top:1rem;">
+          <span>🤖</span>
+          <span>Ask Kavon</span>
+        </button>
       </div>
-    </div>
-
-    <!-- AI Q&A Chat — styled as bright blue section for visibility -->
-    <div class="ai-qa-section" id="aiQASection" style="display:none;">
-      <div class="ai-qa-header">
-        <div style="display:flex;align-items:center;gap:.7rem;">
-          <div style="width:34px;height:34px;border-radius:50%;background:var(--blue-bright);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">🤖</div>
-          <div>
-            <div style="font-size:.88rem;font-weight:800;color:var(--navy);">Ask the AI Coach</div>
-            <div style="font-size:.7rem;color:var(--text-muted);">Ask anything about this trade — signals, strategy, what to watch for next time</div>
-          </div>
-        </div>
-      </div>
-      <div class="qa-suggestions" id="qaSuggestions"></div>
-      <div class="qa-messages" id="qaMessages"></div>
-      <div class="qa-input-row">
-        <input type="text" class="qa-input-light" id="qaInput" placeholder="e.g. Why was this a buy? What signals should I have caught?" onkeydown="if(event.key==='Enter')sendQA()">
-        <button class="qa-send-blue" id="qaSendBtn" onclick="sendQA()">Ask AI →</button>
-      </div>
-      <div style="font-size:.68rem;color:var(--text-muted);margin-top:.5rem;text-align:center;">Powered by Kavon AI · Answers based on this specific trade's data</div>
     </div>
   </div>
 </div>
@@ -1520,7 +1504,6 @@ const STATE = {
   chartData: [],
   chartLabels: [],
   animIndex: 0,
-  qaHistory: [],
   lastChoice: null,
   lastCorrect: null,
   replayTf: '1D',
@@ -1984,9 +1967,8 @@ function openLesson(idx, mode) {
   document.getElementById('aiFeedback').classList.remove('show');
   document.getElementById('buyBtn').disabled = false;
   document.getElementById('sellBtn').disabled = false;
-  document.getElementById('aiQASection').style.display = 'none';
-  document.getElementById('qaMessages').innerHTML = '';
-  STATE.qaHistory = [];
+  const askKavonBtn = document.getElementById('askKavonAfterDecision');
+  if(askKavonBtn) askKavonBtn.style.display = 'none';
 
   // Reset hint system
   STATE.hintActive = false;
@@ -2587,31 +2569,11 @@ function makeDecision(choice) {
     aiLessonBox.after(missedBox);
   }
 
-  document.getElementById('aiQASection').style.display = 'block';
-  STATE.qaHistory = [];
-  document.getElementById('qaMessages').innerHTML = '';
-
-  // Update suggestions — use missed questions if available
-  let suggestions;
-  if(!correct && (l.diff === 'intermediate' || l.diff === 'advanced') && l.missedQuestions) {
-    suggestions = l.missedQuestions.slice(0, 4);
-  } else if(correct) {
-    suggestions = [
-      'Why was ' + l.ticker + ' a good ' + l.correctAnswer + '?',
-      'What signals confirmed this trade?',
-      'How could I have spotted this earlier?',
-      'What would have been a stop-loss level?'
-    ];
-  } else {
-    suggestions = [
-      'Why was ' + l.correctAnswer + ' the right call?',
-      'What did I miss about ' + l.ticker + '?',
-      'What signals should have warned me?',
-      'How do I avoid this mistake next time?'
-    ];
+  // Show Ask Kavon button only in live mode
+  const askKavonBtn = document.getElementById('askKavonAfterDecision');
+  if(askKavonBtn) {
+    askKavonBtn.style.display = isLive ? 'flex' : 'none';
   }
-  const suggestHtml = suggestions.map(s => `<button class="qa-suggest-btn" onclick="sendQAText('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
-  document.getElementById('qaSuggestions').innerHTML = suggestHtml;
 
   document.getElementById('aiFeedback').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -3209,227 +3171,6 @@ function refreshHintOverlays() {
     renderHintOverlays(pattern, data.length);
   }
 }
-
-// ═══════════════════════════════════════════════════════════════════════════
-// AI Q&A CHAT
-// ═══════════════════════════════════════════════════════════════════════════
-function sendQA() {
-  const input = document.getElementById('qaInput');
-  const text = input.value.trim();
-  if(!text) return;
-  input.value = '';
-  sendQAText(text);
-}
-
-function sendQAText(text) {
-  const l = STATE.currentLesson;
-  if(!l) { console.warn('sendQAText: no currentLesson'); return; }
-
-  const msgs = document.getElementById('qaMessages');
-  const sendBtn = document.getElementById('qaSendBtn');
-  const input = document.getElementById('qaInput');
-
-  // Add user message bubble
-  const userDiv = document.createElement('div');
-  userDiv.className = 'qa-msg qa-msg-user';
-  userDiv.textContent = text;
-  msgs.appendChild(userDiv);
-
-  // Add thinking bubble immediately
-  const aiDiv = document.createElement('div');
-  aiDiv.className = 'qa-msg qa-msg-ai loading';
-  aiDiv.innerHTML = '<span class="qa-dots"><span></span><span></span><span></span></span>';
-  msgs.appendChild(aiDiv);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  sendBtn.disabled = true;
-  if(input) input.disabled = true;
-
-  STATE.qaHistory.push({role:'user', content: text});
-
-  // Short visual delay then answer — no async, just setTimeout
-  setTimeout(function() {
-    try {
-      const reply = generateSmartAnswer(text.toLowerCase(), l);
-      aiDiv.className = 'qa-msg qa-msg-ai';
-      aiDiv.textContent = reply;
-      STATE.qaHistory.push({role:'assistant', content: reply});
-    } catch(e) {
-      aiDiv.className = 'qa-msg qa-msg-ai';
-      aiDiv.textContent = 'Something went wrong generating an answer. Try asking again.';
-      console.error('generateSmartAnswer error:', e);
-    }
-    sendBtn.disabled = false;
-    if(input) { input.disabled = false; input.focus(); }
-    msgs.scrollTop = msgs.scrollHeight;
-  }, 300);
-}
-
-function generateSmartAnswer(q, l) {
-  const correct = STATE.lastCorrect;
-  const chose = STATE.lastChoice;
-  const right = l.correctAnswer;
-  const isDay = l.module === 'day';
-  const isAdvanced = l.diff === 'advanced';
-  const isIntermediate = l.diff === 'intermediate';
-  const newsText = l.news.map(n=>n.headline).join('; ');
-  const cutoff = l.cutoffTime || 'end of day';
-
-  // ── Pattern matching → specific contextual answers ────────────────────────
-
-  // Short interest
-  if(/short interest|short.*seller|short.*squeeze|shorts/.test(q)) {
-    if(l.shortInterest) {
-      const si = parseFloat(l.shortInterest);
-      return isAdvanced || isIntermediate
-        ? l.ticker + ' had ' + l.shortInterest + ' of its float sold short on ' + l.date + '. ' + (si > 10 ? 'At over 10%, short sellers had meaningful conviction here — these are typically hedge funds that have done extensive analysis. Here\'s what I want you to think about: if sophisticated funds with deep research are betting this stock falls, what do they know that the headline numbers aren\'t showing?' : 'The short interest was moderate — institutional conviction wasn\'t overwhelming either direction.') + ' The correct answer was ' + right + '.'
-        : l.ticker + ' had ' + l.shortInterest + ' of its float sold short. ' + (si > 10 ? 'High short interest means sophisticated investors are bearish — but it can also fuel a short squeeze if the stock moves up.' : 'Moderate short interest.') + ' The correct answer was ' + right + '.';
-    }
-    return 'Short interest data wasn\'t a key factor in this particular setup.';
-  }
-
-  // Put/call ratio
-  if(/put.call|put\/call|options.*ratio|calls|puts/.test(q)) {
-    if(l.putCallRatio) {
-      const pc = parseFloat(l.putCallRatio);
-      const pcDesc = pc > 1.5 ? 'extremely bearish options positioning' : pc < 0.5 ? 'extremely bullish — which is often a contrarian sell signal at extremes' : 'neutral options positioning';
-      return isAdvanced || isIntermediate
-        ? 'The put/call ratio on ' + l.ticker + ' was ' + l.putCallRatio + ' — ' + pcDesc + '. Options traders tend to be more sophisticated than the average investor. A ratio above 1 means more bearish bets than bullish. Here\'s the harder question: if the options market was positioned this way, what were they seeing that the headlines weren\'t showing?'
-        : 'The put/call ratio was ' + l.putCallRatio + ' — ' + pcDesc + '. Puts are bets the stock goes down, calls are bets it goes up. This was one of the signals pointing toward ' + right + '.';
-    }
-    return 'Options flow data wasn\'t available for this lesson, but it\'s a key metric in real trading.';
-  }
-
-  // Institutional flow
-  if(/institutional|smart money|fund|hedge fund|dark pool|flow/.test(q)) {
-    if(l.institutionalFlow) {
-      return isAdvanced || isIntermediate
-        ? 'Institutional flow for ' + l.ticker + ' showed: "' + l.institutionalFlow + '." Think about what that means: if you were buying ' + l.ticker + ' that morning, who was on the other side of your trade? Institutions move markets because of the size of their orders. When they\'re selling, retail buyers absorb that supply. Here\'s the harder question: if funds with teams of analysts were positioned this way, what does that suggest about how informed their view was?'
-        : 'Institutional flow showed "' + l.institutionalFlow + '" for ' + l.ticker + '. Large institutions move markets. When they\'re selling, retail buyers absorb the supply. This pointed toward ' + right + '.';
-    }
-    return 'Institutional flow data wasn\'t a featured metric in this lesson.';
-  }
-
-  // RSI / overbought / oversold
-  if(/rsi|overbought|oversold/.test(q)) {
-    const rsiState = l.rsi > 70 ? 'overbought (above 70)' : l.rsi < 30 ? 'oversold (below 30)' : 'neutral range';
-    const rsiImplication = l.rsi > 70
-      ? `An RSI of ${l.rsi} signaled overbought conditions — meaning buying momentum was stretched and a pullback was possible. In this case, ${right==='sell'?'that was the correct read':'the catalyst was strong enough to push it higher despite the overbought signal'}. High RSI doesn't guarantee a reversal; it just means you need a stronger catalyst to keep going up.`
-      : l.rsi < 30
-      ? `An RSI of ${l.rsi} signaled oversold conditions — the stock had been beaten down hard. Oversold RSI often precedes a bounce, especially if negative news is already priced in. Here the correct call was to ${right}.`
-      : `${l.ticker}'s RSI of ${l.rsi} was in neutral territory — not stretched in either direction. This means RSI alone wasn't a strong signal; the decision came down to the news catalyst and volume instead.`;
-    return rsiImplication;
-  }
-
-  // MACD
-  if(/macd|momentum|signal line/.test(q)) {
-    return `${l.ticker}'s MACD showed "${l.macd}" at the time. MACD measures the gap between two moving averages — when it's bullish, short-term price is accelerating faster than the longer-term trend, which is a buy signal. When bearish, the opposite is true. In this trade, the MACD ${l.macd.toLowerCase().includes('bull')||l.macd.toLowerCase().includes('break')?'supported the buy case':'was warning of downward momentum'}, which lined up with the correct answer to ${right}.`;
-  }
-
-  // Volume
-  if(/volume|how much.*traded|shares traded|institutional/.test(q)) {
-    return `${l.ticker} traded ${l.volume} shares on this day. ${parseInt(l.volume)>100?'That is very high volume — institutions were clearly active, meaning the move was likely to be sustained rather than a thin-market fake-out.':'Volume at this level shows real conviction behind the move.'} High volume on a directional move means large players are committed to that direction, which is one of the most reliable confirmation signals in trading.`;
-  }
-
-  // Analyst ratings
-  if(/analyst|rating|buy.*rating|wall street|upgrade/.test(q)) {
-    const total = l.analysts.buy + l.analysts.hold + l.analysts.sell;
-    const bullPct = Math.round(l.analysts.buy/total*100);
-    return `At the time, ${l.analysts.buy} analysts rated ${l.ticker} a Buy, ${l.analysts.hold} Hold, and ${l.analysts.sell} Sell — that's ${bullPct}% bullish on Wall Street. ${bullPct>70?'A strong analyst consensus like that creates structural buying demand from funds that track analyst ratings.':bullPct<40?'The low buy consensus meant institutional support was weak — fewer funds were obligated to own the stock.':'A mixed analyst picture meant the market was genuinely divided, so the catalyst mattered more than the baseline consensus.'} The correct call was ${right}.`;
-  }
-
-  // 52-week high/low
-  if(/52.week|52w|all.time|high|year high|low/.test(q)) {
-    const pctFromHigh = ((l.weekHigh - l.open) / l.weekHigh * 100).toFixed(0);
-    const pctFromLow = ((l.open - l.weekLow) / l.weekLow * 100).toFixed(0);
-    return `${l.ticker} was trading at $${l.open} that day — ${pctFromHigh}% below its 52-week high of $${l.weekHigh} and ${pctFromLow}% above its 52-week low of $${l.weekLow}. ${pctFromHigh<10?'Being near a 52-week high suggests strong momentum — breakouts from highs often continue.':pctFromHigh>40?'Being far below the 52-week high means the stock was in a significant downtrend, so any bounce needed a very strong catalyst to be sustainable.':'Being in the middle of its range meant the stock was rangebound — the catalyst would determine the next directional move.'}`;
-  }
-
-  // Why correct answer / why buy or sell
-  if(/why.*(buy|correct|right|good call|should.*buy)/.test(q) && right==='buy') {
-    return `The correct call was BUY because: ${l.context} ${l.buyFeedback} The key signals were the RSI of ${l.rsi} (${l.rsi<50?'not yet overbought, room to run':'showing momentum'}), volume of ${l.volume}, and the news: "${l.news[0].headline}". When you see a strong catalyst combined with ${l.sentimentScore>65?'high bullish sentiment':'institutional buying on volume'}, the bias should be to go with the momentum.`;
-  }
-  if(/why.*(sell|correct|right|good call|should.*sell)/.test(q) && right==='sell') {
-    return `The correct call was SELL because: ${l.context} ${l.sellFeedback} The warning signs were RSI of ${l.rsi} (${l.rsi>70?'overbought':'showing weakness'}), the bearish news: "${l.news.find(n=>n.sentiment==='bear')?.headline||l.news[0].headline}", and a sentiment score of only ${l.sentimentScore}/100. When negative catalysts stack up like this, sellers typically dominate for the full session.`;
-  }
-
-  // What did I miss / what signals
-  if(/miss|should.*seen|signal|spotted|warn|clue|hint|tell/.test(q)) {
-    if(correct) {
-      return `You caught the right signals here. The key tells were: (1) the news catalyst — "${l.news[0].headline}", (2) RSI of ${l.rsi} which was ${l.rsi>70?'stretched but momentum was clearly strong':l.rsi<30?'oversold, primed for a bounce':'neutral, so the news drove the move'}, and (3) sentiment score of ${l.sentimentScore}/100. When you see ${l.sentimentScore>65?'high sentiment + positive news + strong volume':'negative sentiment + bad news + weak volume'}, that's the combination to look for every time.`;
-    } else {
-      const missed = l.news.find(n=>n.sentiment===(right==='buy'?'bull':'bear'));
-      return `The signal you likely missed was: "${missed?.headline||l.news[0].headline}". Combined with an RSI of ${l.rsi} and ${l.volume} in volume, this was a clear ${right==='buy'?'bullish':'bearish'} setup. ${right==='buy'?'When institutional buying aligns with positive news and RSI not yet overbought, it is usually safe to go long.':'When negative guidance and weak fundamentals stack up, sellers rarely let up mid-session.'} Next time: ${l.news.filter(n=>n.sentiment===(right==='buy'?'bull':'bear')).length} of ${l.news.length} headlines pointed ${right==='buy'?'bullish':'bearish'} — follow the stack.`;
-    }
-  }
-
-  // Stop loss / risk management
-  if(/stop.loss|stop loss|risk|protect|downside|how much.*lose/.test(q)) {
-    const stopPct = l.diff==='beginner'?2:l.diff==='intermediate'?3.5:5;
-    const stopPrice = (l.open * (1 - stopPct/100)).toFixed(2);
-    return `A reasonable stop-loss for this ${l.diff}-level trade would have been ${stopPct}% below the open, around $${stopPrice}. Stop-losses protect you from catastrophic losses — they say "if I'm wrong, I'll only lose this much." For ${l.ticker} with volatility rated "${l.volatility}", you'd want a wider stop than a calm stock. The actual move was ${l.change>0?'+':''}${l.change}%, so a ${stopPct}% stop would have ${Math.abs(l.change)>stopPct?'been hit on a wrong call':'left you room to be right'}.`;
-  }
-
-  // Sentiment / fear & greed
-  if(/sentiment|fear|greed|crowd|retail|panic/.test(q)) {
-    const sentWord = l.sentimentScore>75?'Extreme Greed':l.sentimentScore>55?'Greed':l.sentimentScore>45?'Neutral':l.sentimentScore>25?'Fear':'Extreme Fear';
-    const sentDetail = l.sentimentScore>75?'Extreme greed means retail investors are euphoric — momentum can keep pushing higher but it also signals a potential top if the catalyst disappoints.':l.sentimentScore<30?'Extreme fear means most investors had already sold or were panicking. When fear is this high, the correct trade is often contrarian — but only if there is a real catalyst to reverse it.':'Neutral sentiment meant the market was waiting for a catalyst to decide direction — which is exactly what the news provided.';
-    return `The investor sentiment score was ${l.sentimentScore}/100 — ${sentWord}. ${sentDetail} The correct answer here was ${right}.`;
-  }
-
-  // News / catalyst explanation
-  if(/news|catalyst|why.*move|why.*jump|why.*drop|announcement|headline/.test(q)) {
-    return `The main catalyst was: "${l.news[0].headline}." ${l.context} This type of news — ${l.news[0].sentiment==='bull'?'a positive surprise beating expectations':'a negative miss or guidance cut'} — typically causes ${l.news[0].sentiment==='bull'?'institutional buyers to accumulate quickly, especially in the first 30-90 minutes':'a sustained selling wave that rarely reverses intraday without a new positive catalyst'}. The other headlines reinforced the same direction: "${l.news[1]?.headline||'no additional headlines'}."`;
-  }
-
-  // Cutoff / what happened after
-  if(isDay && /after.*cutoff|rest.*day|what.*happen|result|outcome/.test(q)) {
-    return `After the ${cutoff} cutoff, ${l.ticker} ${l.change>0?'continued climbing':'kept selling off'} to close at $${l.close}, a ${l.change>0?'+':''}${l.change}% move from open. ${l.change>0?l.buyFeedback:l.sellFeedback} The key lesson: ${l.lesson}`;
-  }
-
-  // Long term / what happened over time
-  if(!isDay && /what.*happen|outcome|result|over.*month|did.*go up|did.*fall/.test(q)) {
-    return `${l.change>0?l.buyFeedback:l.sellFeedback} For long-term trades, the key is identifying whether the fundamental story supports holding through short-term volatility. In ${l.ticker}'s case, the data on ${l.date} pointed clearly toward ${right}. ${l.lesson}`;
-  }
-
-  // P/E, valuation
-  if(/p\/e|pe ratio|valuation|expensive|cheap|price.*earnings/.test(q)) {
-    if(!l.pe) return `${l.ticker} had no P/E ratio at the time because it wasn't yet profitable. For pre-profit companies, investors focus on revenue growth and cash runway instead. When there's no P/E anchor, sentiment and growth expectations drive price much more violently — which is why moves like this one (${l.change>0?'+':''}${l.change}%) happen.`;
-    const cheapExp = l.pe < 20 ? 'relatively cheap' : l.pe < 35 ? 'fairly valued' : 'expensive';
-    const peBody = l.pe>50?'A high P/E means investors are paying a premium for future growth. When growth decelerates, the multiple compresses fast and the stock drops hard.':'A ' + cheapExp + ' multiple gave the stock more cushion — investors were not pricing in perfection, so positive surprises were rewarded directly.';
-    return `${l.ticker}'s P/E ratio was ${l.pe}x at the time — ${cheapExp} for its sector. ${peBody} The correct call was still ${right}.`;
-  }
-
-  // How to improve / next time
-  if(/improve|next time|better|practice|learn|how.*avoid|do.*different/.test(q)) {
-    if(correct) {
-      return `You made the right call — here's how to reinforce it: you correctly identified ${right==='buy'?'positive momentum + catalyst alignment':'negative signals stacking up'}. To sharpen this skill, always check (1) volume — is it 1.5× or more above average? (2) Are multiple headlines pointing the same direction? (3) Is RSI confirming the move, not fighting it? You did that here. Repeat this checklist on every lesson.`;
-    } else {
-      return `Next time with a setup like this, run this checklist before deciding: (1) Check RSI — ${l.rsi} was ${l.rsi>70?'overbought, meaning the stock needed extra catalyst to keep rising':l.rsi<30?'oversold, primed for a bounce':'neutral, direction unclear'}. (2) Count headlines: ${l.news.filter(n=>n.sentiment===(right==='buy'?'bull':'bear')).length}/${l.news.length} pointed ${right==='buy'?'bullish':'bearish'}. (3) Sentiment was ${l.sentimentScore}/100. When 2 of 3 align, go with the signal. They aligned for ${right} here.`;
-    }
-  }
-
-  // What is RSI, MACD, MA (educational)
-  if(/what is rsi|what.*rsi mean|relative strength/.test(q)) {
-    return `RSI (Relative Strength Index) measures how fast a stock has been moving up or down on a scale of 0–100. Above 70 = overbought (may be due for a pullback); below 30 = oversold (may be due for a bounce). ${l.ticker}'s RSI was ${l.rsi} — ${l.rsi>70?'overbought territory, but strong catalysts can keep overbought stocks running':l.rsi<30?'oversold, suggesting sellers had overdone it and a reversal was possible':'neutral, not giving a strong directional signal on its own'}.`;
-  }
-  if(/what is macd|what.*macd mean/.test(q)) {
-    return `MACD (Moving Average Convergence Divergence) tracks the relationship between a 12-day and 26-day moving average. When the shorter average is above the longer one and rising, it's bullish — momentum is building. When it crosses below, it's bearish. For ${l.ticker} it showed "${l.macd}", meaning ${l.macd.toLowerCase().includes('bull')||l.macd.toLowerCase().includes('break')?'upward momentum was in place, supporting a buy bias':'downward momentum was dominant, supporting caution or a sell bias'}.`;
-  }
-  if(/moving average|50.day|what.*ma|50ma/.test(q)) {
-    const aboveBelow = l.open > l.ma50 ? 'above' : 'below';
-    return `The 50-day moving average is the average closing price over the past 50 trading days — it's a key line that separates bullish and bearish territory for most traders. ${l.ticker} was trading ${aboveBelow} its 50-day MA of $${l.ma50} at $${l.open}. ${l.open>l.ma50?'Trading above the 50-day MA is generally bullish — it means medium-term momentum is positive and institutions are more likely to add to positions.':'Trading below the 50-day MA is bearish — it signals medium-term selling pressure, and the stock needs a strong catalyst to reclaim it.'} The correct call was ${right}.`;
-  }
-
-  // Generic fallback — still lesson-specific
-  const fallbacks = [
-    `Great question. The core of this trade was: ${l.context} The correct answer was ${right.toUpperCase()} — ${correct?'which you got right':'and this is why'}: ${right==='buy'?l.buyFeedback:l.sellFeedback}`,
-    `For ${l.ticker} on ${l.date}, the key signal was the combination of RSI ${l.rsi}, sentiment at ${l.sentimentScore}/100, and the headline: "${l.news[0].headline}." When those aligned, the ${right} case was clear. ${l.lesson}`,
-    `Think about it this way: ${l.lesson} In ${l.ticker}'s specific case on ${l.date}, that played out as ${l.change>0?'+':''}${l.change}% by close. The data that mattered most was ${l.context.split('.')[0].toLowerCase()}.`,
-  ];
-  return fallbacks[Math.floor(Math.random()*fallbacks.length)];
-}
-
 
 // ═══════════════════════════════════════════════════════════════════════════
 // KAVON AI (Vanilla JavaScript Implementation)
