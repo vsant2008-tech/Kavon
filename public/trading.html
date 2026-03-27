@@ -638,6 +638,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
   border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.07);color:rgba(255,255,255,.65);
   transition:all .15s;font-family:'Sora',sans-serif;}
 .qa-suggest-btn:hover{background:rgba(33,150,243,.25);border-color:rgba(33,150,243,.4);color:#fff;}
+
+/* ── ADVANCED DATA & MISSED QUESTIONS ────────────────────────── */
+.adv-hint { font-size:.65rem; color:var(--text-muted); margin-top:.5rem; font-style:italic; }
+.missed-q-box { background:rgba(239,68,68,.1); border:1px solid rgba(239,68,68,.3); border-radius:8px; padding:.7rem .9rem; margin-top:.7rem; }
+.missed-q-title { font-size:.7rem; font-weight:800; color:#fca5a5; margin-bottom:.4rem; text-transform:uppercase; letter-spacing:.04em; }
+.missed-q-item { font-size:.78rem; color:rgba(255,255,255,.8); line-height:1.5; margin-bottom:.25rem; padding-left:.8rem; position:relative; }
+.missed-q-item::before { content:'→'; position:absolute; left:0; color:#f87171; }
 </style>
 </head>
 <body>
@@ -1016,6 +1023,26 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
           <div class="dp-section-title"><span>📰</span><span>News & Catalysts</span></div>
           <div class="news-list" id="dpNewsList"></div>
         </div>
+
+        <!-- Advanced Data (for intermediate/advanced) -->
+        <div id="advancedDataSection" style="display:none;">
+          <div class="dp-section-title">🔬 Advanced Data</div>
+          <div class="indicator-grid">
+            <div class="ind-box" id="adShortBox" style="display:none;">
+              <div class="ind-label">Short Interest</div>
+              <div class="ind-value" id="adShortInterest">—</div>
+            </div>
+            <div class="ind-box" id="adPCBox" style="display:none;">
+              <div class="ind-label">Put/Call Ratio</div>
+              <div class="ind-value" id="adPutCall">—</div>
+            </div>
+          </div>
+          <div id="adFlowBox" style="display:none;margin-top:.5rem;">
+            <div class="ind-label" style="font-size:.65rem;margin-bottom:.25rem;">Institutional Flow</div>
+            <div class="ind-value" id="adInstFlow" style="font-size:.78rem;line-height:1.4;">—</div>
+          </div>
+          <div class="adv-hint" id="adHint">Ask the AI about these metrics for more context.</div>
+        </div>
       </div>
     </div>
 
@@ -1174,13 +1201,15 @@ const LESSONS = [
     cutoffTime:'11:00 AM',cutoffIdx:90,predictWindow:'rest of trading day',
     open:153.20,close:188.85,change:+23.3,volume:'195M',weekHigh:197.35,weekLow:88.09,
     pe:14,mktCap:'495B',rsi:68,macd:'Breakout',ma50:134.10,volatility:'Very High',
-    sentimentScore:78, analysts:{buy:42,hold:10,sell:3},
+    sentimentScore:61, analysts:{buy:22,hold:24,sell:9},
+    shortInterest:'10.2%',
     news:[
-      {src:'CNBC',headline:'Meta declares 2023 "Year of Efficiency"; announces $40B buyback program',sentiment:'bull'},
-      {src:'Reuters',headline:"Zuckerberg pivots from metaverse spending to profitability focus",sentiment:'bull'},
-      {src:'Bloomberg',headline:'First Meta dividend announced; analysts scramble to raise price targets',sentiment:'bull'}
+      {src:'CNBC',headline:'Meta Q4 beats on EPS; announces $40B buyback and cost cuts',sentiment:'bull'},
+      {src:'Reuters',headline:'Meta Reality Labs division posts $4.3B quarterly loss — wider than expected',sentiment:'bear'},
+      {src:'Bloomberg',headline:'Zuckerberg signals more layoffs ahead; 11,000 already cut in November',sentiment:'neu'}
     ],
-    context:'Meta reported Q4 earnings last night with a major pivot to efficiency. By 11:00 AM the stock has already climbed significantly. New dividend and $40B buyback announced. Revenue grew 4% after a rough 2022.',
+    missedQuestions:['How far is META down from its all-time high?','What does a $40B buyback actually do to the stock price?','Why does the Reality Labs loss matter less when the stock is already deeply discounted?'],
+    context:'Meta beat Q4 EPS last night and announced a $40B buyback — but Reality Labs burned $4.3B in a single quarter, wider than expected. By 11:00 AM the stock is up sharply but the metaverse division is still bleeding cash at record pace. Analyst opinions are split: some see the efficiency pivot as transformative, others think the buyback is masking structural ad revenue weakness. Short interest is 10.2%. Volume is elevated but not extreme.',
     correctAnswer:'buy',
     buyFeedback:'Meta\'s efficiency pivot shocked the market. By close the stock was +23.3%. At the 11 AM cutoff the momentum was clear — analysts were rushing to upgrade. The continuation was textbook.',
     sellFeedback:'Meta\'s strategic pivot from spending to efficiency re-rated the stock massively. From the 11 AM cutoff, it ran another 10%+ into close. Narrative shifts of this magnitude rarely stop mid-day.',
@@ -1190,13 +1219,15 @@ const LESSONS = [
     cutoffTime:'10:30 AM',cutoffIdx:60,predictWindow:'rest of trading day',
     open:103.90,close:95.96,change:-7.6,volume:'168M',weekHigh:188.11,weekLow:85.87,
     pe:89,mktCap:'965B',rsi:38,macd:'Bearish',ma50:116.20,volatility:'High',
-    sentimentScore:32, analysts:{buy:55,hold:10,sell:2},
+    sentimentScore:41, analysts:{buy:55,hold:10,sell:2},
+    shortInterest:'1.8%',
     news:[
-      {src:'Bloomberg',headline:'Amazon misses Q3 revenue; AWS growth decelerates to 27% from 33%',sentiment:'bear'},
-      {src:'WSJ',headline:'Amazon Q4 guidance $140-148B vs $155B expected — CEO cites macro headwinds',sentiment:'bear'},
-      {src:'Reuters',headline:"Amazon begins hiring freeze in corporate workforce",sentiment:'bear'}
+      {src:'Bloomberg',headline:'AWS revenue grows 27.5% — decelerating but still beats estimates by $200M',sentiment:'neu'},
+      {src:'WSJ',headline:'Amazon Q4 guidance midpoint $144B — analysts say bar was already low after pre-announcement',sentiment:'neu'},
+      {src:'Reuters',headline:'Amazon advertising revenue accelerates to +25% — fastest-growing segment',sentiment:'bull'}
     ],
-    context:'Amazon missed Q3 revenue and issued weak Q4 guidance last night. You are looking at the chart at 10:30 AM — the stock has been selling off since open. AWS growth decelerated sharply. Hiring freeze announced.',
+    missedQuestions:['What is the trend in AWS growth over the last 4 quarters?','Why do 55 Buy ratings not mean institutions are actually buying today?','What happens to Amazon\'s stock when its most profitable segment decelerates?'],
+    context:'Amazon\'s Q3 results came out last night. AWS grew 27.5% — decelerating from 33% but still beat the already-lowered consensus estimate by $200M. Q4 guidance looks weak at first glance, but analysts had already pre-cut estimates after management\'s October warning. Advertising revenue accelerated to +25%. It is 10:30 AM, the stock opened down 10% but has partially recovered. Short interest is only 1.8% — few institutional shorts. 55 of 67 analysts still rate it Buy.',
     correctAnswer:'sell',
     buyFeedback:'Three negatives: revenue miss + guidance cut + AWS deceleration. From 10:30 AM the selling accelerated. AMZN finished the day down -7.6%. Weak guidance = continued selling pressure.',
     sellFeedback:'Correct. Weak guidance signals management sees more pain ahead. AWS deceleration with no catalyst for recovery = sellers stayed in control all day. Down -7.6% by close.',
@@ -1207,12 +1238,14 @@ const LESSONS = [
     open:354.83,close:193.60,change:-44.3,volume:'193M',weekHigh:483.00,weekLow:2.57,
     pe:null,mktCap:'13.6B',rsi:92,macd:'Extreme Overbought',ma50:28.40,volatility:'Extreme',
     sentimentScore:96, analysts:{buy:0,hold:2,sell:8},
+    shortInterest:'113%', putCallRatio:'0.18', institutionalFlow:'Net sell $420M pre-market',
     news:[
-      {src:'Reuters',headline:'Brokers restrict GME buying; Robinhood limits purchases to 1 share',sentiment:'bear'},
-      {src:'WSJ',headline:'SEC investigating unusual trading activity in GameStop; Citadel exposure grows',sentiment:'bear'},
-      {src:'Reddit',headline:"r/WallStreetBets still posting rocket emojis but volume warning signs emerging",sentiment:'neu'}
+      {src:'CNBC',headline:'Ryan Cohen tweets GameStop logo — WSB interprets as transformation signal',sentiment:'bull'},
+      {src:'Reuters',headline:'Short interest falls to 113% from 140% as shorts begin covering',sentiment:'neu'},
+      {src:'Reddit',headline:'r/WallStreetBets: "They have to keep buying to cover — infinite squeeze incoming"',sentiment:'bull'}
     ],
-    context:'GME has surged 1,700%+ on WSB momentum. It is now 12:00 PM. Robinhood just restricted buying to 1 share. RSI is 92 — extreme overbought. No fundamental change in the business. The stock looks exhausted at noon.',
+    missedQuestions:['What happens to a short squeeze when brokers restrict buying?','If short interest fell from 140% to 113%, does that mean more or less squeeze pressure remains?','What does a put/call ratio of 0.18 tell you about who is left to buy?','What does net institutional selling of $420M pre-market signal about smart money positioning?'],
+    context:'It is 12:00 PM on January 27, 2021. GME opened at $354 and has been volatile all morning. The WSB crowd is citing short covering as fuel for more upside. Ryan Cohen just tweeted a cryptic GameStop logo. Short interest has dropped from 140% to 113% — some shorts have already covered. Robinhood just announced buying restrictions of 1 share. The put/call ratio is 0.18 — options market is extremely call-heavy. Institutional flow shows net selling of $420M pre-market from large funds exiting.',
     correctAnswer:'sell',
     buyFeedback:'This was the peak. Broker restrictions + extreme RSI + no fundamental backing = imminent collapse. The afternoon session saw a -44.3% crash from open. Noon was the last exit.',
     sellFeedback:'Perfect. Selling at noon when broker restrictions appeared was the professional read. The afternoon was a waterfall decline — the stock crashed -44.3% from its open by close.',
@@ -1222,13 +1255,15 @@ const LESSONS = [
     cutoffTime:'10:30 AM',cutoffIdx:60,predictWindow:'rest of trading day',
     open:508.25,close:397.35,change:-21.8,volume:'52M',weekHigh:700.99,weekLow:162.71,
     pe:44,mktCap:'176B',rsi:31,macd:'Bearish Breakdown',ma50:542.10,volatility:'Very High',
-    sentimentScore:22, analysts:{buy:18,hold:22,sell:8},
+    sentimentScore:38, analysts:{buy:18,hold:22,sell:8},
+    shortInterest:'5.4%',
     news:[
-      {src:'CNBC',headline:'Netflix adds only 8.3M subscribers vs 8.5M guided; Q1 outlook cut to 2.5M',sentiment:'bear'},
-      {src:'Bloomberg',headline:'Disney+ at 130M, HBO Max at 73M — streaming wars intensifying',sentiment:'bear'},
-      {src:'WSJ',headline:'Netflix CFO: "We are not immune to macro pressures on consumer spending"',sentiment:'bear'}
+      {src:'CNBC',headline:'Netflix misses Q4 subs by 200K — smaller miss than feared; stock initially jumps',sentiment:'neu'},
+      {src:'Bloomberg',headline:'Netflix Q1 guidance: 2.5M subscriber adds — well below 6M consensus estimate',sentiment:'bear'},
+      {src:'WSJ',headline:'Netflix announces potential ad-supported tier — new revenue stream being explored',sentiment:'bull'}
     ],
-    context:'Netflix missed subscriber guidance and slashed Q1 outlook last night. By 10:30 AM the stock is down significantly. The miss + guidance cut + competitor pressure is a triple negative. CFO warned on macro.',
+    missedQuestions:['Why did the stock jump after-hours if it missed subscribers?','What is the difference between the actual miss and the whisper number?','If the ad-supported tier is announced, how long until it actually generates revenue?','Does RSI below 30 always predict a bounce, or can it stay oversold for weeks?'],
+    context:'Netflix\'s Q4 subscriber miss of 200K was actually smaller than the 500K whisper number — and the stock initially jumped 5% after-hours. But by open this morning the Q1 guidance of 2.5M subs vs 6M consensus wiped out that optimism. It is 10:30 AM and the stock is down sharply from open. Some bulls are arguing the ad-supported tier announcement is a business model evolution that changes the long-term story. The RSI of 31 is technically oversold. 22 analysts have it as Hold — the largest single group.',
     correctAnswer:'sell',
     buyFeedback:'Subscriber miss + guidance cut + rising competition = fundamental thesis crack. From 10:30 AM the selling intensified, finishing down -21.8%. There was no catalyst to reverse the selling.',
     sellFeedback:'Correct. For subscription companies, user growth is the primary KPI. Missing it AND guiding drastically lower means the business is stalling. Sellers controlled the rest of the day.',
@@ -1254,13 +1289,15 @@ const LESSONS = [
     cutoffTime:'11:30 AM',cutoffIdx:120,predictWindow:'rest of trading day',
     open:54.20,close:38.66,change:-28.7,volume:'88M',weekHigh:268.34,weekLow:31.55,
     pe:null,mktCap:'9.8B',rsi:24,macd:'Extreme Bearish',ma50:72.30,volatility:'Extreme',
-    sentimentScore:8, analysts:{buy:9,hold:18,sell:12},
+    sentimentScore:12, analysts:{buy:9,hold:18,sell:12},
+    shortInterest:'8.9%', putCallRatio:'3.2', institutionalFlow:'Net sell $680M morning session',
     news:[
-      {src:'Reuters',headline:'FTX files Chapter 11 bankruptcy; $8B customer funds missing',sentiment:'bear'},
-      {src:'Bloomberg',headline:'Coinbase has $15M direct FTX exposure; broader contagion feared',sentiment:'bear'},
-      {src:'WSJ',headline:'Bitcoin falls 20% in 48 hours; crypto credit crisis spreading',sentiment:'bear'}
+      {src:'Reuters',headline:'FTX files Chapter 11; Coinbase CEO tweets "COIN has zero FTX exposure"',sentiment:'neu'},
+      {src:'Bloomberg',headline:'Coinbase Q3 earnings beat estimates; trading revenue up 14% sequentially',sentiment:'bull'},
+      {src:'WSJ',headline:'Bitcoin stabilizes at $16K after initial panic selling — buyers emerge at support',sentiment:'neu'}
     ],
-    context:'FTX — the #2 crypto exchange — filed for bankruptcy this morning. It is 11:30 AM. COIN is in free fall on massive volume. Bitcoin is down 20%. Contagion fears are spreading rapidly across all crypto stocks.',
+    missedQuestions:['What does a put/call ratio of 3.2 mean and who is buying those puts?','What is the difference between direct exposure and systemic contagion risk?','Why does an exchange bankruptcy cause customers to pull funds from OTHER exchanges?','If $680M left in the morning session, what does that suggest about the afternoon?'],
+    context:'FTX — the #2 crypto exchange — filed for bankruptcy this morning. It is 11:30 AM. Coinbase CEO Brian Armstrong has publicly tweeted that COIN has zero direct FTX exposure. Bitcoin has partially stabilized at $16K after the initial panic. COIN\'s Q3 earnings from last week actually beat estimates. The put/call ratio is 3.2 — extreme options bearishness. Institutional flow shows $680M in net selling during the morning session. RSI of 24 is technically deeply oversold. Some traders are calling this a buy-the-panic opportunity.',
     correctAnswer:'sell',
     buyFeedback:'FTX\'s collapse triggered full-sector contagion. From 11:30 AM, selling accelerated. COIN closed -28.7% from open. There was no catalyst for a reversal — only more bad news emerged.',
     sellFeedback:'Correct. Industry contagion from an exchange collapse is one of the most powerful negative forces. From 11:30 AM the selling intensified. COIN finished -28.7% for the day.',
@@ -1270,13 +1307,15 @@ const LESSONS = [
     cutoffTime:'10:30 AM',cutoffIdx:60,predictWindow:'rest of trading day',
     open:170.20,close:126.19,change:-24.6,volume:'89M',weekHigh:310.16,weekLow:67.58,
     pe:22,mktCap:'148B',rsi:29,macd:'Bearish',ma50:186.40,volatility:'Very High',
-    sentimentScore:18, analysts:{buy:24,hold:18,sell:5},
+    sentimentScore:31, analysts:{buy:24,hold:18,sell:5},
+    shortInterest:'4.1%',
     news:[
-      {src:'Bloomberg',headline:'PayPal abandons 750M user target; CEO walks back 5-year growth plan',sentiment:'bear'},
-      {src:'CNBC',headline:'PayPal Q4 misses revenue; active user growth stalls at 426M',sentiment:'bear'},
-      {src:'WSJ',headline:"Apple Pay, Block's Cash App gaining share from PayPal — analysts warn",sentiment:'bear'}
+      {src:'Bloomberg',headline:'PayPal Q4 beats EPS by $0.09; adjusted revenue in-line with estimates',sentiment:'bull'},
+      {src:'CNBC',headline:'PayPal abandons 750M user target; shifts focus to "engagement over growth"',sentiment:'bear'},
+      {src:'WSJ',headline:'Venmo monthly active users up 6% — PayPal\'s fastest growing product still gaining',sentiment:'bull'}
     ],
-    context:'PayPal CEO abandoned the 750M user target — a core 5-year strategic goal. Q4 missed revenue. It is 10:30 AM and the stock is in steep decline. Active user growth stalled. Competition from Apple Pay intensifying.',
+    missedQuestions:['Why was the 750M user target so important to PayPal\'s valuation specifically?','What does it mean when a company shifts from a growth metric to a profitability narrative?','Does an RSI of 29 guarantee a bounce, or can stocks stay oversold for extended periods?','If 24 analysts still have Buy ratings, why is the stock selling off?'],
+    context:'PayPal just reported Q4 last night. The headline EPS beat and the Venmo growth number look positive. But buried in the earnings call, the CEO formally abandoned the 750M active user target — the core metric that justified PayPal\'s premium valuation for three years. Management is now talking about "profitable engagement" instead of user growth. It is 10:30 AM. The stock has sold off hard despite the EPS beat. RSI is 29 — technically deeply oversold. Analysts still have 24 Buy ratings vs 5 Sells. Venmo is growing, but it generates no profit.',
     correctAnswer:'sell',
     buyFeedback:'Abandoning a major long-term target signals internal knowledge the model is broken. From 10:30 AM selling intensified. PYPL finished -24.6% for the day. There was no floor.',
     sellFeedback:'Correct. When management abandons long-term strategic targets — not just quarterly guidance — it signals a deep structural problem. Sellers controlled the entire afternoon. -24.6% by close.',
@@ -1302,13 +1341,15 @@ const LESSONS = [
     cutoffTime:'11:00 AM',cutoffIdx:90,predictWindow:'rest of trading day',
     open:88.50,close:84.85,change:-3.9,volume:'31M',weekHigh:123.74,weekLow:78.73,
     pe:null,mktCap:'155B',rsi:40,macd:'Bearish',ma50:91.20,volatility:'Medium',
-    sentimentScore:35, analysts:{buy:20,hold:16,sell:5},
+    sentimentScore:44, analysts:{buy:20,hold:16,sell:5},
+    shortInterest:'2.8%',
     news:[
-      {src:'Reuters',headline:'Disney+ loses subscribers for 2nd consecutive quarter — down 11.7M to 146.1M',sentiment:'bear'},
-      {src:'CNBC',headline:'Linear TV cord-cutting accelerates; Disney ESPN rights fees under pressure',sentiment:'bear'},
-      {src:'Bloomberg',headline:'Theme parks strong but not enough to offset streaming unit losses',sentiment:'neu'}
+      {src:'Reuters',headline:'Disney Q3 beats EPS by 35%; Bob Iger signals streaming path to profitability by 2024',sentiment:'bull'},
+      {src:'CNBC',headline:'Disney+ subscriber losses slow — down 11.7M but better than feared 15M estimate',sentiment:'neu'},
+      {src:'Bloomberg',headline:'Disney theme parks revenue hits all-time record $8.3B — highest ever reported',sentiment:'bull'}
     ],
-    context:'Disney reported second consecutive quarter of Disney+ subscriber losses last night. By 11:00 AM the stock is under pressure. Linear TV is declining. Parks are strong but streaming losses are deepening.',
+    missedQuestions:['Was this EPS beat driven by revenue growth or cost cuts — and why does that matter?','What does light trading volume on an earnings beat tell you about institutional conviction?','How many consecutive quarters of subscriber losses does it take to establish a trend?','If Disney+ needs to reach profitability by cutting costs, what does that mean for content quality and future subscriber growth?'],
+    context:'Disney beat Q3 EPS by 35 cents and theme parks hit an all-time record. Bob Iger told investors Disney+ will reach streaming profitability by 2024. The subscriber losses of 11.7M were smaller than the feared 15M. It is 11:00 AM and the stock opened higher but has faded. Volume is light at 31M — well below the 90-day average of 52M. RSI of 40 is neutral. The stock is still 28% below its 52-week high. Some analysts are calling this the inflection point.',
     correctAnswer:'sell',
     buyFeedback:'Two consecutive quarters of subscriber losses in the core product is a structural signal. From 11 AM selling continued. DIS finished -3.9% for the day.',
     sellFeedback:'Correct. Consecutive subscriber losses in a company\'s core growth product signal structural weakness. Parks strength couldn\'t offset the streaming concern. -3.9% by close.',
@@ -1318,13 +1359,15 @@ const LESSONS = [
     cutoffTime:'10:30 AM',cutoffIdx:60,predictWindow:'rest of trading day',
     open:17.50,close:16.24,change:-7.2,volume:'44M',weekHigh:39.53,weekLow:11.67,
     pe:null,mktCap:'14B',rsi:38,macd:'Bearish',ma50:19.80,volatility:'Very High',
-    sentimentScore:28, analysts:{buy:12,hold:15,sell:8},
+    sentimentScore:42, analysts:{buy:12,hold:15,sell:8},
+    shortInterest:'14.2%', putCallRatio:'1.8', institutionalFlow:'Mixed — Amazon adding, hedge funds reducing',
     news:[
-      {src:'Bloomberg',headline:'Rivian widens Q4 loss to $1.72B; 2023 production guidance cut to 50K',sentiment:'bear'},
-      {src:'CNBC',headline:'Rivian burning $1.7B per quarter with $12B cash remaining',sentiment:'bear'},
-      {src:'WSJ',headline:'High interest rates raise EV startup financing costs significantly',sentiment:'bear'}
+      {src:'Bloomberg',headline:'Rivian Q4 production hits 10,020 vehicles — beats 10,000 target for first time',sentiment:'bull'},
+      {src:'CNBC',headline:'Rivian raises 2023 production guidance to 50K vehicles — up from prior 40K',sentiment:'bull'},
+      {src:'WSJ',headline:'Amazon orders 100,000 Rivian delivery vans — reaffirms commitment as anchor customer',sentiment:'bull'}
     ],
-    context:'Rivian reported wider losses and cut production guidance last night. It is 10:30 AM. Cash burn is $1.7B/quarter in a high interest rate environment. The stock has been declining since open with no buyer support visible.',
+    missedQuestions:['If Rivian burns $1.7B/quarter and has $12B cash, how many quarters of runway is that — and what happens then?','What does a stock that gaps up 8% at open but fades by 10:30 AM tell you about who is selling?','How does a 4.75% interest rate environment affect a company that needs to raise capital to survive?','Amazon has 100,000 van orders — but does Rivian get paid when ordered or when delivered?'],
+    context:'Rivian just hit its production target for the first time ever — 10,020 vehicles in Q4 — and raised 2023 guidance to 50K. Amazon reaffirmed its 100,000 van order. On the surface this looks like a turnaround. It is 10:30 AM. The stock opened up 8% but is now fading. Short interest is 14.2% — significant hedge fund bearishness. The put/call ratio of 1.8 suggests institutional hedging. Rivian is burning $1.7B per quarter with $12B cash remaining. Q4 net loss was $1.72B — wider than consensus. Interest rates are at 4.75% and rising.',
     correctAnswer:'sell',
     buyFeedback:'Widening losses + guidance cut + $1.7B/quarter cash burn in a 5%+ rate environment = compounding negatives. From 10:30 AM the selling continued. RIVN closed -7.2%.',
     sellFeedback:'Correct. Pre-profit EV companies with high cash burn are extremely vulnerable in high-rate environments. No visible buyer support at 10:30 AM = afternoon continuation lower. -7.2% by close.',
@@ -1908,6 +1951,33 @@ function openLesson(idx, mode) {
         ${n.sentiment==='bull'?'▲ Bullish':n.sentiment==='bear'?'▼ Bearish':'● Neutral'}
       </span>
     </div>`).join('');
+
+  // Advanced Data (intermediate/advanced only)
+  const advSection = document.getElementById('advancedDataSection');
+  const adShortBox = document.getElementById('adShortBox');
+  const adPCBox    = document.getElementById('adPCBox');
+  const adFlowBox  = document.getElementById('adFlowBox');
+  if(l.diff === 'intermediate' || l.diff === 'advanced') {
+    advSection.style.display = '';
+    if(l.shortInterest) {
+      adShortBox.style.display = '';
+      document.getElementById('adShortInterest').textContent = l.shortInterest;
+      const si = parseFloat(l.shortInterest);
+      document.getElementById('adShortInterest').style.color = si > 10 ? '#f87171' : si > 5 ? '#fbbf24' : '#4ade80';
+    } else { adShortBox.style.display = 'none'; }
+    if(l.putCallRatio) {
+      adPCBox.style.display = '';
+      document.getElementById('adPutCall').textContent = l.putCallRatio;
+      const pc = parseFloat(l.putCallRatio);
+      document.getElementById('adPutCall').style.color = pc > 1.5 ? '#f87171' : pc < 0.5 ? '#fbbf24' : '#94a3b8';
+    } else { adPCBox.style.display = 'none'; }
+    if(l.institutionalFlow) {
+      adFlowBox.style.display = '';
+      document.getElementById('adInstFlow').textContent = l.institutionalFlow;
+    } else { adFlowBox.style.display = 'none'; }
+  } else {
+    advSection.style.display = 'none';
+  }
 
   // Reset decision UI
   document.getElementById('decisionZone').style.display = 'block';
@@ -2504,23 +2574,44 @@ function makeDecision(choice) {
   document.getElementById('aiText').textContent   = correct ? l.buyFeedback : l.sellFeedback;
   document.getElementById('aiLesson').textContent = l.lesson;
 
+  // Add missed questions box if incorrect on intermediate/advanced
+  const aiLessonBox = document.getElementById('aiLesson').parentElement;
+  const existingMissed = document.getElementById('missedQBox');
+  if(existingMissed) existingMissed.remove();
+  if(!correct && (l.diff === 'intermediate' || l.diff === 'advanced') && l.missedQuestions && l.missedQuestions.length) {
+    const missedBox = document.createElement('div');
+    missedBox.id = 'missedQBox';
+    missedBox.className = 'missed-q-box';
+    missedBox.innerHTML = '<div class="missed-q-title">🔍 Questions you should have asked</div>'
+      + l.missedQuestions.map(q => '<div class="missed-q-item">' + q + '</div>').join('');
+    aiLessonBox.after(missedBox);
+  }
+
   document.getElementById('aiQASection').style.display = 'block';
   STATE.qaHistory = [];
   document.getElementById('qaMessages').innerHTML = '';
-  const suggestions = correct ? [
-    'Why was '+l.ticker+' a good '+l.correctAnswer+'?',
-    'What signals confirmed this trade?',
-    'How could I have spotted this earlier?',
-    'What would have been a stop-loss level?'
-  ] : [
-    'Why was '+l.correctAnswer+' the right call?',
-    'What did I miss about '+l.ticker+'?',
-    'What signals should have warned me?',
-    'How do I avoid this mistake next time?'
-  ];
-  document.getElementById('qaSuggestions').innerHTML = suggestions.map(s=>
-    `<button class="qa-suggest-btn" onclick="sendQAText('${s.replace(/'/g,"\\'")}')"> ${s}</button>`
-  ).join('');
+
+  // Update suggestions — use missed questions if available
+  let suggestions;
+  if(!correct && (l.diff === 'intermediate' || l.diff === 'advanced') && l.missedQuestions) {
+    suggestions = l.missedQuestions.slice(0, 4);
+  } else if(correct) {
+    suggestions = [
+      'Why was ' + l.ticker + ' a good ' + l.correctAnswer + '?',
+      'What signals confirmed this trade?',
+      'How could I have spotted this earlier?',
+      'What would have been a stop-loss level?'
+    ];
+  } else {
+    suggestions = [
+      'Why was ' + l.correctAnswer + ' the right call?',
+      'What did I miss about ' + l.ticker + '?',
+      'What signals should have warned me?',
+      'How do I avoid this mistake next time?'
+    ];
+  }
+  const suggestHtml = suggestions.map(s => `<button class="qa-suggest-btn" onclick="sendQAText('${s.replace(/'/g,"\\'")}')">${s}</button>`).join('');
+  document.getElementById('qaSuggestions').innerHTML = suggestHtml;
 
   document.getElementById('aiFeedback').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
@@ -3179,10 +3270,45 @@ function generateSmartAnswer(q, l) {
   const chose = STATE.lastChoice;
   const right = l.correctAnswer;
   const isDay = l.module === 'day';
+  const isAdvanced = l.diff === 'advanced';
+  const isIntermediate = l.diff === 'intermediate';
   const newsText = l.news.map(n=>n.headline).join('; ');
   const cutoff = l.cutoffTime || 'end of day';
 
   // ── Pattern matching → specific contextual answers ────────────────────────
+
+  // Short interest
+  if(/short interest|short.*seller|short.*squeeze|shorts/.test(q)) {
+    if(l.shortInterest) {
+      const si = parseFloat(l.shortInterest);
+      return isAdvanced || isIntermediate
+        ? l.ticker + ' had ' + l.shortInterest + ' of its float sold short on ' + l.date + '. ' + (si > 10 ? 'At over 10%, short sellers had meaningful conviction here — these are typically hedge funds that have done extensive analysis. Here\'s what I want you to think about: if sophisticated funds with deep research are betting this stock falls, what do they know that the headline numbers aren\'t showing?' : 'The short interest was moderate — institutional conviction wasn\'t overwhelming either direction.') + ' The correct answer was ' + right + '.'
+        : l.ticker + ' had ' + l.shortInterest + ' of its float sold short. ' + (si > 10 ? 'High short interest means sophisticated investors are bearish — but it can also fuel a short squeeze if the stock moves up.' : 'Moderate short interest.') + ' The correct answer was ' + right + '.';
+    }
+    return 'Short interest data wasn\'t a key factor in this particular setup.';
+  }
+
+  // Put/call ratio
+  if(/put.call|put\/call|options.*ratio|calls|puts/.test(q)) {
+    if(l.putCallRatio) {
+      const pc = parseFloat(l.putCallRatio);
+      const pcDesc = pc > 1.5 ? 'extremely bearish options positioning' : pc < 0.5 ? 'extremely bullish — which is often a contrarian sell signal at extremes' : 'neutral options positioning';
+      return isAdvanced || isIntermediate
+        ? 'The put/call ratio on ' + l.ticker + ' was ' + l.putCallRatio + ' — ' + pcDesc + '. Options traders tend to be more sophisticated than the average investor. A ratio above 1 means more bearish bets than bullish. Here\'s the harder question: if the options market was positioned this way, what were they seeing that the headlines weren\'t showing?'
+        : 'The put/call ratio was ' + l.putCallRatio + ' — ' + pcDesc + '. Puts are bets the stock goes down, calls are bets it goes up. This was one of the signals pointing toward ' + right + '.';
+    }
+    return 'Options flow data wasn\'t available for this lesson, but it\'s a key metric in real trading.';
+  }
+
+  // Institutional flow
+  if(/institutional|smart money|fund|hedge fund|dark pool|flow/.test(q)) {
+    if(l.institutionalFlow) {
+      return isAdvanced || isIntermediate
+        ? 'Institutional flow for ' + l.ticker + ' showed: "' + l.institutionalFlow + '." Think about what that means: if you were buying ' + l.ticker + ' that morning, who was on the other side of your trade? Institutions move markets because of the size of their orders. When they\'re selling, retail buyers absorb that supply. Here\'s the harder question: if funds with teams of analysts were positioned this way, what does that suggest about how informed their view was?'
+        : 'Institutional flow showed "' + l.institutionalFlow + '" for ' + l.ticker + '. Large institutions move markets. When they\'re selling, retail buyers absorb the supply. This pointed toward ' + right + '.';
+    }
+    return 'Institutional flow data wasn\'t a featured metric in this lesson.';
+  }
 
   // RSI / overbought / oversold
   if(/rsi|overbought|oversold/.test(q)) {
