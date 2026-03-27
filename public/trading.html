@@ -3465,6 +3465,10 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
     if (!isInitial) {
       this.started = true;
       this.history.push({ role: 'user', content: text });
+    } else {
+      // For initial messages in validation mode, add a user message to satisfy API requirements
+      this.started = true;
+      this.history.push({ role: 'user', content: 'Begin the learning check' });
     }
 
     this.loading = true;
@@ -3555,6 +3559,11 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
               </div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
+              ${this.validationMode ? `
+                <span style="font-size:11px;padding:4px 9px;border-radius:6px;font-weight:600;background:${this.validationState.isCorrect ? 'rgba(0,229,160,0.15)' : 'rgba(255,77,109,0.15)'};color:${this.validationState.isCorrect ? '#00e5a0' : '#ff4d6d'};border:1px solid ${this.validationState.isCorrect ? 'rgba(0,229,160,0.3)' : 'rgba(255,77,109,0.3)'};">
+                  ${this.validationState.isCorrect ? '✓ CORRECT' : '✗ INCORRECT'}
+                </span>
+              ` : ''}
               <span style="font-size:10px;padding:3px 8px;border-radius:4px;font-family:monospace;letter-spacing:0.08em;font-weight:500;background:${this.validationMode ? 'rgba(147,51,234,0.12)' : isPreMode ? 'rgba(255,209,102,0.12)' : 'rgba(0,229,160,0.1)'};color:${this.validationMode ? '#a78bfa' : isPreMode ? '#ffd166' : '#00e5a0'};border:1px solid ${this.validationMode ? 'rgba(147,51,234,0.25)' : isPreMode ? 'rgba(255,209,102,0.25)' : 'rgba(0,229,160,0.2)'};">
                 ${modeLabel}
               </span>
@@ -3583,7 +3592,7 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
               </div>
             ` : ''}
 
-            ${this.history.map(m => `
+            ${this.history.filter(m => m.content !== 'Begin the learning check').map(m => `
               <div style="display:flex;flex-direction:column;max-width:90%;${m.role === 'user' ? 'align-self:flex-end;align-items:flex-end;' : 'align-self:flex-start;align-items:flex-start;'}">
                 <div style="font-size:9px;text-transform:uppercase;letter-spacing:0.1em;color:#3d5470;margin-bottom:4px;padding:0 3px;font-family:monospace;">${m.role === 'user' ? 'You' : 'Kavon AI'}</div>
                 <div style="padding:${m.role === 'user' ? '10px 13px' : '14px 16px'};border-radius:10px;font-size:13.5px;line-height:1.75;color:#dde6f0;word-break:break-word;${m.role === 'user' ? 'background:#0f2340;border:1px solid #1a3a5e;border-bottom-right-radius:3px;color:#c8dff5;white-space:pre-wrap;' : 'background:#131920;border:1px solid #1e2d3d;border-bottom-left-radius:3px;'}">
@@ -3986,7 +3995,7 @@ function scheduleAutoOpenKavonAI() {
     autoOpenTimer = setTimeout(() => {
       // Open in validation mode for learning check
       openKavonAIModal(true);
-    }, 2000);
+    }, 500);
   }
 }
 
