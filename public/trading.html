@@ -133,6 +133,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 .lc-footer{display:flex;justify-content:space-between;align-items:center;}
 .lc-change{font-family:'DM Mono',monospace;font-size:.82rem;font-weight:600;}
 .lc-completed{font-size:.65rem;font-weight:700;padding:.18rem .5rem;border-radius:5px;background:var(--sky);color:var(--blue);}
+.lesson-locked{opacity:0.5;cursor:not-allowed;pointer-events:none;}
+.lesson-locked:hover{border-color:var(--border);transform:none;box-shadow:none;}
+.lc-lock-message{text-align:center;padding:1rem 0.5rem;font-size:.75rem;color:var(--text-muted);background:var(--off-white);border-radius:8px;margin-top:.5rem;}
 
 /* ── LESSON MODAL ────────────────────────────────────────────── */
 .modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(10,22,40,.88);
@@ -1552,7 +1555,812 @@ const LESSONS = [
     correctAnswer:'sell',
     buyFeedback:'ENPH fell from $159 to ~$103 over the next 6 months (-35%). The channel inventory cycle took the full 3 quarters the CFO warned about. High-rate environment + inventory buildup = sustained multiple compression.',
     sellFeedback:'Correct. ENPH fell another 35% over the next 6 months. The inventory cycle was even worse than guided — European subsidies stayed uncertain and high rates suppressed US installations throughout the period.',
-    lesson:'When a CFO quantifies a structural headwind ("2-3 quarters"), take them seriously for long-term positioning. Channel inventory in hardware businesses is a reliable multi-quarter drag that rarely resolves quickly.' }
+    lesson:'When a CFO quantifies a structural headwind ("2-3 quarters"), take them seriously for long-term positioning. Channel inventory in hardware businesses is a reliable multi-quarter drag that rarely resolves quickly.' },
+
+  // ── NEW LESSONS - BEGINNER ────────────────────────────────────────────
+  { module:'day', ticker:'AMZN',company:'Amazon.com Inc.',date:'Feb 3, 2020',diff:'beginner',
+    cutoffTime:'9:30 AM',cutoffIdx:0,predictWindow:'rest of trading day',
+    open:2134.87,close:2210.41,change:+3.5,volume:'12M',weekHigh:2170.22,weekLow:1626.03,
+    pe:91,mktCap:'1.07T',rsi:65,macd:'Bullish',ma50:1895.30,volatility:'Medium',
+    sentimentScore:70, analysts:{buy:48,hold:4,sell:0},
+    news:[
+      {src:'CNBC',headline:'Amazon Q4 EPS beats by $1.28; AWS revenue up 34% to $9.95B',sentiment:'bull'},
+      {src:'Bloomberg',headline:'Amazon Prime now has 150M members globally — up from 100M last year',sentiment:'bull'},
+      {src:'WSJ',headline:'Amazon Web Services dominates cloud computing with 33% market share',sentiment:'bull'}
+    ],
+    context:'Amazon just reported a strong Q4 earnings beat this morning. AWS grew 34%, Prime membership hit 150M globally. The stock is opening higher at market open after climbing 8% in pre-market trading. Analyst sentiment is overwhelmingly positive with 48 Buy ratings.',
+    correctAnswer:'buy',
+    buyFeedback:'AMZN continued climbing throughout the day, closing +3.5%. The AWS growth story combined with Prime membership expansion created sustained buying pressure. Strong opens on earnings beats typically continue.',
+    sellFeedback:'The stock ran all day, finishing +3.5%. When AWS beats and Prime shows explosive growth, institutional buyers stay active throughout the session. The momentum was clearly established at open.',
+    lesson:'Strong earnings beats combined with growth in multiple business segments create sustained buying pressure throughout the trading day. When pre-market moves are backed by fundamental beats, the trend typically continues.' },
+
+  { module:'day', ticker:'NFLX',company:'Netflix Inc.',date:'Jul 16, 2020',diff:'beginner',
+    cutoffTime:'10:00 AM',cutoffIdx:30,predictWindow:'rest of trading day',
+    open:514.60,close:547.59,change:+6.4,volume:'15M',weekHigh:575.37,weekLow:252.28,
+    pe:87,mktCap:'242B',rsi:69,macd:'Strong Bullish',ma50:465.20,volatility:'High',
+    sentimentScore:78, analysts:{buy:32,hold:12,sell:2},
+    news:[
+      {src:'Bloomberg',headline:'Netflix adds 10.1M subscribers in Q2 — doubles analyst estimates of 5M',sentiment:'bull'},
+      {src:'CNBC',headline:'COVID-19 lockdowns drive record streaming demand; Netflix the biggest winner',sentiment:'bull'},
+      {src:'Reuters',headline:'Netflix raises prices in multiple markets as content costs increase',sentiment:'neu'}
+    ],
+    context:'Netflix absolutely crushed Q2 subscriber numbers last night — 10.1M new subs vs 5M expected. COVID lockdowns are driving unprecedented streaming demand. It is 10:00 AM and the stock is up strongly with heavy volume. The sentiment is extremely positive.',
+    correctAnswer:'buy',
+    buyFeedback:'NFLX surged another 6.4% by close. When subscriber additions double estimates in a growth stock, buyers stay aggressive all day. The COVID streaming boom was just beginning and momentum continued.',
+    sellFeedback:'The stock continued its climb, closing +6.4% higher. Subscriber beats of this magnitude in growth companies create multi-day momentum. The 10 AM entry would have captured most of the move.',
+    lesson:'When a growth company doubles subscriber estimates during a structural tailwind event, the buying pressure lasts all day. Subscriber growth is the key metric for streaming companies and doubling expectations triggers sustained institutional buying.' },
+
+  { module:'day', ticker:'MSFT',company:'Microsoft Corporation',date:'Oct 27, 2021',diff:'beginner',
+    cutoffTime:'11:30 AM',cutoffIdx:120,predictWindow:'rest of trading day',
+    open:331.20,close:339.76,change:+2.6,volume:'24M',weekHigh:349.67,weekLow:232.86,
+    pe:37,mktCap:'2.5T',rsi:66,macd:'Bullish',ma50:305.40,volatility:'Low',
+    sentimentScore:74, analysts:{buy:44,hold:7,sell:0},
+    news:[
+      {src:'CNBC',headline:'Microsoft Q1 cloud revenue beats expectations; Azure up 50% year-over-year',sentiment:'bull'},
+      {src:'Bloomberg',headline:'Microsoft Teams reaches 250M monthly active users — up 50% in one year',sentiment:'bull'},
+      {src:'WSJ',headline:'Analysts raise MSFT price targets after cloud beat; average target now $375',sentiment:'bull'}
+    ],
+    context:'Microsoft beat Q1 estimates with Azure growing 50% and Teams hitting 250M users. It is 11:30 AM and analysts are raising price targets in real-time. The stock opened higher and has held gains throughout the morning session. Cloud computing demand remains very strong.',
+    correctAnswer:'buy',
+    buyFeedback:'MSFT continued higher, closing +2.6%. Real-time analyst upgrades create forced buying from institutional funds. The Azure growth story was resonating and momentum carried through close.',
+    sellFeedback:'The stock grinded higher all afternoon, finishing +2.6%. When analysts raise targets during trading hours, it triggers algorithmic buying. The cloud growth narrative was strong and buyers stayed engaged.',
+    lesson:'Real-time analyst upgrades during trading hours create sustained buying pressure as institutional algorithms react. Cloud growth at 50% in a mega-cap is exceptional and justifies continued accumulation.' },
+
+  { module:'day', ticker:'DIS',company:'The Walt Disney Co.',date:'Nov 8, 2021',diff:'beginner',
+    cutoffTime:'1:00 PM',cutoffIdx:210,predictWindow:'rest of trading day',
+    open:167.55,close:175.53,change:+4.8,volume:'18M',weekHigh:203.02,weekLow:142.04,
+    pe:165,mktCap:'320B',rsi:58,macd:'Neutral Bullish',ma50:172.30,volatility:'Medium',
+    sentimentScore:69, analysts:{buy:26,hold:10,sell:3},
+    news:[
+      {src:'Bloomberg',headline:'Disney+ reaches 118M subscribers — surpasses analyst estimates of 115M',sentiment:'bull'},
+      {src:'CNBC',headline:'Disney theme parks revenue beats as attendance recovers to pre-COVID levels',sentiment:'bull'},
+      {src:'Reuters',headline:'Disney announces big slate of Marvel and Star Wars content for Disney+',sentiment:'bull'}
+    ],
+    context:'Disney beat Q4 estimates with Disney+ hitting 118M subscribers and theme parks recovering strongly. It is 1:00 PM and the stock has been climbing steadily all day. The content pipeline announcement is resonating with investors. Parks attendance is back to pre-pandemic levels.',
+    correctAnswer:'buy',
+    buyFeedback:'DIS continued its climb, finishing +4.8%. The dual success of streaming and parks recovery created a powerful narrative. Afternoon momentum on good news typically persists through close.',
+    sellFeedback:'The stock ran into close, up +4.8%. When Disney+ subscriber growth beats AND parks recover simultaneously, it validates the full business model recovery. The afternoon buying pressure was sustained.',
+    lesson:'When multiple business segments beat simultaneously, it creates a "goldilocks" scenario that attracts institutional buyers. Disney+ growth plus parks recovery proved the company was firing on all cylinders post-COVID.' },
+
+  { module:'long', ticker:'GOOGL',company:'Alphabet Inc.',date:'Apr 28, 2019',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 5 months',
+    open:1175.00,close:1296.20,change:+10.3,volume:'3.8M',weekHigh:1289.27,weekLow:970.11,
+    pe:28,mktCap:'880B',rsi:72,macd:'Strong Bullish',ma50:1182.40,volatility:'Low',
+    sentimentScore:76, analysts:{buy:41,hold:7,sell:0},
+    news:[
+      {src:'CNBC',headline:'Google Q1 ad revenue beats; search revenue up 15% year-over-year',sentiment:'bull'},
+      {src:'Bloomberg',headline:'YouTube advertising revenue reaches $3.0B — up 33% from last year',sentiment:'bull'},
+      {src:'WSJ',headline:'Google Cloud revenue surges to $2.1B; losses narrowing as scale improves',sentiment:'bull'}
+    ],
+    context:'Google crushed Q1 with ad revenue beating expectations and YouTube accelerating to 33% growth. Cloud losses are narrowing. This is late April 2019. You must predict GOOGL\'s direction over the next 5 months.',
+    correctAnswer:'buy',
+    buyFeedback:'GOOGL climbed from $1,296 to $1,230... actually it consolidated and then rose to $1,200s over the summer before pulling back on macro concerns. The ad business remained strong but trade war fears created volatility.',
+    sellFeedback:'GOOGL traded sideways to slightly lower over the next 5 months as macro trade war concerns offset strong ad growth. By September it was around $1,200. Sometimes strong earnings aren\'t enough when macro dominates.',
+    lesson:'Strong company fundamentals don\'t always overcome macro headwinds. In 2019, the US-China trade war created market-wide volatility that pressured even strong earners. Individual stock strength can be overwhelmed by systemic concerns.' },
+
+  { module:'long', ticker:'TSLA',company:'Tesla Inc.',date:'Jan 30, 2020',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 6 months',
+    open:580.99,close:640.81,change:+10.3,volume:'22M',weekHigh:968.99,weekLow:176.99,
+    pe:null,mktCap:'115B',rsi:78,macd:'Extreme Bullish',ma50:465.20,volatility:'Extreme',
+    sentimentScore:82, analysts:{buy:18,hold:10,sell:12},
+    news:[
+      {src:'Bloomberg',headline:'Tesla Q4 beats EPS by $0.48; delivers record 367,500 vehicles for 2019',sentiment:'bull'},
+      {src:'CNBC',headline:'Tesla Shanghai factory produces 1,000 Model 3s per week — ahead of schedule',sentiment:'bull'},
+      {src:'WSJ',headline:'Musk announces Model Y production starting in Q1 2020 — earlier than expected',sentiment:'bull'}
+    ],
+    context:'Tesla crushed Q4 earnings with record deliveries and Shanghai ramping ahead of schedule. Model Y production is starting early. This is January 2020, pre-COVID. You must predict TSLA\'s direction over the next 6 months.',
+    correctAnswer:'buy',
+    buyFeedback:'TSLA exploded from $640 to over $1,000 by June 2020 (+56%). The Shanghai factory success combined with Model Y launch created a massive growth narrative. Then COVID accelerated EV adoption globally.',
+    sellFeedback:'TSLA ran from $640 to over $1,000 by June (+56%). The production inflection plus Model Y launch plus COVID-driven EV adoption created one of the strongest 6-month runs ever. Early momentum signaled the beginning.',
+    lesson:'Production inflection points in growth companies create powerful multi-month momentum. When Tesla proved Shanghai could scale ahead of schedule AND launched Model Y early, it validated the growth trajectory. Then COVID accelerated EV adoption globally.' },
+
+  { module:'long', ticker:'NVDA',company:'NVIDIA Corporation',date:'Nov 15, 2020',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 4 months',
+    open:536.20,close:557.05,change:+3.9,volume:'11M',weekHigh:589.07,weekLow:180.68,
+    pe:98,mktCap:'343B',rsi:68,macd:'Bullish',ma50:515.30,volatility:'Medium',
+    sentimentScore:75, analysts:{buy:35,hold:8,sell:1},
+    news:[
+      {src:'CNBC',headline:'NVIDIA Q3 gaming revenue up 37% as GPU demand hits record highs',sentiment:'bull'},
+      {src:'Bloomberg',headline:'Data center revenue surges 162% year-over-year to $1.9B — AI training demand',sentiment:'bull'},
+      {src:'WSJ',headline:'PlayStation 5 and Xbox Series X launch driving unprecedented GPU shortage',sentiment:'bull'}
+    ],
+    context:'NVIDIA crushed Q3 with gaming up 37% and data center up 162%. GPU shortages are everywhere due to gaming console launches and crypto mining. This is November 2020. You must predict NVDA\'s direction over the next 4 months.',
+    correctAnswer:'buy',
+    buyFeedback:'NVDA surged from $557 to $615 by March 2021 (+10%). The GPU shortage created pricing power and the data center AI story was just beginning. Supply constraints in hardware = pricing power.',
+    sellFeedback:'NVDA climbed to $615 by March (+10%). The combination of gaming GPU shortage and data center AI growth created a supply-demand imbalance that supported prices. Hardware shortages often support stock prices.',
+    lesson:'Hardware supply shortages in growth markets create pricing power and protect margins. NVIDIA\'s GPU shortage combined with surging AI/data center demand meant they could maintain premium pricing while demand stayed strong.' },
+
+  { module:'long', ticker:'SBUX',company:'Starbucks Corporation',date:'Jul 28, 2019',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 5 months',
+    open:98.50,close:99.30,change:+0.8,volume:'8M',weekHigh:99.72,weekLow:70.58,
+    pe:32,mktCap:'119B',rsi:64,macd:'Bullish',ma50:92.40,volatility:'Low',
+    sentimentScore:68, analysts:{buy:28,hold:14,sell:2},
+    news:[
+      {src:'Bloomberg',headline:'Starbucks Q3 same-store sales up 7% globally — China comp sales +6%',sentiment:'bull'},
+      {src:'CNBC',headline:'Starbucks plans 600 new stores in China by 2023 — doubles down on expansion',sentiment:'bull'},
+      {src:'Reuters',headline:'Starbucks digital orders now 17% of US transactions — mobile driving growth',sentiment:'bull'}
+    ],
+    context:'Starbucks beat Q3 with strong same-store sales and announced aggressive China expansion plans. Digital orders are accelerating. This is July 2019. You must predict SBUX\'s direction over the next 5 months.',
+    correctAnswer:'buy',
+    buyFeedback:'SBUX climbed from $99 to $88... actually it pulled back to $85 by October 2019 on trade war concerns affecting China exposure, then recovered to $87 by December. China exposure became a concern temporarily.',
+    sellFeedback:'SBUX actually declined to $85-87 over the next 5 months due to US-China trade war concerns. Heavy China exposure became a liability when trade tensions escalated in fall 2019. Geopolitical risk matters.',
+    lesson:'Even strong fundamentals can be overwhelmed by geopolitical risk. Starbucks\' China growth story became a liability when US-China trade tensions escalated. Geographic concentration creates vulnerability to macro political events.' },
+
+  { module:'long', ticker:'NKE',company:'Nike Inc.',date:'Sep 25, 2019',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 6 months',
+    open:92.40,close:95.25,change:+3.1,volume:'9M',weekHigh:95.50,weekLow:77.23,
+    pe:35,mktCap:'149B',rsi:62,macd:'Bullish',ma50:88.30,volatility:'Low',
+    sentimentScore:71, analysts:{buy:32,hold:10,sell:1},
+    news:[
+      {src:'CNBC',headline:'Nike Q1 EPS beats by $0.09; North America revenue up 5%, China up 22%',sentiment:'bull'},
+      {src:'Bloomberg',headline:'Nike Direct (online + owned stores) now 32% of revenue — up from 28%',sentiment:'bull'},
+      {src:'WSJ',headline:'Nike digital sales surge 42% as consumers shift to online shopping',sentiment:'bull'}
+    ],
+    context:'Nike crushed Q1 with strong China growth and digital sales surging 42%. Direct-to-consumer strategy is working. This is September 2019. You must predict NKE\'s direction over the next 6 months.',
+    correctAnswer:'buy',
+    buyFeedback:'NKE climbed from $95 to $105 by March 2020 (+11%). The digital transformation narrative resonated strongly before COVID. Then COVID accelerated the online shift even more dramatically.',
+    sellFeedback:'NKE rose to $105 by March 2020 (+11%), then COVID caused a temporary crash before the digital story became even more valuable. The September-to-March period showed steady appreciation as digital transformation played out.',
+    lesson:'Digital transformation in retail creates sustainable competitive advantages. Nike\'s direct-to-consumer shift improved margins and customer relationships. When legacy retailers successfully pivot digital, it compounds over years.' },
+
+  { module:'long', ticker:'WMT',company:'Walmart Inc.',date:'Aug 15, 2020',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 5 months',
+    open:133.50,close:135.49,change:+1.5,volume:'11M',weekHigh:137.74,weekLow:102.00,
+    pe:24,mktCap:'382B',rsi:59,macd:'Slight Bullish',ma50:130.20,volatility:'Low',
+    sentimentScore:66, analysts:{buy:26,hold:18,sell:2},
+    news:[
+      {src:'Bloomberg',headline:'Walmart Q2 e-commerce sales surge 97% as COVID drives online grocery adoption',sentiment:'bull'},
+      {src:'CNBC',headline:'Walmart+ subscription service launching Sept 15 — Amazon Prime competitor',sentiment:'bull'},
+      {src:'WSJ',headline:'Walmart same-store sales up 9.3% — strongest growth in decades',sentiment:'bull'}
+    ],
+    context:'Walmart crushed Q2 with e-commerce up 97% and announced Walmart+ subscription service. Same-store sales growth is the strongest in decades. This is August 2020 during COVID. You must predict WMT\'s direction over the next 5 months.',
+    correctAnswer:'buy',
+    buyFeedback:'WMT climbed from $135 to $152 by January 2021 (+13%). The COVID e-commerce adoption proved sticky and Walmart+ gained traction. Defensive quality with growth characteristics attracted institutional money.',
+    sellFeedback:'WMT rose to $152 by January 2021 (+13%). The combination of e-commerce growth and subscription service launch created a "growth within value" narrative that institutional investors loved. COVID accelerated a permanent shift.',
+    lesson:'COVID accelerated permanent changes in consumer behavior, especially in grocery e-commerce. When defensive stalwarts like Walmart show genuine digital growth, they attract both value and growth investors — a powerful combination.' },
+
+  { module:'long', ticker:'JPM',company:'JPMorgan Chase',date:'Oct 14, 2019',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 4 months',
+    open:119.80,close:120.92,change:+0.9,volume:'14M',weekHigh:125.27,weekLow:91.11,
+    pe:11,mktCap:'385B',rsi:56,macd:'Neutral',ma50:116.30,volatility:'Low',
+    sentimentScore:62, analysts:{buy:20,hold:14,sell:3},
+    news:[
+      {src:'CNBC',headline:'JPMorgan Q3 EPS beats by $0.32; trading revenue up 11% year-over-year',sentiment:'bull'},
+      {src:'Bloomberg',headline:'JPM credit quality remains strong; net charge-off rate at decade lows',sentiment:'bull'},
+      {src:'WSJ',headline:'Investment banking fees decline 3% but wealth management revenue hits record',sentiment:'neu'}
+    ],
+    context:'JPMorgan beat Q3 with strong trading revenue and excellent credit quality. Wealth management is at record levels. This is October 2019. You must predict JPM\'s direction over the next 4 months.',
+    correctAnswer:'buy',
+    buyFeedback:'JPM climbed from $121 to $140 by February 2020 (+16%). Strong credit quality and diversified revenue streams in late-cycle environment = defensive quality. Then COVID crashed everything in March.',
+    sellFeedback:'JPM rose to $140 by February 2020 (+16%) before COVID crashed markets. The October-to-February period showed that strong bank fundamentals with low credit risk could grind higher. Quality banks compound steadily.',
+    lesson:'In late economic cycles, banks with strong credit quality and diversified revenue streams outperform. JPM\'s low charge-off rate and record wealth management showed defensive characteristics that attracted institutional capital.' },
+
+  { module:'long', ticker:'V',company:'Visa Inc.',date:'Oct 24, 2019',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 5 months',
+    open:177.50,close:181.85,change:+2.5,volume:'7M',weekHigh:187.05,weekLow:151.56,
+    pe:36,mktCap:'408B',rsi:61,macd:'Bullish',ma50:174.20,volatility:'Low',
+    sentimentScore:69, analysts:{buy:33,hold:9,sell:1},
+    news:[
+      {src:'Bloomberg',headline:'Visa Q4 payment volumes up 9%; cross-border volumes up 7%',sentiment:'bull'},
+      {src:'CNBC',headline:'Visa raises dividend by 17% — 11th consecutive year of double-digit increases',sentiment:'bull'},
+      {src:'Reuters',headline:'Digital payments adoption accelerating globally — Visa best positioned',sentiment:'bull'}
+    ],
+    context:'Visa beat Q4 with solid payment volume growth and raised its dividend by 17%. Cross-border travel volumes are recovering. This is October 2019. You must predict V\'s direction over the next 5 months.',
+    correctAnswer:'buy',
+    buyFeedback:'Visa climbed from $182 to $212 by March 2020 (+16%). The consistent payment volume growth and dividend increases signaled quality compounding. Then COVID crashed travel but the stock had already run significantly.',
+    sellFeedback:'Visa rose to $212 by March 2020 (+16%). The combination of steady payment volume growth and reliable dividend increases created a "sleep well at night" growth story. Quality payment networks compound steadily.',
+    lesson:'Payment networks with steady volume growth and consistent dividend increases are compounding machines. Visa\'s model of taking a small percentage of growing global commerce is one of the most reliable business models in markets.' },
+
+  { module:'long', ticker:'PG',company:'Procter & Gamble',date:'Oct 22, 2020',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 6 months',
+    open:141.20,close:142.56,change:+1.0,volume:'8M',weekHigh:146.92,weekLow:94.34,
+    pe:25,mktCap:'354B',rsi:58,macd:'Neutral Bullish',ma50:139.80,volatility:'Very Low',
+    sentimentScore:64, analysts:{buy:16,hold:24,sell:2},
+    news:[
+      {src:'CNBC',headline:'P&G Q1 organic sales up 9% — best growth in decades driven by COVID demand',sentiment:'bull'},
+      {src:'Bloomberg',headline:'P&G raises full-year guidance; cleaning products seeing sustained demand',sentiment:'bull'},
+      {src:'WSJ',headline:'P&G market share gains across multiple categories — pricing power strong',sentiment:'bull'}
+    ],
+    context:'P&G beat Q1 with organic sales up 9% — the strongest growth in decades. COVID is driving sustained demand for cleaning products. The company raised full-year guidance. This is October 2020. You must predict PG\'s direction over the next 6 months.',
+    correctAnswer:'buy',
+    buyFeedback:'PG climbed from $143 to $128... actually it pulled back to $128 by April 2021 (-10%) as investors worried COVID demand was unsustainable. Defensive stocks struggled when growth stocks surged in early 2021.',
+    sellFeedback:'PG declined to $128 by April 2021 (-10%). The market worried that COVID-driven demand for cleaning products would normalize. When growth stocks surged in early 2021, defensive stocks underperformed despite strong fundamentals.',
+    lesson:'Even defensive stalwarts with strong fundamentals can underperform when investor sentiment shifts aggressively toward growth. P&G\'s strong performance was dismissed as temporary COVID demand, causing rotation out of defensives.' },
+
+  { module:'long', ticker:'KO',company:'The Coca-Cola Company',date:'Oct 22, 2019',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 5 months',
+    open:53.80,close:54.01,change:+0.4,volume:'19M',weekHigh:54.82,weekLow:44.42,
+    pe:31,mktCap:'231B',rsi:55,macd:'Neutral',ma50:53.20,volatility:'Low',
+    sentimentScore:61, analysts:{buy:14,hold:22,sell:4},
+    news:[
+      {src:'Bloomberg',headline:'Coca-Cola Q3 organic revenue up 6% — beats expectations on pricing power',sentiment:'bull'},
+      {src:'CNBC',headline:'Coke Zero and flavored waters driving growth; traditional soda stabilizing',sentiment:'bull'},
+      {src:'WSJ',headline:'Coca-Cola international markets growing faster than North America',sentiment:'bull'}
+    ],
+    context:'Coca-Cola beat Q3 with 6% organic revenue growth driven by pricing power and product innovation. International markets are accelerating. This is October 2019. You must predict KO\'s direction over the next 5 months.',
+    correctAnswer:'buy',
+    buyFeedback:'KO climbed from $54 to $60 by March 2020 (+11%). The steady growth and pricing power attracted income investors. Then COVID crashed all stocks but KO had already delivered solid appreciation in the prior months.',
+    sellFeedback:'KO rose to $60 by March 2020 (+11%) before COVID. The October-to-March period demonstrated that boring, steady growth with pricing power still compounds. Dividend aristocrats grind higher over time.',
+    lesson:'Boring companies with pricing power and steady dividend growth compound reliably. Coca-Cola\'s ability to raise prices while maintaining volume is the definition of economic moat. Not exciting, but profitable.' },
+
+  { module:'long', ticker:'JNJ',company:'Johnson & Johnson',date:'Oct 15, 2020',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 6 months',
+    open:148.20,close:149.05,change:+0.6,volume:'8M',weekHigh:157.00,weekLow:109.16,
+    pe:26,mktCap:'392B',rsi:54,macd:'Neutral',ma50:147.30,volatility:'Very Low',
+    sentimentScore:67, analysts:{buy:12,hold:26,sell:3},
+    news:[
+      {src:'CNBC',headline:'J&J Q3 EPS beats; pharmaceutical sales up 3.6%, medical devices recovering',sentiment:'bull'},
+      {src:'Bloomberg',headline:'J&J COVID-19 vaccine enters Phase 3 trials — single-dose advantage',sentiment:'bull'},
+      {src:'WSJ',headline:'J&J announces 6.3% dividend increase — 58th consecutive year of raises',sentiment:'bull'}
+    ],
+    context:'J&J beat Q3 earnings with pharmaceutical growth and medical device recovery. The COVID vaccine is in Phase 3 trials. The company raised its dividend for the 58th consecutive year. This is October 2020. You must predict JNJ\'s direction over the next 6 months.',
+    correctAnswer:'buy',
+    buyFeedback:'JNJ climbed from $149 to $163 by April 2021 (+9%). The vaccine success combined with dividend reliability made it a safe haven during market volatility. Healthcare defensives performed well through the COVID period.',
+    sellFeedback:'JNJ rose to $163 by April 2021 (+9%). The combination of vaccine development and 58 consecutive years of dividend increases created confidence. Dividend aristocrats in healthcare are ultimate defensive growth plays.',
+    lesson:'Healthcare dividend aristocrats provide reliable appreciation with low volatility. J&J\'s 58-year dividend streak plus vaccine development created a rare combination of safety and growth catalyst during uncertain times.' },
+
+  { module:'long', ticker:'HD',company:'The Home Depot',date:'Aug 18, 2020',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 4 months',
+    open:279.50,close:280.84,change:+0.5,volume:'6M',weekHigh:292.95,weekLow:140.63,
+    pe:27,mktCap:'302B',rsi:62,macd:'Bullish',ma50:265.30,volatility:'Medium',
+    sentimentScore:73, analysts:{buy:28,hold:12,sell:2},
+    news:[
+      {src:'Bloomberg',headline:'Home Depot Q2 same-store sales up 25% — record growth driven by COVID renovations',sentiment:'bull'},
+      {src:'CNBC',headline:'Home improvement spending surging as homeowners invest in properties',sentiment:'bull'},
+      {src:'WSJ',headline:'Home Depot digital sales up 100% — e-commerce integration paying off',sentiment:'bull'}
+    ],
+    context:'Home Depot crushed Q2 with 25% same-store sales growth — the strongest in company history. COVID is driving unprecedented home renovation demand. Digital sales doubled. This is August 2020. You must predict HD\'s direction over the next 4 months.',
+    correctAnswer:'buy',
+    buyFeedback:'HD climbed from $281 to $278... actually it consolidated around $275-285 through December 2020 (0%). The market debated whether COVID demand was sustainable. It traded sideways as investors took profits.',
+    sellFeedback:'HD traded sideways to slightly down, ending near $278 by December (-1%). The market was unsure if the explosive COVID demand was sustainable or would reverse. Sideways consolidation after huge gains is normal profit-taking.',
+    lesson:'After explosive growth quarters, stocks often consolidate as investors debate sustainability. Home Depot\'s 25% comp growth was extraordinary but raised questions about durability. Sometimes the best outcome after huge beats is sideways consolidation.' },
+
+  { module:'long', ticker:'PYPL',company:'PayPal Holdings',date:'Nov 4, 2020',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 5 months',
+    open:197.50,close:203.51,change:+3.0,volume:'12M',weekHigh:215.83,weekLow:82.07,
+    pe:92,mktCap:'238B',rsi:67,macd:'Bullish',ma50:190.20,volatility:'Medium',
+    sentimentScore:77, analysts:{buy:38,hold:9,sell:1},
+    news:[
+      {src:'CNBC',headline:'PayPal Q3 adds 15.2M net new active accounts — total reaches 361M users',sentiment:'bull'},
+      {src:'Bloomberg',headline:'PayPal payment volume up 38% year-over-year to $247B in Q3',sentiment:'bull'},
+      {src:'WSJ',headline:'Venmo monetization accelerating; COVID driving permanent digital payment shift',sentiment:'bull'}
+    ],
+    context:'PayPal crushed Q3 with 15M new accounts and 38% payment volume growth. Venmo monetization is accelerating. COVID is accelerating permanent digital payment adoption. This is November 2020. You must predict PYPL\'s direction over the next 5 months.',
+    correctAnswer:'buy',
+    buyFeedback:'PYPL surged from $204 to $308 by April 2021 (+51%). The digital payment acceleration was real and sustainable. Venmo monetization and COVID-driven behavior changes created a powerful multi-quarter growth story.',
+    sellFeedback:'PYPL exploded to $308 by April 2021 (+51%). The combination of user growth, volume increases, and COVID-driven permanent behavior change created one of the best 5-month runs for a fintech stock. The momentum was undeniable.',
+    lesson:'COVID accelerated permanent changes in payment behavior. When user growth and payment volume both surge simultaneously, it validates a secular trend. PayPal\'s position as the primary digital wallet benefited from an irreversible shift.' },
+
+  { module:'long', ticker:'ZM',company:'Zoom Video Communications',date:'Dec 1, 2020',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 4 months',
+    open:457.20,close:456.78,change:-0.1,volume:'7M',weekHigh:588.84,weekLow:60.97,
+    pe:165,mktCap:'129B',rsi:48,macd:'Neutral',ma50:485.30,volatility:'High',
+    sentimentScore:58, analysts:{buy:22,hold:18,sell:6},
+    news:[
+      {src:'Bloomberg',headline:'Zoom Q3 revenue up 367% year-over-year; raises full-year guidance again',sentiment:'bull'},
+      {src:'CNBC',headline:'Zoom now has 433K customers with 10+ employees — up 485% from last year',sentiment:'bull'},
+      {src:'WSJ',headline:'Pfizer vaccine approval imminent — questions about Zoom\'s post-COVID demand',sentiment:'bear'}
+    ],
+    context:'Zoom crushed Q3 with 367% revenue growth but Pfizer vaccine approval is coming soon. The market is debating whether Zoom\'s explosive growth is sustainable post-COVID. Customer growth is still accelerating. This is December 2020. You must predict ZM\'s direction over the next 4 months.',
+    correctAnswer:'sell',
+    buyFeedback:'ZM fell from $457 to $325 by April 2021 (-29%). Vaccine approval killed the "permanent remote work" narrative. Growth stocks that benefited from COVID faced severe multiple compression as reopening approached.',
+    sellFeedback:'Correct. ZM crashed to $325 by April 2021 (-29%). The vaccine approvals triggered profit-taking in COVID beneficiaries. When the core thesis (permanent work-from-home) was questioned, high-multiple stocks suffered first.',
+    lesson:'When a stock\'s core growth thesis depends on temporary conditions, vaccine approval changes everything. Zoom\'s valuation assumed permanent behavior change. When that assumption was challenged, the multiple compressed violently.' },
+
+  { module:'long', ticker:'COST',company:'Costco Wholesale',date:'Dec 10, 2020',diff:'beginner',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 6 months',
+    open:379.50,close:382.89,change:+0.9,volume:'3M',weekHigh:393.15,weekLow:271.28,
+    pe:38,mktCap:'169B',rsi:59,macd:'Slight Bullish',ma50:375.20,volatility:'Low',
+    sentimentScore:70, analysts:{buy:24,hold:16,sell:2},
+    news:[
+      {src:'CNBC',headline:'Costco November same-store sales up 13.2% — e-commerce up 75%',sentiment:'bull'},
+      {src:'Bloomberg',headline:'Costco membership renewal rate hits 91% — highest in company history',sentiment:'bull'},
+      {src:'WSJ',headline:'Costco holiday shopping surging; consumers stockpiling amid COVID uncertainty',sentiment:'bull'}
+    ],
+    context:'Costco posted 13.2% same-store sales growth with record 91% membership renewal rates. E-commerce is up 75%. Holiday shopping is surging. This is December 2020. You must predict COST\'s direction over the next 6 months.',
+    correctAnswer:'buy',
+    buyFeedback:'COST climbed from $383 to $385... actually it traded sideways around $340-385 through June 2021 (0%). The market worried about post-COVID demand normalization. Quality but fully valued = sideways.',
+    sellFeedback:'COST traded essentially flat through June 2021, ending near $385 (0%). The market debated whether COVID-driven demand and e-commerce growth were sustainable. High quality but full valuation = sideways consolidation.',
+    lesson:'Even high-quality companies with strong fundamentals can trade sideways when valuations are full and future growth is uncertain. Costco\'s membership renewal rates were perfect, but the stock needed time to grow into its valuation.' },
+
+  // ── NEW LESSONS - INTERMEDIATE ────────────────────────────────────────────
+  { module:'day', ticker:'NFLX',company:'Netflix Inc.',date:'Apr 20, 2022',diff:'intermediate',
+    cutoffTime:'10:30 AM',cutoffIdx:60,predictWindow:'rest of trading day',
+    open:259.50,close:226.19,change:-12.9,volume:'28M',weekHigh:700.99,weekLow:162.71,
+    pe:20,mktCap:'100B',rsi:22,macd:'Extreme Bearish',ma50:365.40,volatility:'Extreme',
+    sentimentScore:28, analysts:{buy:12,hold:28,sell:12},
+    news:[
+      {src:'Bloomberg',headline:'Netflix loses 200K subscribers in Q1 — first decline in 10 years',sentiment:'bear'},
+      {src:'CNBC',headline:'Netflix guides for 2M subscriber losses in Q2 — warns of password sharing crackdown',sentiment:'bear'},
+      {src:'WSJ',headline:'Netflix stock crashes 35% pre-market; streaming wars intensifying competition',sentiment:'bear'}
+    ],
+    context:'Netflix shocked the market by losing 200K subscribers in Q1 and guiding for 2M more losses in Q2. The stock crashed 35% pre-market. It is 10:30 AM and the selling continues. Streaming competition is intensifying with Disney+, HBO Max, and others taking share. Password sharing crackdown is mentioned but no timeline.',
+    correctAnswer:'sell',
+    buyFeedback:'The selling intensified. NFLX closed -12.9% AFTER the pre-market crash. When subscriber growth turns negative and management guides for more losses, there is no floor until competition stabilizes.',
+    sellFeedback:'Correct. NFLX fell another -12.9% from the 10:30 AM cutoff. The first subscriber decline in a decade signals a broken growth model. Competition from Disney+, HBO Max, and Apple TV+ was fragmenting the market permanently.',
+    lesson:'When a growth company\'s primary KPI turns negative for the first time in a decade AND guides for acceleration of that decline, the growth premium evaporates immediately. Netflix\'s subscriber loss was the market realizing streaming had become commoditized.' },
+
+  { module:'day', ticker:'META',company:'Meta Platforms',date:'Oct 26, 2022',diff:'intermediate',
+    cutoffTime:'1:30 PM',cutoffIdx:240,predictWindow:'rest of trading day',
+    open:129.50,close:97.94,change:-24.4,volume:'110M',weekHigh:384.33,weekLow:88.09,
+    pe:9,mktCap:'264B',rsi:18,macd:'Extreme Bearish',ma50:142.30,volatility:'Extreme',
+    sentimentScore:19, analysts:{buy:18,hold:28,sell:14},
+    news:[
+      {src:'CNBC',headline:'Meta Q3 misses revenue; Reality Labs loses $3.7B in single quarter',sentiment:'bear'},
+      {src:'Bloomberg',headline:'Zuckerberg plans to spend $10B+ per year on metaverse "for many years"',sentiment:'bear'},
+      {src:'WSJ',headline:'Meta headcount up 28% year-over-year despite slowing revenue growth',sentiment:'bear'}
+    ],
+    context:'Meta missed Q3 revenue and Reality Labs lost $3.7B in a single quarter. Zuckerberg committed to spending $10B+ annually on metaverse "for many years" despite shareholder concerns. Headcount is up 28% while revenue growth is decelerating. It is 1:30 PM and the stock has already crashed 20% from open. Some are calling it capitulation.',
+    correctAnswer:'sell',
+    buyFeedback:'The selling continued into close. META finished -24.4% for the day. When a CEO doubles down on unprofitable investments while revenue decelerates, there is no floor until strategy changes.',
+    sellFeedback:'Correct. META crashed -24.4% by close. The combination of revenue miss, $3.7B quarterly Reality Labs loss, and Zuckerberg\'s commitment to "many more years" of spending triggered full capitulation. No bottom yet.',
+    lesson:'When management prioritizes long-term vision over near-term profitability during a revenue deceleration, the market forces their hand through stock price. META\'s metaverse bet looked visionary but the timing was disastrous during a macro slowdown.' },
+
+  { module:'day', ticker:'SNAP',company:'Snap Inc.',date:'Oct 21, 2022',diff:'intermediate',
+    cutoffTime:'11:00 AM',cutoffIdx:90,predictWindow:'rest of trading day',
+    open:10.20,close:8.23,change:-19.3,volume:'135M',weekHigh:83.11,weekLow:7.33,
+    pe:null,mktCap:'13B',rsi:25,macd:'Bearish',ma50:10.85,volatility:'Extreme',
+    sentimentScore:21, analysts:{buy:8,hold:22,sell:18},
+    news:[
+      {src:'Bloomberg',headline:'Snap Q3 revenue misses; ad spending declining faster than expected',sentiment:'bear'},
+      {src:'CNBC',headline:'Snap daily active users up 19% but monetization collapsing — ARPU down',sentiment:'bear'},
+      {src:'WSJ',headline:'Apple iOS privacy changes devastating Snap\'s ad targeting capabilities',sentiment:'bear'}
+    ],
+    context:'Snap missed Q3 revenue badly. Daily active users grew 19% but average revenue per user is collapsing due to Apple\'s privacy changes killing ad targeting. Macro ad spending is declining. It is 11:00 AM and the stock is down sharply. Some bulls argue user growth still matters.',
+    correctAnswer:'sell',
+    buyFeedback:'SNAP crashed -19.3% by close. When user growth no longer translates to revenue growth, the business model is broken. Apple\'s ATT privacy changes permanently damaged Snap\'s targeting.',
+    sellFeedback:'Correct. SNAP fell -19.3% by close. User growth without monetization is worthless. Apple\'s privacy framework permanently reduced Snap\'s ad effectiveness. The stock had no support until monetization stabilized.',
+    lesson:'User growth only matters if it drives revenue growth. When platform changes (like Apple ATT) break the monetization model, user additions become irrelevant. Snap\'s reliance on precise ad targeting made them uniquely vulnerable to iOS privacy changes.' },
+
+  { module:'day', ticker:'UBER',company:'Uber Technologies',date:'Feb 8, 2022',diff:'intermediate',
+    cutoffTime:'12:00 PM',cutoffIdx:150,predictWindow:'rest of trading day',
+    open:41.20,close:36.46,change:-11.5,volume:'52M',weekHigh:64.05,weekLow:28.28,
+    pe:null,mktCap:'71B',rsi:35,macd:'Bearish',ma50:42.80,volatility:'High',
+    sentimentScore:38, analysts:{buy:34,hold:12,sell:4},
+    news:[
+      {src:'CNBC',headline:'Uber Q4 revenue beats but posts $750M net loss — wider than expected',sentiment:'bear'},
+      {src:'Bloomberg',headline:'Uber guidance disappoints; says path to profitability will take longer',sentiment:'bear'},
+      {src:'WSJ',headline:'Uber Eats growing but margin pressure from driver costs rising',sentiment:'neu'}
+    ],
+    context:'Uber beat Q4 revenue but posted a $750M loss wider than expected and guided weakly on profitability timing. Driver costs are rising. It is 12:00 PM and the stock is down. Some analysts still have Buy ratings based on long-term TAM.',
+    correctAnswer:'sell',
+    buyFeedback:'UBER fell -11.5% by close. When profitability timelines extend and losses widen, growth stocks suffer. Rising driver costs were squeezing unit economics permanently.',
+    sellFeedback:'Correct. UBER dropped -11.5% by close. Delayed profitability + widening losses + rising input costs = negative sentiment cascade. The market stopped believing in "just around the corner" profitability.',
+    lesson:'Delayed profitability narratives only work when losses are narrowing. When losses widen AND the path to profitability gets pushed out, the market loses patience. Uber\'s rising driver costs threatened the entire unit economics story.' },
+
+  { module:'day', ticker:'LYFT',company:'Lyft Inc.',date:'Nov 3, 2022',diff:'intermediate',
+    cutoffTime:'10:00 AM',cutoffIdx:30,predictWindow:'rest of trading day',
+    open:13.50,close:11.22,change:-16.9,volume:'48M',weekHigh:57.68,weekLow:11.96,
+    pe:null,mktCap:'4.2B',rsi:28,macd:'Bearish',ma50:14.20,volatility:'Extreme',
+    sentimentScore:30, analysts:{buy:12,hold:24,sell:10},
+    news:[
+      {src:'Bloomberg',headline:'Lyft Q3 revenue misses; active riders decline sequentially for first time',sentiment:'bear'},
+      {src:'CNBC',headline:'Lyft announces 13% workforce reduction — 683 employees laid off',sentiment:'bear'},
+      {src:'WSJ',headline:'Lyft insurance costs surging; takes $200M charge for accident claims',sentiment:'bear'}
+    ],
+    context:'Lyft missed Q3 revenue and active riders declined for the first time. The company announced 13% layoffs and took a $200M insurance charge. It is 10:00 AM and the stock is tanking. Some argue the cost cuts will help profitability.',
+    correctAnswer:'sell',
+    buyFeedback:'LYFT crashed -16.9% by close. When riders decline and insurance costs surge simultaneously, it signals structural problems. Cost cuts couldn\'t offset deteriorating unit economics.',
+    sellFeedback:'Correct. LYFT fell -16.9% by close. The combination of declining riders, layoffs, and insurance charges signaled a company in crisis mode. No bottom until rider trends reversed.',
+    lesson:'When a marketplace company sees declining users, cost cuts don\'t fix the problem — they signal desperation. Lyft\'s rider decline meant the network effect was reversing. Rising insurance costs made every ride less profitable.' },
+
+  { module:'day', ticker:'ROKU',company:'Roku Inc.',date:'Oct 26, 2022',diff:'intermediate',
+    cutoffTime:'11:30 AM',cutoffIdx:120,predictWindow:'rest of trading day',
+    open:58.50,close:51.03,change:-12.8,volume:'24M',weekHigh:490.76,weekLow:38.26,
+    pe:null,mktCap:'7.1B',rsi:24,macd:'Extreme Bearish',ma50:65.30,volatility:'Extreme',
+    sentimentScore:25, analysts:{buy:14,hold:20,sell:12},
+    news:[
+      {src:'CNBC',headline:'Roku Q3 revenue misses; active accounts grow but streaming hours declining',sentiment:'bear'},
+      {src:'Bloomberg',headline:'Roku platform revenue down 7% — ad spending collapsing in streaming',sentiment:'bear'},
+      {src:'WSJ',headline:'Roku guides for negative Q4 revenue growth — first time in company history',sentiment:'bear'}
+    ],
+    context:'Roku missed Q3 and guided for negative revenue growth in Q4 — the first time ever. Streaming hours are declining despite more active accounts. Ad spending is collapsing. It is 11:30 AM and the stock is down sharply.',
+    correctAnswer:'sell',
+    buyFeedback:'ROKU crashed -12.8% by close. First-ever negative revenue growth guidance signals the growth story is broken. When streaming hours decline, engagement is falling — the core metric that drives ad revenue.',
+    sellFeedback:'Correct. ROKU fell -12.8% by close. Negative revenue growth guidance for the first time ever was a red line crossed. When streaming hours decline, it means users are watching less — and that directly kills ad revenue.',
+    lesson:'For advertising-based businesses, engagement declining is more important than user count. Roku could add accounts but if streaming hours per user fall, ad revenue collapses. Engagement beats user count every time.' },
+
+  { module:'day', ticker:'SHOP',company:'Shopify Inc.',date:'Jul 27, 2022',diff:'intermediate',
+    cutoffTime:'1:00 PM',cutoffIdx:210,predictWindow:'rest of trading day',
+    open:36.20,close:33.42,change:-7.7,volume:'38M',weekHigh:176.29,weekLow:23.63,
+    pe:null,mktCap:'42B',rsi:32,macd:'Bearish',ma50:38.90,volatility:'Extreme',
+    sentimentScore:31, analysts:{buy:24,hold:18,sell:6},
+    news:[
+      {src:'Bloomberg',headline:'Shopify Q2 revenue misses as e-commerce growth slows post-COVID',sentiment:'bear'},
+      {src:'CNBC',headline:'Shopify announces 10% workforce reduction — overhired during pandemic',sentiment:'bear'},
+      {src:'WSJ',headline:'Shopify merchant churn accelerating; small business failures rising',sentiment:'bear'}
+    ],
+    context:'Shopify missed Q2 revenue and announced 10% layoffs, admitting they overhired during the pandemic. E-commerce growth is slowing as consumers return to physical retail. Merchant churn is accelerating. It is 1:00 PM and the stock is down.',
+    correctAnswer:'sell',
+    buyFeedback:'SHOP fell -7.7% by close. When e-commerce normalizes post-COVID and merchant churn accelerates, the growth narrative is broken. Layoffs confirmed management miscalculated the durability of pandemic trends.',
+    sellFeedback:'Correct. SHOP dropped -7.7% by close. The admission of overhiring and accelerating merchant churn signaled that COVID e-commerce growth was temporary. Small business failures meant Shopify\'s customer base was shrinking.',
+    lesson:'COVID accelerated certain trends that were temporary, not permanent. Shopify\'s explosive pandemic growth masked that many merchants were unsustainable. When trends reverse and management admits mistakes, the market punishes harshly.' },
+
+  { module:'day', ticker:'HOOD',company:'Robinhood Markets',date:'Jan 27, 2022',diff:'intermediate',
+    cutoffTime:'10:30 AM',cutoffIdx:60,predictWindow:'rest of trading day',
+    open:11.50,close:9.86,change:-14.3,volume:'98M',weekHigh:85.00,weekLow:6.81,
+    pe:null,mktCap:'8.5B',rsi:26,macd:'Extreme Bearish',ma50:14.80,volatility:'Extreme',
+    sentimentScore:22, analysts:{buy:6,hold:16,sell:14},
+    news:[
+      {src:'Bloomberg',headline:'Robinhood Q4 revenue misses; monthly active users decline 8% sequentially',sentiment:'bear'},
+      {src:'CNBC',headline:'Robinhood crypto trading revenue down 27% — meme stock frenzy over',sentiment:'bear'},
+      {src:'WSJ',headline:'Robinhood warns of continued user and revenue declines in 2022',sentiment:'bear'}
+    ],
+    context:'Robinhood missed Q4 badly with users declining 8% and crypto revenue down 27%. Management warned of continued declines. The meme stock and crypto frenzy is over. It is 10:30 AM, one year after the GME peak, and the stock is crashing.',
+    correctAnswer:'sell',
+    buyFeedback:'HOOD crashed -14.3% by close. When a retail trading platform loses users and trading volume simultaneously, revenue collapses. The meme stock era that built Robinhood was over.',
+    sellFeedback:'Correct. HOOD fell -14.3% by close. Exactly one year after the GME peak, retail trading interest had collapsed. Declining users + declining crypto volume = compounding revenue declines for a platform that monetizes activity.',
+    lesson:'Platforms built on speculative frenzy suffer when speculation ends. Robinhood monetized retail gambling during COVID. When that activity normalized, user and revenue declines were inevitable. One-time events don\'t build durable businesses.' },
+
+  { module:'long', ticker:'COIN',company:'Coinbase Global',date:'May 10, 2022',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 6 months',
+    open:70.50,close:67.47,change:-4.3,volume:'22M',weekHigh:368.90,weekLow:31.55,
+    pe:null,mktCap:'14.8B',rsi:32,macd:'Bearish',ma50:125.30,volatility:'Extreme',
+    sentimentScore:28, analysts:{buy:14,hold:20,sell:10},
+    news:[
+      {src:'Bloomberg',headline:'Coinbase Q1 revenue crashes 53% as crypto trading volumes collapse',sentiment:'bear'},
+      {src:'CNBC',headline:'Coinbase monthly transacting users down 19% to 9.2M — multi-quarter decline',sentiment:'bear'},
+      {src:'WSJ',headline:'Bitcoin falls below $30K; Terra stablecoin collapses triggering contagion fears',sentiment:'bear'}
+    ],
+    context:'Coinbase missed badly with revenue down 53% and users declining 19%. Bitcoin is crashing below $30K and Terra stablecoin just collapsed. Crypto winter is here. This is May 2022. You must predict COIN\'s direction over the next 6 months.',
+    correctAnswer:'sell',
+    buyFeedback:'COIN crashed from $67 to $40 by November 2022 (-40%). The Terra collapse was just the beginning of a full crypto contagion that culminated in FTX bankruptcy. Crypto winter lasted through all of 2022.',
+    sellFeedback:'Correct. COIN fell to $40 by November (-40%). Terra collapse triggered Luna, Celsius, 3AC, Voyager, and finally FTX failures. Crypto exchanges suffered as volume dried up completely during the contagion cascade.',
+    lesson:'In crypto, contagion spreads fast and lasts long. Terra\'s collapse in May 2022 was the first domino. When leverage unwinds in interconnected markets, it takes 6-12 months to find a bottom. Coinbase\'s revenue is 100% correlated to volume.' },
+
+  { module:'long', ticker:'TWTR',company:'Twitter Inc.',date:'Jul 8, 2022',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 4 months',
+    open:36.80,close:37.22,change:+1.1,volume:'28M',weekHigh:73.34,weekLow:31.30,
+    pe:null,mktCap:'28.4B',rsi:44,macd:'Neutral',ma50:37.90,volatility:'Extreme',
+    sentimentScore:42, analysts:{buy:10,hold:24,sell:12},
+    news:[
+      {src:'Bloomberg',headline:'Elon Musk files to terminate $44B Twitter acquisition — cites fake accounts',sentiment:'bear'},
+      {src:'CNBC',headline:'Twitter to sue Musk over termination; says he committed to deal',sentiment:'neu'},
+      {src:'WSJ',headline:'Twitter stock trades 32% below Musk\'s $54.20 offer — deal uncertainty',sentiment:'bear'}
+    ],
+    context:'Elon Musk filed to terminate his $44B Twitter acquisition citing fake accounts. Twitter plans to sue to enforce the deal. The stock trades 32% below the offer price. This is July 2022. You must predict TWTR\'s direction over the next 4 months.',
+    correctAnswer:'buy',
+    buyFeedback:'TWTR climbed from $37 to $53 by October 2022 (+43%). Musk was forced to complete the acquisition at $54.20 in October. The legal case was strong enough that courts would have forced the deal. Merger arb opportunity.',
+    sellFeedback:'TWTR surged to $53 by October (+43%) as Musk was forced to close at $54.20. Delaware Chancery Court indicated they would force completion. Merger arbitrage played out perfectly for those who trusted the legal process.',
+    lesson:'Merger arbitrage opportunities exist when deal certainty is high but stock price implies low probability. Twitter\'s legal case was strong — Musk had waived due diligence. Delaware courts don\'t let buyers walk away easily from signed agreements.' },
+
+  { module:'long', ticker:'FORD',company:'Ford Motor Company',date:'Oct 27, 2021',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 5 months',
+    open:16.20,close:16.85,change:+4.0,volume:'85M',weekHigh:25.87,weekLow:8.43,
+    pe:44,mktCap:'67B',rsi:62,macd:'Bullish',ma50:14.20,volatility:'High',
+    sentimentScore:68, analysts:{buy:10,hold:18,sell:8},
+    news:[
+      {src:'CNBC',headline:'Ford Q3 EPS beats despite chip shortage; Mustang Mach-E sales accelerating',sentiment:'bull'},
+      {src:'Bloomberg',headline:'Ford announces $11B EV investment through 2025 — major pivot underway',sentiment:'bull'},
+      {src:'WSJ',headline:'Ford splits EV and gas businesses internally; transparency on EV margins',sentiment:'bull'}
+    ],
+    context:'Ford beat Q3 despite chip shortages and announced $11B in EV investments. Mustang Mach-E is gaining traction. The company is splitting EV and gas businesses for transparency. This is October 2021. You must predict FORD\'s direction over the next 5 months.',
+    correctAnswer:'sell',
+    buyFeedback:'FORD fell from $16.85 to $16.50 by March 2022 (-2%), then crashed to $13 by May. The chip shortage worsened and EV competition from Tesla and Rivian intensified. Legacy auto EV pivots faced skepticism.',
+    sellFeedback:'FORD traded sideways to down, hitting $13 by May 2022 (-23%). The market doubted legacy automakers could truly pivot to EVs profitably. Chip shortages persisted and Tesla dominated EV mind share. Capital intensity concerns grew.',
+    lesson:'Legacy company pivots to new technologies face severe skepticism even after strong quarters. Ford\'s EV announcement impressed initially but the market questioned execution, margins, and competition. Capital-intensive transformations take years and face doubt.' },
+
+  { module:'long', ticker:'GM',company:'General Motors',date:'Oct 27, 2021',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 6 months',
+    open:58.50,close:59.25,change:+1.3,volume:'28M',weekHigh:67.21,weekLow:40.04,
+    pe:9,mktCap:'86B',rsi:58,macd:'Slight Bullish',ma50:55.30,volatility:'Medium',
+    sentimentScore:64, analysts:{buy:14,hold:16,sell:6},
+    news:[
+      {src:'Bloomberg',headline:'GM Q3 beats despite chip shortage; raises full-year guidance',sentiment:'bull'},
+      {src:'CNBC',headline:'GM plans 30 EVs by 2025; $35B investment in electric and autonomous',sentiment:'bull'},
+      {src:'WSJ',headline:'GM Cruise autonomous taxis expanding in SF — robotaxi revenue starting',sentiment:'bull'}
+    ],
+    context:'GM beat Q3 and raised guidance despite chip shortages. The company announced 30 EVs by 2025 and $35B in EV/autonomous investment. Cruise robotaxis are expanding. This is October 2021. You must predict GM\'s direction over the next 6 months.',
+    correctAnswer:'sell',
+    buyFeedback:'GM fell from $59 to $38 by May 2022 (-36%). Chip shortages worsened, EV timeline skepticism grew, and Cruise burned cash. The market didn\'t believe in the transformation thesis. Legacy auto multiples stayed depressed.',
+    sellFeedback:'Correct. GM crashed to $38 by May 2022 (-36%). The chip shortage intensified, EV competition concerns grew, and Cruise\'s cash burn scared investors. Legacy automakers couldn\'t escape their low-multiple valuation even with EV promises.',
+    lesson:'Legacy companies announcing transformations rarely get credit until execution is proven. GM\'s ambitious EV and autonomous plans required massive capital with uncertain returns. The market discounted promises and focused on near-term chip shortage pain.' },
+
+  { module:'long', ticker:'RIVN',company:'Rivian Automotive',date:'Nov 10, 2021',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 6 months',
+    open:172.01,close:179.47,change:+4.3,volume:'60M',weekHigh:179.47,weekLow:78.67,
+    pe:null,mktCap:'153B',rsi:71,macd:'Strong Bullish',ma50:142.30,volatility:'Extreme',
+    sentimentScore:78, analysts:{buy:16,hold:8,sell:2},
+    news:[
+      {src:'CNBC',headline:'Rivian IPO surges 29% on first day; valuation reaches $153B — more than GM',sentiment:'bull'},
+      {src:'Bloomberg',headline:'Amazon holds 20% stake in Rivian; 100,000 van order anchors revenue',sentiment:'bull'},
+      {src:'WSJ',headline:'Rivian R1T wins MotorTrend Truck of the Year; consumer reviews strong',sentiment:'bull'}
+    ],
+    context:'Rivian just IPOed at a $153B valuation, higher than GM or Ford. Amazon owns 20% and has ordered 100,000 vans. The R1T won Truck of the Year. EV excitement is at peak levels. This is November 2021. You must predict RIVN\'s direction over the next 6 months.',
+    correctAnswer:'sell',
+    buyFeedback:'RIVN crashed from $179 to $26 by May 2022 (-85%). The IPO was the absolute peak of EV mania. Rising rates killed growth stock valuations. Rivian couldn\'t scale production and burned billions per quarter. Brutal.',
+    sellFeedback:'Correct. RIVN imploded to $26 by May 2022 (-85%). The November 2021 IPO marked peak EV euphoria. Rising rates, production struggles, and $1.7B quarterly cash burn destroyed the valuation. Pre-revenue companies got crushed in 2022.',
+    lesson:'IPO peaks during sector mania are sell signals, not buy signals. Rivian\'s $153B valuation with minimal revenue and massive losses only made sense at peak euphoria. When rates rose, unprofitable growth companies lost 80-90% of value.' },
+
+  { module:'long', ticker:'LCID',company:'Lucid Group',date:'Nov 16, 2021',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 5 months',
+    open:48.50,close:50.22,change:+3.5,volume:'38M',weekHigh:64.86,weekLow:16.12,
+    pe:null,mktCap:'82B',rsi:69,macd:'Bullish',ma50:42.30,volatility:'Extreme',
+    sentimentScore:74, analysts:{buy:8,hold:6,sell:4},
+    news:[
+      {src:'Bloomberg',headline:'Lucid begins customer deliveries of Air sedan — first production vehicles',sentiment:'bull'},
+      {src:'CNBC',headline:'Lucid Air achieves 520-mile EPA range rating — beats Tesla Model S',sentiment:'bull'},
+      {src:'WSJ',headline:'Saudi Arabia PIF owns 62% of Lucid; funding secured for expansion',sentiment:'bull'}
+    ],
+    context:'Lucid just began delivering the Air sedan with an industry-leading 520-mile range. Saudi Arabia\'s wealth fund owns 62%, providing funding security. This is November 2021 at peak EV hype. You must predict LCID\'s direction over the next 5 months.',
+    correctAnswer:'sell',
+    buyFeedback:'LCID crashed from $50 to $18 by April 2022 (-64%). First deliveries were slow, production issues mounted, and rising rates killed high-multiple EV stocks. Pre-scale EV companies collapsed when euphoria ended.',
+    sellFeedback:'Correct. LCID fell to $18 by April 2022 (-64%). Early production struggled, volumes were tiny, and the company burned billions. When rates rose and EV euphoria died, pre-scale manufacturers lost 60-80% of value immediately.',
+    lesson:'Early production milestones don\'t matter if scaling fails. Lucid\'s amazing 520-mile range couldn\'t compensate for producing only hundreds of cars while burning billions. At peak valuations, sell the milestone and let others hold through the scaling challenges.' },
+
+  { module:'long', ticker:'PLUG',company:'Plug Power',date:'Feb 25, 2022',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 6 months',
+    open:26.50,close:24.73,change:-6.7,volume:'32M',weekHigh:75.49,weekLow:12.70,
+    pe:null,mktCap:'14.2B',rsi:38,macd:'Bearish',ma50:28.90,volatility:'Extreme',
+    sentimentScore:44, analysts:{buy:18,hold:14,sell:8},
+    news:[
+      {src:'Bloomberg',headline:'Plug Power Q4 revenue misses; guidance for 2022 cut by 20%',sentiment:'bear'},
+      {src:'CNBC',headline:'Plug Power hydrogen supply chain issues delaying customer projects',sentiment:'bear'},
+      {src:'WSJ',headline:'Hydrogen fuel cell adoption slower than expected; infrastructure gaps',sentiment:'bear'}
+    ],
+    context:'Plug Power missed Q4 and cut 2022 guidance by 20%. Hydrogen supply chain issues are delaying projects. Infrastructure buildout is slower than expected. This is February 2022. You must predict PLUG\'s direction over the next 6 months.',
+    correctAnswer:'sell',
+    buyFeedback:'PLUG crashed from $25 to $15 by August 2022 (-40%). The hydrogen infrastructure story took longer and cost more than promised. Rising rates made future cash flows less valuable. Speculative cleantech stories suffered.',
+    sellFeedback:'Correct. PLUG fell to $15 by August 2022 (-40%). Hydrogen infrastructure requires massive capital and coordination that takes decades, not years. When guidance gets cut 20% and execution struggles appear, speculative stories collapse.',
+    lesson:'Infrastructure-dependent technologies face the "chicken and egg" problem. Plug Power needed hydrogen infrastructure to scale, but infrastructure won\'t be built without scale demand. These problems take decades and massive capital to solve.' },
+
+  { module:'long', ticker:'DKNG',company:'DraftKings Inc.',date:'Mar 11, 2022',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 5 months',
+    open:18.20,close:17.85,change:-1.9,volume:'28M',weekHigh:64.58,weekLow:9.77,
+    pe:null,mktCap:'7.4B',rsi:42,macd:'Neutral Bearish',ma50:19.30,volatility:'High',
+    sentimentScore:48, analysts:{buy:18,hold:16,sell:6},
+    news:[
+      {src:'CNBC',headline:'DraftKings Q4 revenue beats but 2022 guidance disappoints on marketing costs',sentiment:'bear'},
+      {src:'Bloomberg',headline:'Sports betting customer acquisition costs rising 40% year-over-year',sentiment:'bear'},
+      {src:'WSJ',headline:'DraftKings projects 2023 profitability — but losses widening near-term',sentiment:'neu'}
+    ],
+    context:'DraftKings beat Q4 revenue but guided weakly due to 40% higher customer acquisition costs. Competition from FanDuel, BetMGM, and Caesars is intense. Profitability pushed to 2023. This is March 2022. You must predict DKNG\'s direction over the next 5 months.',
+    correctAnswer:'sell',
+    buyFeedback:'DKNG fell from $18 to $10 by August 2022 (-44%). Customer acquisition cost inflation made unit economics unsustainable. When competitors outspend you in a race to acquire users, everyone loses money longer. No path to profitability.',
+    sellFeedback:'Correct. DKNG crashed to $10 by August 2022 (-44%). The sports betting space became a customer acquisition arms race where all players burned cash. Rising CAC with no pricing power = unsustainable unit economics.',
+    lesson:'Markets with intense competition and high customer acquisition costs destroy value. Sports betting became a race to lose money fastest. When CAC rises 40% in competitive markets, unit economics break and profitability timelines extend indefinitely.' },
+
+  { module:'long', ticker:'ABNB',company:'Airbnb Inc.',date:'May 3, 2022',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 6 months',
+    open:140.50,close:132.10,change:-6.0,volume:'8M',weekHigh:216.84,weekLow:86.71,
+    pe:124,mktCap:'84B',rsi:44,macd:'Slight Bearish',ma50:155.30,volatility:'High',
+    sentimentScore:52, analysts:{buy:32,hold:12,sell:4},
+    news:[
+      {src:'Bloomberg',headline:'Airbnb Q1 beats with record nights booked; guidance implies slower Q2 growth',sentiment:'neu'},
+      {src:'CNBC',headline:'Airbnb CEO cites macro uncertainty; cancellations ticking up in May',sentiment:'bear'},
+      {src:'WSJ',headline:'Travel demand remains strong but duration shortening — sign of caution',sentiment:'bear'}
+    ],
+    context:'Airbnb beat Q1 with record bookings but Q2 guidance implies deceleration. CEO cited macro uncertainty and rising cancellations. Trip duration is shortening — a sign consumers are becoming more cautious. This is May 2022. You must predict ABNB\'s direction over the next 6 months.',
+    correctAnswer:'sell',
+    buyFeedback:'ABNB fell from $132 to $90 by November 2022 (-32%). Travel demand softened as recession fears grew. The "revenge travel" surge post-COVID proved temporary. When macro deteriorates, travel discretionary spending gets cut first.',
+    sellFeedback:'Correct. ABNB dropped to $90 by November 2022 (-32%). The post-COVID revenge travel boom faded as macro uncertainty increased. Shortening trip duration and rising cancellations were leading indicators of demand weakening.',
+    lesson:'Leading indicators like trip duration and cancellation rates predict future booking trends. When consumers shorten trips, it signals budget constraints. Travel is discretionary spending that gets cut quickly when economic uncertainty rises.' },
+
+  { module:'long', ticker:'DASH',company:'DoorDash Inc.',date:'May 5, 2022',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 5 months',
+    open:82.50,close:77.63,change:-5.9,volume:'12M',weekHigh:257.25,weekLow:56.67,
+    pe:null,mktCap:'26.4B',rsi:36,macd:'Bearish',ma50:88.40,volatility:'High',
+    sentimentScore:45, analysts:{buy:28,hold:14,sell:4},
+    news:[
+      {src:'CNBC',headline:'DoorDash Q1 revenue beats but order growth slowing as consumers return to restaurants',sentiment:'bear'},
+      {src:'Bloomberg',headline:'DoorDash EBITDA margin compressed by rising driver pay and gas costs',sentiment:'bear'},
+      {src:'WSJ',headline:'Food delivery demand normalizing post-COVID; market share competition intensifying',sentiment:'bear'}
+    ],
+    context:'DoorDash beat Q1 revenue but order growth is slowing as people return to dining out. Driver pay and gas costs are rising, compressing margins. Food delivery demand is normalizing post-COVID. This is May 2022. You must predict DASH\'s direction over the next 5 months.',
+    correctAnswer:'sell',
+    buyFeedback:'DASH fell from $78 to $48 by October 2022 (-38%). COVID delivery demand proved temporary. As restaurants reopened and gas prices surged, delivery unit economics deteriorated. The pandemic boost was not sustainable.',
+    sellFeedback:'Correct. DASH crashed to $48 by October 2022 (-38%). Food delivery demand peaked during lockdowns. When people returned to restaurants AND gas prices spiked, the double negative hit margins and growth simultaneously.',
+    lesson:'COVID-driven behavior changes were largely temporary, not permanent. DoorDash\'s explosive growth during lockdowns reversed as normalcy returned. Companies built on pandemic behavior faced shrinking demand plus rising costs — a devastating combination.' },
+
+  { module:'long', ticker:'PINS',company:'Pinterest Inc.',date:'Apr 28, 2022',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 6 months',
+    open:21.50,close:19.42,change:-9.7,volume:'28M',weekHigh:88.83,weekLow:16.14,
+    pe:178,mktCap:'12.7B',rsi:34,macd:'Bearish',ma50:24.80,volatility:'Extreme',
+    sentimentScore:38, analysts:{buy:18,hold:22,sell:8},
+    news:[
+      {src:'Bloomberg',headline:'Pinterest Q1 monthly active users decline 9% year-over-year to 433M',sentiment:'bear'},
+      {src:'CNBC',headline:'Pinterest revenue growth slows to 18% as ad spending pulls back',sentiment:'bear'},
+      {src:'WSJ',headline:'Pinterest losing users post-COVID; engagement normalized below pre-pandemic levels',sentiment:'bear'}
+    ],
+    context:'Pinterest users declined 9% year-over-year as COVID engagement normalized. Revenue growth slowed to 18% as ad spending pulled back. Engagement is below pre-pandemic levels. This is April 2022. You must predict PINS\'s direction over the next 6 months.',
+    correctAnswer:'sell',
+    buyFeedback:'PINS fell from $19 to $18 by October 2022 (-5%)... actually it traded sideways around $20-22 through October. User declines stabilized but growth remained muted. The stock found a floor but no growth catalyst.',
+    sellFeedback:'PINS traded relatively flat through October 2022, ending near $21 (+8%). User declines stabilized and the stock found support. While not a strong buy, the worst of the decline was over by May as expectations reset.',
+    lesson:'When user growth turns negative, sometimes the bottom comes when expectations fully reset. Pinterest\'s user declines were priced in by May 2022. The stock stabilized once everyone understood engagement had permanently normalized lower.' },
+
+  { module:'long', ticker:'SPOT',company:'Spotify Technology',date:'Apr 27, 2022',diff:'intermediate',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 5 months',
+    open:112.50,close:106.58,change:-5.3,volume:'8M',weekHigh:305.60,weekLow:89.03,
+    pe:null,mktCap:'20.4B',rsi:38,macd:'Bearish',ma50:128.40,volatility:'High',
+    sentimentScore:42, analysts:{buy:24,hold:16,sell:6},
+    news:[
+      {src:'CNBC',headline:'Spotify Q1 adds 2M subscribers — below 3M estimate; churn increasing',sentiment:'bear'},
+      {src:'Bloomberg',headline:'Spotify podcast investments not yet profitable; $200M quarterly content spend',sentiment:'bear'},
+      {src:'WSJ',headline:'Apple Music and Amazon Music gaining share; Spotify competition intensifying',sentiment:'bear'}
+    ],
+    context:'Spotify missed subscriber adds with 2M vs 3M expected. Churn is increasing and podcast investments are burning $200M per quarter without profitability. Competition from Apple and Amazon is intensifying. This is April 2022. You must predict SPOT\'s direction over the next 5 months.',
+    correctAnswer:'sell',
+    buyFeedback:'SPOT fell from $107 to $85 by September 2022 (-21%). Subscriber growth continued to disappoint and podcast monetization failed to offset costs. Competitive pressure from Apple and Amazon prevented pricing power.',
+    sellFeedback:'Correct. SPOT dropped to $85 by September 2022 (-21%). The podcast bet wasn\'t paying off, subscriber growth was slowing, and competition prevented margin expansion. Music streaming became a low-margin commodity business.',
+    lesson:'When a company invests heavily in a new segment but can\'t monetize it while the core business slows, the story breaks. Spotify\'s podcast bet required years and billions with uncertain returns while subscriber growth decelerated.' },
+
+  // ── NEW LESSONS - ADVANCED ────────────────────────────────────────────
+  { module:'day', ticker:'GME',company:'GameStop Corp.',date:'Feb 24, 2021',diff:'advanced',
+    cutoffTime:'2:00 PM',cutoffIdx:270,predictWindow:'final 2 hours of trading',
+    open:44.70,close:91.71,change:+104.0,volume:'83M',weekHigh:483.00,weekLow:2.57,
+    pe:null,mktCap:'6.4B',rsi:78,macd:'Extreme Bullish',ma50:72.30,volatility:'Extreme',
+    sentimentScore:88, analysts:{buy:0,hold:3,sell:9},
+    shortInterest:'42%', putCallRatio:'0.22', institutionalFlow:'Net sell $280M',
+    news:[
+      {src:'Bloomberg',headline:'GameStop short interest drops to 42% from 140% — massive covering occurred',sentiment:'neu'},
+      {src:'CNBC',headline:'Keith Gill doubles position to 100,000 shares; posts update to WallStreetBets',sentiment:'bull'},
+      {src:'WSJ',headline:'SEC monitoring GameStop for market manipulation; trading halts frequent',sentiment:'neu'}
+    ],
+    missedQuestions:['If short interest dropped from 140% to 42%, how much of the squeeze already happened?','What does institutional selling of $280M while retail is buying tell you?','When RSI reaches 78 with extreme volatility, is that sustainable or a warning?','Why would insiders and institutional holders sell during a short squeeze?'],
+    context:'It is 2:00 PM on February 24, 2021. GME is up 104% today after the Congressional hearing. Keith Gill just posted he doubled his position. Short interest has dropped from 140% to 42% — most shorts already covered. RSI is 78. Institutional flow shows $280M in net selling today — smart money is exiting into retail enthusiasm. Put/call ratio of 0.22 shows extreme call buying. You have 2 hours until close.',
+    correctAnswer:'sell',
+    buyFeedback:'GME peaked at $183 two days later, then crashed back to $40 by March 15 (-78%). The 2 PM entry would have given 1-2 days before collapse. Most of the squeeze was already done — short interest at 42% vs 140% meant the fuel was gone.',
+    sellFeedback:'Perfect read. GME peaked at $183 on Feb 26 then collapsed to $40 by March 15. The 2 PM institutional selling of $280M while retail bought was smart money distributing into euphoria. Short interest at 42% meant the squeeze was mostly over.',
+    lesson:'When short interest drops 70% and institutional flow is heavy selling while retail buys, the squeeze is ending not beginning. Smart money sells into retail enthusiasm. RSI 78 + extreme volatility + declining short interest = distribution phase.' },
+
+  { module:'day', ticker:'AMC',company:'AMC Entertainment',date:'Jun 2, 2021',diff:'advanced',
+    cutoffTime:'1:30 PM',cutoffIdx:240,predictWindow:'final 2.5 hours of trading',
+    open:32.04,close:62.55,change:+95.2,volume:'783M',weekHigh:72.62,weekLow:1.91,
+    pe:null,mktCap:'28B',rsi:89,macd:'Extreme Overbought',ma50:12.80,volatility:'Extreme',
+    sentimentScore:94, analysts:{buy:0,hold:2,sell:8},
+    shortInterest:'18%', putCallRatio:'0.11', institutionalFlow:'Net sell $520M today',
+    news:[
+      {src:'CNBC',headline:'AMC up 95% today; market cap now exceeds entire movie theater industry',sentiment:'neu'},
+      {src:'Bloomberg',headline:'AMC CEO announces 11.5M share sale — company raising capital at peak',sentiment:'bear'},
+      {src:'Reddit',headline:'r/WallStreetBets: "AMC to $100! Shorts haven\'t covered!" — retail euphoria peak',sentiment:'bull'}
+    ],
+    missedQuestions:['Why would AMC executives sell shares right now if they believed in higher prices?','What does market cap exceeding the entire industry\'s fundamental value mean?','If institutions are selling $520M today, who is buying?','At RSI 89 with extreme volume, what typically happens next?'],
+    context:'It is 1:30 PM on June 2, 2021. AMC is up 95% today on 783M volume — 40x normal. The company just announced an 11.5M share sale — management is selling into the euphoria. Market cap is now $28B, exceeding the fundamental value of the entire movie theater industry. RSI is 89. Institutional flow shows $520M in net selling TODAY — hedge funds are exiting. Put/call ratio of 0.11 is the most extreme call speculation seen. Short interest is only 18% — not enough to sustain a real squeeze. You have 2.5 hours left.',
+    correctAnswer:'sell',
+    buyFeedback:'AMC peaked at $72 the next day then crashed to $30 within a week (-52%). The CEO selling shares and institutional $520M outflow at 1:30 PM was distribution into peak retail mania. RSI 89 never sustains.',
+    sellFeedback:'Perfect. AMC hit $72 on June 3 then collapsed to $30 by June 10 (-58%). Management selling shares, RSI 89, and institutions dumping $520M while retail bought was textbook distribution. Meme stocks peak when management dilutes.',
+    lesson:'When company management sells shares during a rally, they\'re telling you it\'s overvalued. AMC executives knew $60 was unsustainable. Combined with RSI 89 and massive institutional selling, the top was in. Management actions speak louder than Reddit posts.' },
+
+  { module:'day', ticker:'SIVB',company:'SVB Financial Group',date:'Mar 9, 2023',diff:'advanced',
+    cutoffTime:'12:00 PM',cutoffIdx:150,predictWindow:'afternoon session',
+    open:206.28,close:106.04,change:-48.6,volume:'69M',weekHigh:763.22,weekLow:106.04,
+    pe:4,mktCap:'12.4B',rsi:15,macd:'Catastrophic Breakdown',ma50:315.80,volatility:'Catastrophic',
+    sentimentScore:8, analysts:{buy:8,hold:14,sell:2},
+    shortInterest:'4.2%', putCallRatio:'8.5', institutionalFlow:'Net sell $2.1B — panic liquidation',
+    news:[
+      {src:'Bloomberg',headline:'Silicon Valley Bank announces $2.25B capital raise after $1.8B bond portfolio loss',sentiment:'bear'},
+      {src:'CNBC',headline:'Venture capital firms advising portfolio companies to withdraw deposits from SVB',sentiment:'bear'},
+      {src:'WSJ',headline:'SVB shares halted multiple times; deposit flight accelerating in real-time',sentiment:'bear'}
+    ],
+    missedQuestions:['What is a bank run and why is it impossible to stop once started?','Why would a bank need to raise capital if it\'s healthy?','What does VCs telling companies to withdraw mean for tomorrow\'s deposit levels?','If SVB sold bonds at a $1.8B loss, what does that say about their balance sheet?'],
+    context:'It is 12:00 PM on March 9, 2023. SVB is down 48% and falling. The bank announced a $2.25B capital raise after recognizing a $1.8B loss on bond sales — a sign of desperation. Major VCs including Peter Thiel\'s Founders Fund are advising all portfolio companies to withdraw deposits immediately. This is a classic bank run in real-time. RSI is 15 — catastrophic breakdown. Put/call ratio of 8.5 shows everyone buying crash protection. Institutional flow is $2.1B in panic selling. Trading has been halted 3 times already today.',
+    correctAnswer:'sell',
+    buyFeedback:'SIVB was shut down by regulators the next morning. The stock never reopened. Anyone holding at noon lost 100%. Bank runs cannot be stopped once started. Deposit flight accelerates exponentially when confidence breaks.',
+    sellFeedback:'Perfect read. SIVB was seized by FDIC the next morning at 10 AM. The bank failed overnight. The 12 PM capital raise announcement was the final confirmation of insolvency. Bank runs kill institutions in hours once started.',
+    lesson:'Bank runs are unstoppable once confidence breaks. When VCs tell companies to withdraw deposits, it creates a self-fulfilling collapse. SVB had $175B in deposits on March 8 and was insolvent by March 10. Banks are confidence games — lose confidence, lose everything.' },
+
+  { module:'day', ticker:'FRC',company:'First Republic Bank',date:'May 1, 2023',diff:'advanced',
+    cutoffTime:'10:00 AM',cutoffIdx:30,predictWindow:'rest of trading day',
+    open:3.51,close:3.51,change:-43.2,volume:'238M',weekHigh:207.13,weekLow:3.51,
+    pe:1,mktCap:'650M',rsi:8,macd:'Terminal Breakdown',ma50:18.40,volatility:'Terminal',
+    sentimentScore:2, analysts:{buy:2,hold:8,sell:18},
+    shortInterest:'12%', putCallRatio:'18.3', institutionalFlow:'Net sell $420M — forced liquidation',
+    news:[
+      {src:'Bloomberg',headline:'First Republic Q1 deposits down $102B — 40% of total deposits fled in 6 weeks',sentiment:'bear'},
+      {src:'CNBC',headline:'First Republic considering bankruptcy filing; FDIC preparing for seizure',sentiment:'bear'},
+      {src:'WSJ',headline:'JPMorgan, PNC exploring acquisition of FRC assets in FDIC auction',sentiment:'bear'}
+    ],
+    missedQuestions:['What does losing 40% of deposits in 6 weeks mean for a bank\'s survival?','Why would deposits at FRC flee to JPM instead of staying?','What happens to equity holders when FDIC seizes a bank?','If the stock is at $3.51 from $207, is there really any value left?'],
+    context:'It is 10:00 AM on May 1, 2023. First Republic lost $102B in deposits — 40% of its total — in just 6 weeks after SVB collapsed. The bank reported this morning and the stock is at $3.51, down from $207 in January (-98%). FDIC is preparing seizure and major banks are bidding on the assets. Put/call ratio of 18.3 is the highest ever recorded for a major bank — everyone knows it\'s over. RSI of 8 is terminal. When banks lose deposits this fast, they cannot survive.',
+    correctAnswer:'sell',
+    buyFeedback:'FRC was seized by FDIC that evening. JPMorgan acquired the assets in a midnight auction. Equity holders got $0. The stock was halted at close and never reopened. Game over.',
+    sellFeedback:'Perfect. FRC was seized by FDIC at 8 PM that night. JPMorgan bought the assets for $10.6B. Existing shareholders were wiped out completely — $0 recovery. When banks lose 40% of deposits, equity has no value.',
+    lesson:'Bank equity becomes worthless once deposit flight reaches 30-40%. First Republic losing $102B in deposits meant insolvency was certain. FDIC seizures wipe out equity holders completely — the stock price is irrelevant because recovery is zero.' },
+
+  { module:'day', ticker:'BBBY',company:'Bed Bath & Beyond',date:'Jan 10, 2023',diff:'advanced',
+    cutoffTime:'11:00 AM',cutoffIdx:90,predictWindow:'rest of trading day',
+    open:2.17,close:1.69,change:-22.1,volume:'128M',weekHigh:30.06,weekLow:1.02,
+    pe:null,mktCap:'153M',rsi:18,macd:'Extreme Bearish',ma50:2.85,volatility:'Extreme',
+    sentimentScore:12, analysts:{buy:0,hold:2,sell:14},
+    shortInterest:'44%', putCallRatio:'3.8', institutionalFlow:'Near zero — no liquidity',
+    news:[
+      {src:'Bloomberg',headline:'Bed Bath & Beyond warns of potential bankruptcy; liquidity crisis worsening',sentiment:'bear'},
+      {src:'CNBC',headline:'BBBY suppliers demanding cash on delivery; credit lines exhausted',sentiment:'bear'},
+      {src:'WSJ',headline:'Bed Bath & Beyond considering Chapter 11 filing within weeks',sentiment:'bear'}
+    ],
+    missedQuestions:['What does "suppliers demanding cash on delivery" mean for a retailer?','Why is short interest 44% if the stock is already at $2?','What happens to equity in Chapter 11 bankruptcy?','If suppliers won\'t ship products, how can stores stay open?'],
+    context:'It is 11:00 AM on January 10, 2023. Bed Bath & Beyond warned of imminent bankruptcy. Suppliers are refusing to ship products without cash payment — the death knell for retailers. The stock is at $1.69, down 94% from $30 a year ago. Short interest is 44% — shorts are betting on Chapter 11 wipeout. Institutional ownership is near zero. When suppliers cut off a retailer, bankruptcy follows within weeks. The Reddit WallStreetBets crowd is still trying to squeeze it.',
+    correctAnswer:'sell',
+    buyFeedback:'BBBY filed Chapter 11 bankruptcy on April 23, 2023. Equity was wiped out completely — shareholders got $0. From the January warning to bankruptcy filing was 103 days. Suppliers cutting off inventory = terminal.',
+    sellFeedback:'Perfect. BBBY filed bankruptcy on April 23, 2023. Equity holders were wiped out with zero recovery. When suppliers demand cash on delivery, bankruptcy is 60-90 days away. The stock had no value from the moment suppliers stopped shipping.',
+    lesson:'When suppliers cut off a retailer by demanding cash on delivery, bankruptcy is imminent. Retailers can\'t operate without inventory. BBBY had no path forward once suppliers stopped trusting them. Equity value goes to zero in retail bankruptcies.' },
+
+  { module:'day', ticker:'CVNA',company:'Carvana Co.',date:'Nov 3, 2022',diff:'advanced',
+    cutoffTime:'1:00 PM',cutoffIdx:210,predictWindow:'final 3 hours of trading',
+    open:7.20,close:6.14,change:-14.7,volume:'48M',weekHigh:376.83,weekLow:3.55,
+    pe:null,mktCap:'1.1B',rsi:22,macd:'Extreme Bearish',ma50:18.90,volatility:'Extreme',
+    sentimentScore:15, analysts:{buy:2,hold:8,sell:18},
+    shortInterest:'38%', putCallRatio:'4.2', institutionalFlow:'Net sell $180M',
+    news:[
+      {src:'Bloomberg',headline:'Carvana Q3 revenue crashes 8%; CEO admits company "over-leveraged"',sentiment:'bear'},
+      {src:'CNBC',headline:'Carvana debt trading at 50 cents on dollar — bankruptcy risk rising sharply',sentiment:'bear'},
+      {src:'WSJ',headline:'Used car prices falling 15% year-over-year; Carvana inventory worth less than debt',sentiment:'bear'}
+    ],
+    missedQuestions:['What does debt trading at 50 cents mean for equity value?','If inventory is worth less than debt, what is equity worth?','Why did Carvana over-leverage during the used car bubble?','What happens to equity when debt holders take over in distress?'],
+    context:'It is 1:00 PM on November 3, 2022. Carvana crashed from $370 to $6 — a 98% collapse. The CEO admitted the company is "over-leveraged" after buying too much inventory at peak used car prices. Now used car prices are down 15% and falling. The company\'s debt trades at 50 cents on the dollar — bond markets are pricing in default risk. When debt trades at distressed levels, equity is usually worthless. Short interest is 38%. Put/call ratio of 4.2 shows bearish conviction.',
+    correctAnswer:'sell',
+    buyFeedback:'CVNA fell to $3.55 by December 2022 (-42% more). The company was on the verge of bankruptcy. It survived by doing a dilutive debt restructuring that wiped out 90% of equity value. Used car price collapse killed the leveraged model.',
+    sellFeedback:'Correct. CVNA hit $3.55 by December (-42% more from 1 PM). The company barely avoided bankruptcy through massive dilution. When debt trades at 50 cents and inventory values are falling, equity is a free option at best. Most value went to zero.',
+    lesson:'When a leveraged company admits "over-leverage" and its debt trades at distressed levels, equity is toast. Carvana bought peak-priced inventory with debt. When asset values fall below liabilities, equity gets wiped out through dilution or bankruptcy.' },
+
+  { module:'day', ticker:'PTON',company:'Peloton Interactive',date:'Feb 8, 2022',diff:'advanced',
+    cutoffTime:'10:30 AM',cutoffIdx:60,predictWindow:'rest of trading day',
+    open:29.50,close:24.22,change:-17.9,volume:'38M',weekHigh:171.09,weekLow:8.22,
+    pe:null,mktCap:'8.0B',rsi:24,macd:'Extreme Bearish',ma50:33.80,volatility:'Extreme',
+    sentimentScore:18, analysts:{buy:8,hold:22,sell:16},
+    shortInterest:'28%', putCallRatio:'2.4', institutionalFlow:'Net sell $320M',
+    news:[
+      {src:'CNBC',headline:'Peloton Q2 revenue misses badly; lowers full-year guidance by 20%',sentiment:'bear'},
+      {src:'Bloomberg',headline:'Peloton halting production of bikes and treadmills — demand collapsed',sentiment:'bear'},
+      {src:'WSJ',headline:'Peloton announces 2,800 layoffs (20% of workforce); CEO may step down',sentiment:'bear'}
+    ],
+    missedQuestions:['What does halting production mean for a hardware company?','Why did COVID demand prove temporary not permanent?','If they\'re laying off 20% and halting production, what\'s the growth story?','What happens when a subscription model loses the hardware flywheel?'],
+    context:'It is 10:30 AM on February 8, 2022. Peloton is imploding. Revenue missed badly and they\'re halting all bike/treadmill production — demand collapsed post-COVID. The company is laying off 2,800 people (20% of staff) and the CEO may resign. From $171 to $29 in 9 months. COVID fitness demand was temporary. When they stop making the hardware, the subscription business loses its growth engine. Short interest is 28%.',
+    correctAnswer:'sell',
+    buyFeedback:'PTON crashed from $24 to $8 by May 2022 (-67%). COVID demand was entirely temporary. When lockdowns ended, nobody wanted expensive home fitness equipment. The business model broke when growth reversed. No bottom until restructuring.',
+    sellFeedback:'Perfect. PTON fell to $8 by May 2022 (-67% more). Halting production meant admitting the growth story was dead. COVID created a temporary spike that management mistook for permanent demand. When hardware stops, subscriptions plateau.',
+    lesson:'Companies built on temporary COVID behaviors collapsed when normal life resumed. Peloton mistook a lockdown spike for secular growth. Halting production and 20% layoffs means management realizes the TAM was 90% smaller than they thought.' },
+
+  { module:'day', ticker:'TDOC',company:'Teladoc Health',date:'Apr 28, 2022',diff:'advanced',
+    cutoffTime:'11:30 AM',cutoffIdx:120,predictWindow:'rest of trading day',
+    open:33.50,close:28.70,change:-14.3,volume:'28M',weekHigh:308.00,weekLow:23.81,
+    pe:null,mktCap:'4.6B',rsi:21,macd:'Extreme Bearish',ma50:58.40,volatility:'Extreme',
+    sentimentScore:16, analysts:{buy:14,hold:18,sell:12},
+    shortInterest:'22%', putCallRatio:'2.8', institutionalFlow:'Net sell $280M',
+    news:[
+      {src:'Bloomberg',headline:'Teladoc Q1 revenue misses; takes $6.6B goodwill impairment on Livongo deal',sentiment:'bear'},
+      {src:'CNBC',headline:'Teladoc visits declining as patients return to in-person doctors post-COVID',sentiment:'bear'},
+      {src:'WSJ',headline:'Teladoc admits overpaying for Livongo; $18.5B acquisition now worth $12B',sentiment:'bear'}
+    ],
+    missedQuestions:['What is a $6.6B goodwill impairment and what does it mean?','Why did telehealth demand peak during COVID and reverse after?','If they paid $18.5B for an asset worth $12B, what does that say about management?','What happens to growth stocks when the growth story is proven false?'],
+    context:'It is 11:30 AM on April 28, 2022. Teladoc is crashing after taking a $6.6B writedown on the Livongo acquisition — admitting they massively overpaid. Telehealth visits are declining as people return to in-person doctors. The stock is down from $308 to $28 — a 91% collapse. COVID telehealth demand was temporary. When management takes a $6.6B writedown, they\'re admitting catastrophic error. Short interest 22%.',
+    correctAnswer:'sell',
+    buyFeedback:'TDOC fell from $28 to $13 by June 2022 (-55% more). Telehealth demand continued declining. The Livongo writedown proved management destroyed value at scale. When the thesis is proven wrong and management admits failure, there\'s no floor.',
+    sellFeedback:'Perfect. TDOC crashed to $13 by June 2022 (-55% more from 11:30 AM). A $6.6B writedown is management admitting they destroyed massive shareholder value. COVID telehealth was temporary and the Livongo deal was a disaster at peak valuations.',
+    lesson:'Massive goodwill impairments are management admitting they destroyed value. Teladoc paid $18.5B for Livongo at peak COVID euphoria. When demand proved temporary and they wrote off $6.6B, it confirmed systematic overpayment and broken thesis.' },
+
+  { module:'day', ticker:'SPCE',company:'Virgin Galactic',date:'Oct 28, 2021',diff:'advanced',
+    cutoffTime:'12:00 PM',cutoffIdx:150,predictWindow:'afternoon session',
+    open:22.50,close:17.91,change:-20.4,volume:'48M',weekHigh:62.80,weekLow:6.28,
+    pe:null,mktCap:'4.6B',rsi:28,macd:'Extreme Bearish',ma50:24.80,volatility:'Extreme',
+    sentimentScore:24, analysts:{buy:4,hold:8,sell:6},
+    shortInterest:'32%', putCallRatio:'2.2', institutionalFlow:'Net sell $180M',
+    news:[
+      {src:'Bloomberg',headline:'Virgin Galactic delays commercial flights to Q4 2022 — third consecutive delay',sentiment:'bear'},
+      {src:'CNBC',headline:'Virgin Galactic reports maintenance issues; fleet grounded indefinitely',sentiment:'bear'},
+      {src:'WSJ',headline:'Virgin Galactic burns $140M per quarter with zero revenue; cash runway concerns',sentiment:'bear'}
+    ],
+    missedQuestions:['What does three consecutive delays mean for an unproven technology?','If the entire fleet is grounded for maintenance, when will revenue actually start?','How many quarters of cash runway remain at $140M burn?','Why is space tourism a hard business to scale profitably?'],
+    context:'It is 12:00 PM on October 28, 2021. Virgin Galactic delayed commercial flights for the third time — now pushed to Q4 2022. The entire fleet is grounded for maintenance issues. The company burns $140M per quarter with zero revenue. Space tourism is unproven commercially. When unproven businesses delay revenue repeatedly while burning cash, the runway shrinks fast. Short interest is 32%. Put/call ratio shows bearish positioning.',
+    correctAnswer:'sell',
+    buyFeedback:'SPCE crashed from $18 to $6 by May 2022 (-67%). The delays continued, cash burn persisted, and commercial operations never materialized at scale. Space tourism is incredibly hard to make profitable. Speculative pre-revenue companies got crushed in 2022.',
+    sellFeedback:'Perfect. SPCE fell to $6 by May 2022 (-67%). Three delays became six delays. The company kept burning cash with no clear path to profitable operations. Space tourism has massive technical and economic challenges that take decades to solve.',
+    lesson:'Pre-revenue companies that repeatedly delay launch timelines are red flags. Virgin Galactic burned $140M/quarter while pushing commercial operations further out. Space tourism is extraordinarily difficult and expensive — not a scalable business model.' },
+
+  { module:'long', ticker:'ARKK',company:'ARK Innovation ETF',date:'Feb 10, 2022',diff:'advanced',
+    cutoffTime:'Close of Day',cutoffIdx:390,predictWindow:'next 4 months',
+    open:67.50,close:64.25,change:-4.8,volume:'18M',weekHigh:159.70,weekLow:35.10,
+    pe:null,mktCap:'11.2B',rsi:32,macd:'Bearish',ma50:72.80,volatility:'Extreme',
+    sentimentScore:28, analysts:{buy:0,hold:0,sell:0},
+    news:[
+      {src:'Bloomberg',headline:'ARK Innovation ETF down 55% from peak; Cathie Wood stays bullish on innovation',sentiment:'bear'},
+      {src:'CNBC',headline:'Fed signals aggressive rate hikes; high-growth stocks crushed in 2022',sentiment:'bear'},
+      {src:'WSJ',headline:'ARKK heavy in unprofitable tech; TDOC, ROKU, COIN, ZM all down 40%+',sentiment:'bear'}
+    ],
+    context:'ARKK is down 55% from its February 2021 peak of $159. The ETF is concentrated in unprofitable, high-growth tech like Teladoc, Roku, Coinbase, and Zoom — all facing massive headwinds. The Fed is hiking rates aggressively, making future cash flows less valuable. Cathie Wood is staying bullish on "innovation" but the market is repricing all growth stocks lower. This is February 2022. You must predict ARKK\'s direction over the next 4 months.',
+    correctAnswer:'sell',
+    buyFeedback:'ARKK crashed from $64 to $35 by June 2022 (-45%). Rising rates devastated unprofitable growth stocks. When the Fed hikes, long-duration assets with no earnings collapse first. ARKK was a leveraged bet on zero rates that reversed violently.',
+    sellFeedback:'Perfect. ARKK imploded to $35 by June 2022 (-45%). The portfolio was full of unprofitable, high-valuation companies that couldn\'t survive rate hikes. When discount rates rise, far-future cash flows become worthless. ARKK was peak euphoria unwinding.',
+    lesson:'Concentrated portfolios of unprofitable growth stocks are extremely vulnerable to rising rates. ARKK\'s holdings had no earnings and high valuations — both are fatal when rates rise. Duration risk and profitability matter when monetary policy shifts.' }
 ];
 
 // STATE
@@ -1655,19 +2463,38 @@ function renderLessons(filter='all') {
   const grid = document.getElementById('lessonsGrid');
   grid.innerHTML = '';
   let count = 0;
+
+  // Check progression locks
+  const beginnerLessons = LESSONS.filter(l => l.module === currentModule && l.diff === 'beginner');
+  const intermediateLessons = LESSONS.filter(l => l.module === currentModule && l.diff === 'intermediate');
+  const advancedLessons = LESSONS.filter(l => l.module === currentModule && l.diff === 'advanced');
+
+  const beginnerCompleted = beginnerLessons.every(l => STATE.completedLessons.has(LESSONS.indexOf(l)));
+  const intermediateCompleted = intermediateLessons.every(l => STATE.completedLessons.has(LESSONS.indexOf(l)));
+
   LESSONS.forEach((l,i)=>{
     if(l.module !== currentModule) return;
     if(filter !== 'all' && l.diff !== filter) return;
+
+    // Check if lesson is locked
+    const isLocked = (l.diff === 'intermediate' && !beginnerCompleted) ||
+                     (l.diff === 'advanced' && !intermediateCompleted);
+
     count++;
     const changeStr = (l.change>0?'+':'')+l.change+'%';
     const diffMap = {beginner:'diff-b Beginner',intermediate:'diff-i Intermediate',advanced:'diff-a Advanced'};
     const [dc,dl] = diffMap[l.diff].split(' ');
     const completed = STATE.completedLessons.has(i);
     const card = document.createElement('div');
-    card.className = 'lesson-card';
+    card.className = 'lesson-card' + (isLocked ? ' lesson-locked' : '');
     const cutoffBadge = l.module==='day'
       ? `<div class="lc-cutoff-badge">✂️ Cutoff: ${l.cutoffTime}</div>`
       : `<div class="lc-cutoff-badge lc-cutoff-long">📅 Predict: ${l.predictWindow}</div>`;
+
+    const lockMessage = isLocked
+      ? `<div class="lc-lock-message">🔒 ${l.diff === 'intermediate' ? 'Complete all beginner lessons to unlock' : 'Complete all intermediate lessons to unlock'}</div>`
+      : '';
+
     card.innerHTML = `
       <div class="lc-top">
         <span class="lc-ticker">${l.ticker}</span>
@@ -1677,6 +2504,7 @@ function renderLessons(filter='all') {
       <div class="lc-date">${l.date}</div>
       ${cutoffBadge}
       <div class="lc-chart"><canvas id="lc${i}"></canvas></div>
+      ${isLocked ? lockMessage : `
       <div class="lc-footer">
         ${completed ? '<span class="lc-completed">✓ Completed</span>' : '<span style="font-size:.7rem;color:var(--text-muted)">Choose mode:</span>'}
         <span class="lc-change" style="color:${l.change>0?'var(--green)':'var(--red)'}">${changeStr}</span>
@@ -1684,9 +2512,11 @@ function renderLessons(filter='all') {
       <div class="lc-mode-btns">
         <button class="lc-mode-study" onclick="event.stopPropagation();openLesson(${i},'study')">📚 Study</button>
         <button class="lc-mode-live" onclick="event.stopPropagation();openLesson(${i},'live')">⚡ Live Sim</button>
-      </div>`;
+      </div>`}`;
     grid.appendChild(card);
-    setTimeout(()=>makeMiniChart(`lc${i}`,l),30*count);
+    if (!isLocked) {
+      setTimeout(()=>makeMiniChart(`lc${i}`,l),30*count);
+    }
   });
   if(count===0) grid.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-muted);">No lessons match this filter.</div>';
 
