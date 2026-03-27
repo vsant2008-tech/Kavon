@@ -430,6 +430,50 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 @keyframes hintFadeIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
 .hint-pattern-badge .pswatch{width:18px;height:3px;border-radius:2px;display:inline-block;flex-shrink:0;}
 
+/* ── INFO TOOLTIPS ───────────────────────────────────────────── */
+.info-tooltip-trigger{display:inline-flex;align-items:center;justify-content:center;
+  width:14px;height:14px;border-radius:50%;background:var(--blue-bright);color:#fff;
+  font-size:.65rem;font-weight:700;cursor:help;margin-left:.3rem;
+  vertical-align:middle;transition:all .15s;border:none;padding:0;}
+.info-tooltip-trigger:hover{background:var(--blue);transform:scale(1.15);}
+.info-tooltip{position:absolute;z-index:1000;background:#fff;border:2px solid var(--blue-bright);
+  border-radius:10px;padding:.8rem;max-width:280px;box-shadow:0 8px 24px rgba(0,0,0,.15);
+  font-size:.78rem;line-height:1.5;display:none;animation:tooltipFadeIn .2s ease;}
+.info-tooltip.active{display:block;}
+@keyframes tooltipFadeIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.tooltip-definition{color:var(--text-dark);margin-bottom:.6rem;font-weight:500;}
+.tooltip-application{color:var(--text-muted);font-size:.72rem;padding-top:.6rem;
+  border-top:1px solid var(--border);}
+.tooltip-application strong{color:var(--blue);display:block;font-weight:700;
+  font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.3rem;}
+
+/* ── ONBOARDING BANNER ───────────────────────────────────────── */
+.onboarding-banner{background:linear-gradient(135deg,#e3f2fd,#bbdefb);
+  border:2px solid var(--blue-bright);border-radius:10px;padding:.7rem 1rem;
+  margin-bottom:.75rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  animation:slideDown .3s ease;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.onboarding-content{display:flex;align-items:center;gap:.6rem;flex:1;}
+.onboarding-icon{font-size:1.2rem;}
+.onboarding-text{font-size:.8rem;color:var(--text-dark);line-height:1.4;}
+.onboarding-text strong{color:var(--blue);font-weight:700;}
+.onboarding-dismiss{padding:.3rem .7rem;border-radius:6px;border:none;
+  background:var(--blue);color:#fff;font-size:.72rem;font-weight:700;
+  cursor:pointer;font-family:'Sora',sans-serif;transition:all .15s;}
+.onboarding-dismiss:hover{background:var(--blue-mid);transform:translateY(-1px);}
+
+/* ── GUIDED THINKING QUESTIONS ──────────────────────────────────── */
+.thinking-questions-panel{background:linear-gradient(135deg,#fff8e1,#ffecb3);
+  border:2px solid #f9a825;border-radius:10px;padding:1rem;margin-bottom:.75rem;
+  display:none;}
+.thinking-questions-panel.active{display:block;animation:slideDown .3s ease;}
+.tq-title{font-size:.88rem;font-weight:800;color:#e65100;margin-bottom:.8rem;
+  display:flex;align-items:center;gap:.5rem;}
+.tq-list{display:flex;flex-direction:column;gap:.6rem;}
+.tq-item{background:#fff;border:1.5px solid #ffe082;border-radius:8px;padding:.7rem .9rem;
+  font-size:.82rem;line-height:1.5;color:var(--text-dark);display:flex;align-items:start;gap:.6rem;}
+.tq-number{font-weight:800;color:#f9a825;min-width:20px;}
+
 /* ── LESSON CARD MODE BUTTONS ────────────────────────────────── */
 .lc-mode-btns{display:flex;gap:.5rem;margin-top:.6rem;}
 .lc-mode-study,.lc-mode-live{flex:1;padding:.38rem .5rem;border-radius:7px;font-size:.72rem;font-weight:700;
@@ -939,12 +983,27 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
         </div>
         <div class="chart-progress"><div class="chart-progress-fill" id="chartProgressFill" style="width:0%"></div></div>
 
+        <!-- Onboarding Banner -->
+        <div class="onboarding-banner" id="onboardingBanner" style="display:none;">
+          <div class="onboarding-content">
+            <span class="onboarding-icon">💡</span>
+            <div class="onboarding-text">New to trading? Tap the <strong>ⓘ</strong> icons next to any term to learn what it means.</div>
+          </div>
+          <button class="onboarding-dismiss" onclick="dismissOnboarding()">Got it</button>
+        </div>
+
+        <!-- Guided Thinking Questions Panel -->
+        <div class="thinking-questions-panel" id="thinkingQuestionsPanel">
+          <div class="tq-title"><span>🧭</span><span>Where should I look?</span></div>
+          <div class="tq-list" id="thinkingQuestionsList"></div>
+        </div>
+
         <!-- Hint Bar -->
         <div class="hint-bar" id="hintBar">
           <div class="hint-left">
-            <button class="hint-btn" id="hintBtn" onclick="useHint()">
-              <span class="hint-icon">💡</span>
-              <span id="hintBtnLabel">Reveal Pattern Hint</span>
+            <button class="hint-btn" id="hintBtn" onclick="handleHintClick()">
+              <span class="hint-icon" id="hintIcon">🧭</span>
+              <span id="hintBtnLabel">Where should I look?</span>
             </button>
             <div class="hint-counter" id="hintCounter">
               <span id="hintDotsWrap">
@@ -975,25 +1034,25 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
       <div class="data-panel">
         <!-- Price data -->
         <div class="data-panel-section">
-          <div class="dp-section-title"><span>📊</span><span>Market Data</span></div>
+          <div class="dp-section-title"><span>📊</span><span>Market Data<button class="info-tooltip-trigger" onclick="showTooltip(event, 'marketData')">ⓘ</button></span></div>
           <div class="indicator-grid">
-            <div class="ind-box"><div class="ind-label">Open</div><div class="ind-value" id="dpOpen">—</div></div>
-            <div class="ind-box"><div class="ind-label">Volume</div><div class="ind-value" id="dpVolume">—</div></div>
-            <div class="ind-box"><div class="ind-label">52W High</div><div class="ind-value" id="dp52H">—</div></div>
-            <div class="ind-box"><div class="ind-label">52W Low</div><div class="ind-value" id="dp52L">—</div></div>
-            <div class="ind-box"><div class="ind-label">P/E Ratio</div><div class="ind-value" id="dpPE">—</div></div>
-            <div class="ind-box"><div class="ind-label">Market Cap</div><div class="ind-value" id="dpMktCap">—</div></div>
+            <div class="ind-box"><div class="ind-label">Open<button class="info-tooltip-trigger" onclick="showTooltip(event, 'open')">ⓘ</button></div><div class="ind-value" id="dpOpen">—</div></div>
+            <div class="ind-box"><div class="ind-label">Volume<button class="info-tooltip-trigger" onclick="showTooltip(event, 'volume')">ⓘ</button></div><div class="ind-value" id="dpVolume">—</div></div>
+            <div class="ind-box"><div class="ind-label">52W High<button class="info-tooltip-trigger" onclick="showTooltip(event, '52wHigh')">ⓘ</button></div><div class="ind-value" id="dp52H">—</div></div>
+            <div class="ind-box"><div class="ind-label">52W Low<button class="info-tooltip-trigger" onclick="showTooltip(event, '52wLow')">ⓘ</button></div><div class="ind-value" id="dp52L">—</div></div>
+            <div class="ind-box"><div class="ind-label">P/E Ratio<button class="info-tooltip-trigger" onclick="showTooltip(event, 'pe')">ⓘ</button></div><div class="ind-value" id="dpPE">—</div></div>
+            <div class="ind-box"><div class="ind-label">Market Cap<button class="info-tooltip-trigger" onclick="showTooltip(event, 'marketCap')">ⓘ</button></div><div class="ind-value" id="dpMktCap">—</div></div>
           </div>
         </div>
 
         <!-- Technical indicators -->
         <div class="data-panel-section">
-          <div class="dp-section-title"><span>📉</span><span>Technical Indicators</span></div>
+          <div class="dp-section-title"><span>📉</span><span>Technical Indicators<button class="info-tooltip-trigger" onclick="showTooltip(event, 'technicalIndicators')">ⓘ</button></span></div>
           <div class="indicator-grid">
-            <div class="ind-box"><div class="ind-label">RSI (14)</div><div class="ind-value" id="dpRSI">—</div></div>
-            <div class="ind-box"><div class="ind-label">MACD</div><div class="ind-value" id="dpMACD">—</div></div>
-            <div class="ind-box"><div class="ind-label">50-Day MA</div><div class="ind-value" id="dp50MA">—</div></div>
-            <div class="ind-box"><div class="ind-label">Volatility</div><div class="ind-value" id="dpVol">—</div></div>
+            <div class="ind-box"><div class="ind-label">RSI (14)<button class="info-tooltip-trigger" onclick="showTooltip(event, 'rsi')">ⓘ</button></div><div class="ind-value" id="dpRSI">—</div></div>
+            <div class="ind-box"><div class="ind-label">MACD<button class="info-tooltip-trigger" onclick="showTooltip(event, 'macd')">ⓘ</button></div><div class="ind-value" id="dpMACD">—</div></div>
+            <div class="ind-box"><div class="ind-label">50-Day MA<button class="info-tooltip-trigger" onclick="showTooltip(event, 'ma50')">ⓘ</button></div><div class="ind-value" id="dp50MA">—</div></div>
+            <div class="ind-box"><div class="ind-label">Volatility<button class="info-tooltip-trigger" onclick="showTooltip(event, 'volatility')">ⓘ</button></div><div class="ind-value" id="dpVol">—</div></div>
           </div>
         </div>
 
@@ -1140,6 +1199,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
         </button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- Global Tooltip Container -->
+<div class="info-tooltip" id="globalTooltip">
+  <div class="tooltip-definition" id="tooltipDefinition"></div>
+  <div class="tooltip-application">
+    <strong>How does this help me decide?</strong>
+    <div id="tooltipApplication"></div>
   </div>
 </div>
 
@@ -1975,6 +2043,12 @@ function openLesson(idx, mode) {
   STATE.currentPattern = null;
   resetHintUI();
 
+  // Reset thinking questions
+  resetThinkingQuestions();
+
+  // Cancel any pending auto-open
+  cancelAutoOpenKavonAI();
+
   // Reset replay controls — for day trading lessons, default to showing only up to cutoff
   STATE.isPaused = false;
   STATE.replaySpeed = parseInt(document.getElementById('speedSlider').value) || 5;
@@ -2026,6 +2100,21 @@ function openLesson(idx, mode) {
     if(buyBtn)  buyBtn.textContent  = '▲ BUY';
     if(sellBtn) sellBtn.textContent = '▼ SELL';
   }
+
+  // Update hint button icon based on difficulty
+  const hintIcon = document.getElementById('hintIcon');
+  if (hintIcon) {
+    hintIcon.textContent = l.diff === 'beginner' ? '🧭' : '💡';
+  }
+
+  // Show onboarding banner for first-time beginner users
+  checkAndShowOnboarding();
+
+  // Reset thinking questions panel
+  resetThinkingQuestions();
+
+  // Cancel any pending auto-open
+  cancelAutoOpenKavonAI();
 
   // Start chart animation
   startChartAnimation(l);
@@ -2575,6 +2664,9 @@ function makeDecision(choice) {
     askKavonBtn.style.display = isLive ? 'flex' : 'none';
   }
 
+  // Auto-open Kavon AI for beginner lessons after 2 seconds
+  scheduleAutoOpenKavonAI();
+
   document.getElementById('aiFeedback').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
@@ -3053,8 +3145,10 @@ function resetHintUI() {
   const label = document.getElementById('hintBtnLabel');
   const counter = document.getElementById('hintCountLabel');
   const badge = document.getElementById('hintPatternBadge');
+  const lesson = STATE.currentLesson;
+
   if(btn){btn.disabled=(remaining===0);btn.classList.remove('active-hint');}
-  if(label) label.textContent='Reveal Pattern Hint';
+  if(label) label.textContent = (lesson && lesson.diff === 'beginner') ? 'Where should I look?' : 'Reveal Pattern Hint';
   if(counter) counter.textContent=remaining+' hint'+(remaining!==1?'s':'')+' remaining';
   for(let i=0;i<3;i++){const d=document.getElementById('hd'+i);if(d)d.className='hint-dot'+(i<remaining?'':' used');}
   if(badge) badge.style.display='none';
@@ -3237,6 +3331,31 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
 
   getChips(ctx, mode) {
     const t = ctx.ticker ?? 'this stock';
+    const difficulty = ctx.difficulty ?? 'intermediate';
+
+    // Beginner-friendly questions with zero jargon
+    if (difficulty === 'beginner') {
+      if (mode === 'pre') return [
+        'Is this a good time to buy?',
+        "What's the most important thing to look at right now?",
+        'What would most people do here?',
+        'Help me think through this decision.',
+      ];
+      if (mode === 'learn') return [
+        'What does this number mean?',
+        'Why did the price move like that?',
+        'How do I know if I made the right choice?',
+        'What should I remember for next time?',
+      ];
+      return [
+        'Did I make a good decision?',
+        'What did I do right or wrong?',
+        'What should I have noticed?',
+        'How can I get better at this?',
+      ];
+    }
+
+    // Intermediate/Advanced questions (existing)
     if (mode === 'pre') return [
       `What is the sentiment telling us about ${t} right now?`,
       `Which news headline matters most here?`,
@@ -3497,6 +3616,253 @@ function openKavonAIModal() {
   };
 
   KavonAI.open(context, mode);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INFO TOOLTIPS
+// ═══════════════════════════════════════════════════════════════════════════
+const TOOLTIP_DATA = {
+  marketData: {
+    def: "All the basic numbers about a stock's price and trading activity.",
+    app: "This shows you how active the stock is and where it's trading compared to recent history."
+  },
+  open: {
+    def: "The price the stock was trading at when the market opened today.",
+    app: "Compare this to the current price — if it's much higher or lower, something big is happening."
+  },
+  volume: {
+    def: "How many shares have been bought and sold today.",
+    app: "High volume means lots of people are trading — the move is probably real, not a fluke."
+  },
+  '52wHigh': {
+    def: "The highest price this stock has traded at in the past year.",
+    app: "If the stock is near this price, it might keep going up (momentum) or pull back (resistance)."
+  },
+  '52wLow': {
+    def: "The lowest price this stock has traded at in the past year.",
+    app: "If the stock is near this price, it might bounce back up or keep falling."
+  },
+  pe: {
+    def: "Price-to-Earnings ratio — how expensive the stock is compared to its profits.",
+    app: "Higher P/E = investors think it will grow fast. Lower P/E = might be a bargain or have problems."
+  },
+  marketCap: {
+    def: "The total value of the company if you owned all its shares.",
+    app: "Bigger companies are usually less risky but grow slower. Smaller ones can move fast either way."
+  },
+  technicalIndicators: {
+    def: "Math-based signals that show if a stock's price is likely to go up or down.",
+    app: "These help you see patterns that might tell you if now is a good time to buy or sell."
+  },
+  rsi: {
+    def: "A number from 0-100 that shows if a stock has been going up or down too fast.",
+    app: "Above 70 = might fall soon (overbought). Below 30 = might rise soon (oversold)."
+  },
+  macd: {
+    def: "Shows if the stock's upward or downward momentum is getting stronger or weaker.",
+    app: "Bullish means momentum is up, bearish means it's down — follow the direction."
+  },
+  ma50: {
+    def: "The average price over the last 50 days — a line showing the general trend.",
+    app: "Price above this line = uptrend. Price below = downtrend. Simple as that."
+  },
+  volatility: {
+    def: "How much the stock price jumps around day to day.",
+    app: "High volatility = bigger swings up or down. Low volatility = more predictable moves."
+  },
+  bullish: {
+    def: "Positive news or signal that suggests the stock price might go up.",
+    app: "When you see this, it's a clue that buying might be the right move."
+  },
+  bearish: {
+    def: "Negative news or signal that suggests the stock price might go down.",
+    app: "When you see this, it's a clue that selling might be the right move."
+  }
+};
+
+let activeTooltip = null;
+
+function showTooltip(event, term) {
+  event.stopPropagation();
+  const tooltip = document.getElementById('globalTooltip');
+  const data = TOOLTIP_DATA[term];
+
+  if (!data) return;
+
+  document.getElementById('tooltipDefinition').textContent = data.def;
+  document.getElementById('tooltipApplication').textContent = data.app;
+
+  const trigger = event.target;
+  const triggerRect = trigger.getBoundingClientRect();
+
+  tooltip.classList.add('active');
+
+  // Position tooltip
+  const tooltipRect = tooltip.getBoundingClientRect();
+  let top = triggerRect.bottom + 8;
+  let left = triggerRect.left - (tooltipRect.width / 2) + (triggerRect.width / 2);
+
+  // Keep tooltip on screen
+  if (left < 10) left = 10;
+  if (left + tooltipRect.width > window.innerWidth - 10) {
+    left = window.innerWidth - tooltipRect.width - 10;
+  }
+  if (top + tooltipRect.height > window.innerHeight - 10) {
+    top = triggerRect.top - tooltipRect.height - 8;
+  }
+
+  tooltip.style.top = top + 'px';
+  tooltip.style.left = left + 'px';
+
+  activeTooltip = tooltip;
+}
+
+function hideTooltip() {
+  if (activeTooltip) {
+    activeTooltip.classList.remove('active');
+    activeTooltip = null;
+  }
+}
+
+// Close tooltip when clicking anywhere
+document.addEventListener('click', hideTooltip);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ONBOARDING BANNER
+// ═══════════════════════════════════════════════════════════════════════════
+function checkAndShowOnboarding() {
+  const hasSeenOnboarding = localStorage.getItem('kavon_onboarding_seen');
+  const lesson = STATE.currentLesson;
+
+  if (!hasSeenOnboarding && lesson && lesson.diff === 'beginner') {
+    const banner = document.getElementById('onboardingBanner');
+    if (banner) {
+      banner.style.display = 'flex';
+    }
+  }
+}
+
+function dismissOnboarding() {
+  localStorage.setItem('kavon_onboarding_seen', 'true');
+  const banner = document.getElementById('onboardingBanner');
+  if (banner) {
+    banner.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GUIDED THINKING QUESTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+const THINKING_QUESTIONS = {
+  beginner: [
+    "Is the price higher or lower than it was this morning?",
+    "Are the news headlines mostly positive or mostly negative?",
+    "Is the trading volume higher than usual?"
+  ],
+  intermediate: [
+    "What's the overall sentiment from news and market data?",
+    "Are technical indicators aligned in one direction?",
+    "Is this stock near important price levels (52W high/low)?"
+  ],
+  advanced: [
+    "What's the institutional positioning suggesting?",
+    "How do multiple timeframes and catalysts align?",
+    "What's the risk/reward given current positioning?"
+  ]
+};
+
+function handleHintClick() {
+  const lesson = STATE.currentLesson;
+  if (!lesson) return;
+
+  if (lesson.diff === 'beginner') {
+    toggleThinkingQuestions();
+  } else {
+    useHint();
+  }
+}
+
+function toggleThinkingQuestions() {
+  const panel = document.getElementById('thinkingQuestionsPanel');
+  const btn = document.getElementById('hintBtn');
+  const lesson = STATE.currentLesson;
+
+  if (!lesson) return;
+
+  const isActive = panel.classList.contains('active');
+
+  if (isActive) {
+    panel.classList.remove('active');
+    btn.classList.remove('active-hint');
+  } else {
+    const questions = THINKING_QUESTIONS[lesson.diff] || THINKING_QUESTIONS.beginner;
+    const list = document.getElementById('thinkingQuestionsList');
+
+    list.innerHTML = questions.map((q, i) => `
+      <div class="tq-item">
+        <span class="tq-number">${i + 1}.</span>
+        <span>${q}</span>
+      </div>
+    `).join('');
+
+    panel.classList.add('active');
+    btn.classList.add('active-hint');
+
+    // Deduct a hint
+    if (STATE.hintsRemaining > 0) {
+      STATE.hintsRemaining--;
+      updateHintCounter();
+    }
+  }
+}
+
+function updateHintCounter() {
+  const remaining = STATE.hintsRemaining;
+  const counter = document.getElementById('hintCountLabel');
+  const btn = document.getElementById('hintBtn');
+
+  if (counter) counter.textContent = remaining + ' hint' + (remaining !== 1 ? 's' : '') + ' remaining';
+  if (btn) btn.disabled = remaining === 0;
+
+  for (let i = 0; i < 3; i++) {
+    const dot = document.getElementById('hd' + i);
+    if (dot) dot.className = 'hint-dot' + (i < remaining ? ' active' : ' used');
+  }
+}
+
+function resetThinkingQuestions() {
+  const panel = document.getElementById('thinkingQuestionsPanel');
+  const btn = document.getElementById('hintBtn');
+
+  if (panel) panel.classList.remove('active');
+  if (btn) btn.classList.remove('active-hint');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// AUTO-OPEN KAVON AI AFTER DECISION
+// ═══════════════════════════════════════════════════════════════════════════
+let autoOpenTimer = null;
+
+function scheduleAutoOpenKavonAI() {
+  // Clear any existing timer
+  if (autoOpenTimer) {
+    clearTimeout(autoOpenTimer);
+    autoOpenTimer = null;
+  }
+
+  const lesson = STATE.currentLesson;
+  if (lesson && lesson.diff === 'beginner') {
+    autoOpenTimer = setTimeout(() => {
+      openKavonAIModal();
+    }, 2000);
+  }
+}
+
+function cancelAutoOpenKavonAI() {
+  if (autoOpenTimer) {
+    clearTimeout(autoOpenTimer);
+    autoOpenTimer = null;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
