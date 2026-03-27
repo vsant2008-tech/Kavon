@@ -3,12 +3,17 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 
+const APPROVED_EMAILS = [
+  'your-email@example.com',
+];
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  isApprovedUser: (email: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -32,8 +37,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
         setLoading(false);
 
-        if (event === 'SIGNED_IN' && session) {
-          navigate('/dashboard');
+        if (event === 'SIGNED_IN' && session?.user?.email) {
+          if (isApprovedUser(session.user.email)) {
+            navigate('/dashboard');
+          } else {
+            navigate('/waitlist');
+          }
         }
       })();
     });
@@ -63,8 +72,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const isApprovedUser = (email: string) => {
+    return APPROVED_EMAILS.includes(email.toLowerCase());
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signInWithGoogle, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signInWithGoogle, signOut, isApprovedUser }}>
       {children}
     </AuthContext.Provider>
   );
