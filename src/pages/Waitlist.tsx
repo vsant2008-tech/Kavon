@@ -26,20 +26,26 @@ export default function Waitlist() {
     }
 
     try {
-      const { error: insertError } = await supabase
+      const { data, error: insertError } = await supabase
         .from('waitlist')
-        .insert([{ email }]);
+        .insert([{ email }])
+        .select();
 
       if (insertError) {
+        console.error('Waitlist insert error:', insertError);
+
         if (insertError.code === '23505') {
-          setError('This email is already on the waitlist.');
+          setError("You're already on the list!");
+          console.log('Duplicate email attempt:', email);
         } else {
           setError('Something went wrong. Please try again.');
         }
       } else {
+        console.log('Successfully added to waitlist:', data);
         setSubmitted(true);
       }
     } catch (err) {
+      console.error('Unexpected error during waitlist submission:', err);
       setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);
