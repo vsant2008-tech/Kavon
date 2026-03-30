@@ -1,20 +1,14 @@
 import { useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 export default function Study() {
-  const { user, loading } = useAuth();
-  const navigate = useNavigate();
+  const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
-    if (!loading) {
-      if (user) {
-        window.location.href = '/trading.html';
-      } else {
-        navigate('/?login=true');
-      }
+    if (!loading && isAuthenticated) {
+      window.location.href = '/trading.html';
     }
-  }, [user, loading, navigate]);
+  }, [isAuthenticated, loading]);
 
   if (loading) {
     return (
