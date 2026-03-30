@@ -33,12 +33,13 @@ export default function Waitlist() {
 
       if (insertError) {
         console.error('Waitlist insert error:', insertError);
+        console.error('Error details:', JSON.stringify(insertError, null, 2));
 
         if (insertError.code === '23505') {
           setError("You're already on the list!");
           console.log('Duplicate email attempt:', email);
         } else {
-          setError('Something went wrong. Please try again.');
+          setError(`Error: ${insertError.message || insertError.code || 'Something went wrong'}`);
         }
       } else {
         console.log('Successfully added to waitlist:', data);
@@ -79,7 +80,7 @@ export default function Waitlist() {
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                       <input
-                        type="text"
+                        type="email"
                         id="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
