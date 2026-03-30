@@ -1,6 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-slate-50">
       <Navbar />
@@ -17,12 +20,12 @@ export default function Dashboard() {
             <p className="text-slate-600 mb-4">
               Access your interactive trading lessons and improve your skills
             </p>
-            <a
-              href="/study"
+            <button
+              onClick={() => navigate('/study')}
               className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
               Start Learning
-            </a>
+            </button>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
