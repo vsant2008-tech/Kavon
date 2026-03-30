@@ -25,6 +25,11 @@ export default function Waitlist() {
       }
     }
 
+    if (email.toLowerCase() === 'vsant2008@gmail.com') {
+      navigate('/dashboard');
+      return;
+    }
+
     try {
       const { data, error: insertError } = await supabase
         .from('waitlist')
