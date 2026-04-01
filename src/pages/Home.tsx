@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { TrendingUp, ArrowRight } from 'lucide-react';
 import ShimmerButton from '../components/ui/ShimmerButton';
+import ConstellationBackground from '../components/ui/ConstellationBackground';
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -33,7 +34,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden font-inter">
-      <div className="absolute inset-0 opacity-30">
+      <ConstellationBackground />
+
+      <div className="absolute inset-0 opacity-30" style={{ zIndex: 2 }}>
         <div
           className="absolute top-1/4 right-1/3 w-[1200px] h-[1200px] rounded-full blur-[150px] pointer-events-none"
           style={{
@@ -91,7 +94,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="relative z-10 pt-32 pb-24 px-6">
+      <main className="relative pt-32 pb-24 px-6" style={{ zIndex: 10 }}>
         <div className="max-w-5xl mx-auto text-center">
           <div className="mb-6">
             <div className="inline-block text-xs font-medium text-neutral-500 uppercase tracking-wider h-5">
