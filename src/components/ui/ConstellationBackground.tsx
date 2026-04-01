@@ -27,6 +27,7 @@ export default function ConstellationBackground() {
     const particles: Particle[] = [];
     const particleCount = 80;
     const maxDistance = 150;
+    let showLines = false;
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -36,6 +37,10 @@ export default function ConstellationBackground() {
         vy: (Math.random() - 0.5) * 0.6,
       });
     }
+
+    setTimeout(() => {
+      showLines = true;
+    }, 2000);
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -49,24 +54,26 @@ export default function ConstellationBackground() {
 
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.28)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
         ctx.fill();
       });
 
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
+      if (showLines) {
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < maxDistance) {
-            const opacity = (1 - distance / maxDistance) * 0.38;
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
-            ctx.lineWidth = 0.8;
-            ctx.stroke();
+            if (distance < maxDistance) {
+              const opacity = (1 - distance / maxDistance) * 0.12;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
           }
         }
       }
