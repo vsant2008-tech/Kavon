@@ -4,6 +4,10 @@ export default {
   darkMode: ["class"],
   theme: {
     extend: {
+      fontFamily: {
+        'playfair': ['"Playfair Display"', 'serif'],
+        'inter': ['Inter', 'sans-serif'],
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',

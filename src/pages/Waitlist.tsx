@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { TrendingUp, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import ShimmerButton from '../components/ui/ShimmerButton';
 
 export default function Waitlist() {
   const [email, setEmail] = useState('');
@@ -80,19 +81,19 @@ export default function Waitlist() {
   };
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center px-6">
-      <div className="absolute inset-0 opacity-40">
+    <div className="min-h-screen bg-black relative overflow-hidden flex items-center justify-center px-6 font-inter">
+      <div className="absolute inset-0 opacity-30">
         <div
           className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[1000px] rounded-full blur-[150px] pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%)',
             animation: 'aurora 8s ease-in-out infinite alternate'
           }}
         ></div>
         <div
           className="absolute bottom-0 right-1/3 w-[800px] h-[800px] rounded-full blur-[130px] pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(147, 197, 253, 0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(255, 255, 255, 0.02) 0%, transparent 70%)',
             animation: 'aurora 10s ease-in-out infinite alternate-reverse'
           }}
         ></div>
@@ -100,8 +101,8 @@ export default function Waitlist() {
 
       <style>{`
         @keyframes aurora {
-          0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-          100% { transform: translate(50px, -30px) scale(1.1); opacity: 0.6; }
+          0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+          100% { transform: translate(50px, -30px) scale(1.1); opacity: 0.5; }
         }
 
         @keyframes fadeInUp {
@@ -126,7 +127,7 @@ export default function Waitlist() {
         <div className="text-center mb-16">
           <div className="flex items-center justify-center space-x-3 mb-16 opacity-0 animate-[fadeInUp_0.6s_ease-out_0.3s_forwards]">
             <TrendingUp className="w-6 h-6 text-white" strokeWidth={2} />
-            <span className="text-xl font-semibold text-white tracking-tight">Kavon</span>
+            <span className="text-xl font-semibold text-white tracking-tight font-playfair">Kavon</span>
           </div>
 
           {!submitted ? (
@@ -138,14 +139,14 @@ export default function Waitlist() {
               </div>
 
               <div className={`transition-opacity duration-700 ${showHeadline ? 'opacity-100' : 'opacity-0'}`}>
-                <h1 className="text-6xl sm:text-7xl font-bold mb-8 leading-[0.95] tracking-[-0.02em]">
+                <h1 className="text-5xl sm:text-6xl font-semibold mb-8 leading-[1.05] tracking-tight font-playfair">
                   <span className="block mb-2">
                     <span className="word-reveal text-white" style={{ animationDelay: '0.1s' }}>Elite</span>
                     {' '}
                     <span className="word-reveal text-white" style={{ animationDelay: '0.25s' }}>Trading</span>
                   </span>
                   <span className="block">
-                    <span className="word-reveal bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent" style={{ animationDelay: '0.4s' }}>Education</span>
+                    <span className="word-reveal text-white" style={{ animationDelay: '0.4s' }}>Education</span>
                   </span>
                 </h1>
 
@@ -163,7 +164,7 @@ export default function Waitlist() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     placeholder="Enter your email"
-                    className="w-full px-4 py-4 bg-transparent border border-neutral-800 rounded-lg focus:outline-none focus:border-blue-500 focus:shadow-[0_0_20px_rgba(59,130,246,0.15)] text-white placeholder:text-neutral-600 transition-all duration-300 hover:border-neutral-700"
+                    className="w-full px-4 py-4 bg-transparent border border-neutral-800 rounded-lg focus:outline-none focus:border-white/40 focus:shadow-[0_0_20px_rgba(255,255,255,0.1)] text-white placeholder:text-neutral-600 transition-all duration-300 hover:border-neutral-700"
                   />
 
                   {error && (
@@ -172,22 +173,22 @@ export default function Waitlist() {
                     </div>
                   )}
 
-                  <button
+                  <ShimmerButton
                     type="submit"
                     disabled={loading}
-                    className="group w-full px-8 py-4 text-base font-medium text-black bg-white rounded-lg hover:bg-neutral-100 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? 'Requesting access...' : 'Request early access'}
-                  </button>
+                  </ShimmerButton>
                 </form>
               </div>
             </>
           ) : (
             <div className="max-w-md mx-auto">
               <div className="mb-8 opacity-0 animate-[fadeInUp_0.6s_ease-out_forwards]">
-                <CheckCircle className="w-12 h-12 text-blue-500 mx-auto" strokeWidth={1.5} />
+                <CheckCircle className="w-12 h-12 text-white mx-auto" strokeWidth={1.5} />
               </div>
-              <h2 className="text-3xl font-bold text-white mb-4 tracking-tight opacity-0 animate-[fadeInUp_0.6s_ease-out_0.2s_forwards]">
+              <h2 className="text-3xl font-semibold text-white mb-4 tracking-tight font-playfair opacity-0 animate-[fadeInUp_0.6s_ease-out_0.2s_forwards]">
                 You're on the list
               </h2>
               <p className="text-neutral-400 leading-relaxed opacity-0 animate-[fadeInUp_0.6s_ease-out_0.4s_forwards]">
@@ -204,7 +205,7 @@ export default function Waitlist() {
             { value: '24/7', label: 'AI support' }
           ].map((stat, i) => (
             <div key={i} className="text-center">
-              <div className="text-2xl font-semibold text-white mb-1 tracking-tight">{stat.value}</div>
+              <div className="text-2xl font-semibold text-white mb-1 tracking-tight font-playfair">{stat.value}</div>
               <div className="text-sm text-neutral-500 font-light">{stat.label}</div>
             </div>
           ))}

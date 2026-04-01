@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { TrendingUp, ArrowRight } from 'lucide-react';
+import ShimmerButton from '../components/ui/ShimmerButton';
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -31,19 +32,19 @@ export default function Home() {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
-      <div className="absolute inset-0 opacity-40">
+    <div className="min-h-screen bg-black relative overflow-hidden font-inter">
+      <div className="absolute inset-0 opacity-30">
         <div
           className="absolute top-1/4 right-1/3 w-[1200px] h-[1200px] rounded-full blur-[150px] pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%)',
             animation: 'aurora 8s ease-in-out infinite alternate'
           }}
         ></div>
         <div
           className="absolute bottom-1/4 left-1/4 w-[900px] h-[900px] rounded-full blur-[130px] pointer-events-none"
           style={{
-            background: 'radial-gradient(circle, rgba(147, 197, 253, 0.12) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(255, 255, 255, 0.02) 0%, transparent 70%)',
             animation: 'aurora 10s ease-in-out infinite alternate-reverse'
           }}
         ></div>
@@ -51,8 +52,8 @@ export default function Home() {
 
       <style>{`
         @keyframes aurora {
-          0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-          100% { transform: translate(50px, -30px) scale(1.1); opacity: 0.6; }
+          0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+          100% { transform: translate(50px, -30px) scale(1.1); opacity: 0.5; }
         }
 
         @keyframes fadeInUp {
@@ -78,7 +79,7 @@ export default function Home() {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-3">
               <TrendingUp className="w-5 h-5 text-white" strokeWidth={2} />
-              <span className="text-lg font-semibold text-white tracking-tight">Kavon</span>
+              <span className="text-lg font-semibold text-white tracking-tight font-playfair">Kavon</span>
             </div>
             <button
               onClick={() => isAuthenticated ? navigate('/dashboard') : navigate('/login')}
@@ -99,7 +100,7 @@ export default function Home() {
           </div>
 
           <div className={`transition-opacity duration-700 ${showHeadline ? 'opacity-100' : 'opacity-0'}`}>
-            <h1 className="text-7xl sm:text-8xl lg:text-9xl font-bold mb-10 leading-[0.9] tracking-[-0.03em]">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-semibold mb-10 leading-[1.1] tracking-tight font-playfair">
               <span className="block mb-3">
                 <span className="word-reveal text-white" style={{ animationDelay: '0.1s' }}>Master</span>
                 {' '}
@@ -108,22 +109,19 @@ export default function Home() {
               <span className="block">
                 <span className="word-reveal text-white" style={{ animationDelay: '0.4s' }}>with</span>
                 {' '}
-                <span className="word-reveal bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent" style={{ animationDelay: '0.55s' }}>AI</span>
+                <span className="word-reveal text-white" style={{ animationDelay: '0.55s' }}>AI</span>
               </span>
             </h1>
 
-            <p className="text-xl text-neutral-400 mb-14 max-w-2xl mx-auto leading-relaxed font-light opacity-0 animate-[fadeInUp_0.8s_ease-out_1s_forwards]">
+            <p className="text-lg text-neutral-400 mb-14 max-w-2xl mx-auto leading-relaxed font-light opacity-0 animate-[fadeInUp_0.8s_ease-out_1s_forwards]">
               Transform from novice to expert with intelligent lessons, real-time simulations, and personalized guidance.
             </p>
 
             <div className="flex justify-center mb-32 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.3s_forwards]">
-              <button
-                onClick={() => navigate('/waitlist')}
-                className="group inline-flex items-center gap-3 px-8 py-4 text-base font-medium text-black bg-white rounded-lg hover:bg-neutral-100 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all duration-300 cursor-pointer"
-              >
+              <ShimmerButton onClick={() => navigate('/waitlist')}>
                 Start Learning Free
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
-              </button>
+              </ShimmerButton>
             </div>
 
             <div className="grid grid-cols-3 gap-16 max-w-3xl mx-auto mb-32 pt-12 border-t border-neutral-900 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.5s_forwards]">
@@ -133,7 +131,7 @@ export default function Home() {
                 { value: '24/7', label: 'AI support' }
               ].map((stat, i) => (
                 <div key={i} className="text-center">
-                  <div className="text-3xl font-semibold text-white mb-2 tracking-tight">{stat.value}</div>
+                  <div className="text-3xl font-semibold text-white mb-2 tracking-tight font-playfair">{stat.value}</div>
                   <div className="text-sm text-neutral-500 font-light">{stat.label}</div>
                 </div>
               ))}
@@ -158,7 +156,7 @@ export default function Home() {
           ].map((feature, i) => (
             <div key={i} className="group">
               <div className="border border-neutral-900 rounded-lg p-8 transition-all duration-300 hover:border-neutral-800 cursor-pointer">
-                <h3 className="text-lg font-semibold text-white mb-3 tracking-tight">{feature.title}</h3>
+                <h3 className="text-lg font-semibold text-white mb-3 tracking-tight font-playfair">{feature.title}</h3>
                 <p className="text-neutral-500 leading-relaxed font-light">
                   {feature.desc}
                 </p>
@@ -169,19 +167,16 @@ export default function Home() {
 
         <div className="max-w-3xl mx-auto text-center opacity-0 animate-[fadeInUp_0.8s_ease-out_1.9s_forwards]">
           <div className="border border-neutral-900 rounded-2xl p-12">
-            <h2 className="text-4xl font-bold text-white mb-6 tracking-tight">
+            <h2 className="text-4xl font-semibold text-white mb-6 tracking-tight font-playfair">
               Ready to Transform Your Trading?
             </h2>
             <p className="text-lg text-neutral-400 mb-10 font-light">
               Join thousands of traders who've elevated their skills with our platform.
             </p>
-            <button
-              onClick={() => navigate('/waitlist')}
-              className="group inline-flex items-center gap-3 px-8 py-4 text-base font-medium text-black bg-white rounded-lg hover:bg-neutral-100 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] transition-all duration-300 cursor-pointer"
-            >
+            <ShimmerButton onClick={() => navigate('/waitlist')}>
               Get Started Now
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
-            </button>
+            </ShimmerButton>
           </div>
         </div>
       </main>
