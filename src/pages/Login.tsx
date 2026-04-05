@@ -3,17 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
 import { Lock, TrendingUp } from 'lucide-react';
-import { supabase } from '../lib/supabase';
 
 export default function Login() {
-  const { isAuthenticated, signIn, signUp, loading } = useAuth();
+  const { isAuthenticated, signIn, loading } = useAuth();
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const ADMIN_EMAIL = 'vsant2008@gmail.com';
-  const ADMIN_PASSWORD = 'vinay';
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -21,42 +16,17 @@ export default function Login() {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setIsSubmitting(true);
 
-    if (password.toLowerCase() === ADMIN_PASSWORD) {
-      const { data: existingUser } = await supabase.auth.getUser();
-
-      if (!existingUser.user) {
-        const signUpResult = await signUp(ADMIN_EMAIL, ADMIN_PASSWORD);
-        if (!signUpResult.success) {
-          const signInResult = await signIn(ADMIN_EMAIL, ADMIN_PASSWORD);
-          if (signInResult.success) {
-            navigate('/dashboard');
-            return;
-          } else {
-            setError('Invalid password');
-          }
-        } else {
-          navigate('/dashboard');
-          return;
-        }
-      } else {
-        const result = await signIn(ADMIN_EMAIL, ADMIN_PASSWORD);
-        if (result.success) {
-          navigate('/dashboard');
-        } else {
-          setError('Invalid password');
-        }
-      }
+    const success = signIn(password);
+    if (success) {
+      navigate('/dashboard');
     } else {
-      setError('Invalid password');
+      setError('Incorrect password');
       setPassword('');
     }
-
-    setIsSubmitting(false);
   };
 
   if (loading) {
@@ -77,10 +47,10 @@ export default function Login() {
               <span className="text-2xl font-bold text-slate-900">Kavon</span>
             </div>
             <h1 className="text-3xl font-bold text-slate-900 mb-2">
-              {isSignUp ? 'Create Account' : 'Welcome Back'}
+              Admin Access
             </h1>
             <p className="text-slate-600">
-              {isSignUp ? 'Sign up to start learning' : 'Sign in to continue learning'}
+              Enter your password to access the dashboard
             </p>
           </div>
 
@@ -99,7 +69,7 @@ export default function Login() {
                   required
                   autoFocus
                   className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder="Enter your password"
+                  placeholder="Enter password"
                 />
               </div>
             </div>
@@ -112,10 +82,9 @@ export default function Login() {
 
             <Button
               type="submit"
-              disabled={isSubmitting}
-              className="w-full h-12 text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 disabled:opacity-50"
+              className="w-full h-12 text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200"
             >
-              {isSubmitting ? 'Loading...' : 'Sign In'}
+              Access Dashboard
             </Button>
           </form>
         </div>

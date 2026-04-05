@@ -1,7 +1,8 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
-import AdminLogin from './pages/AdminLogin';
+import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Study from './pages/Study';
 import Waitlist from './pages/Waitlist';
@@ -9,28 +10,29 @@ import Waitlist from './pages/Waitlist';
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/waitlist" element={<Waitlist />} />
-        <Route path="/admin-login" element={<AdminLogin />} />
-        <Route path="/login" element={<Navigate to="/waitlist" replace />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/study"
-          element={
-            <ProtectedRoute>
-              <Study />
-            </ProtectedRoute>
-          }
-        />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/waitlist" element={<Waitlist />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/study"
+            element={
+              <ProtectedRoute>
+                <Study />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

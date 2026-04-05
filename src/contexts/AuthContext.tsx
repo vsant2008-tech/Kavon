@@ -1,48 +1,38 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
+
+const ADMIN_PASSWORD = 'vinay';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
-  adminLogin: (password: string) => boolean;
+  signIn: (password: string) => boolean;
   signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const ADMIN_PASSWORD = 'vinay';
-const AUTH_KEY = 'isAdminAuthenticated';
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('kavon_auth') === 'true';
+  });
+  const [loading] = useState(false);
 
-  useEffect(() => {
-    const authStatus = localStorage.getItem(AUTH_KEY);
-    setIsAuthenticated(authStatus === 'true');
-    setLoading(false);
-  }, []);
-
-  const adminLogin = (password: string): boolean => {
+  const signIn = (password: string): boolean => {
     if (password === ADMIN_PASSWORD) {
-      localStorage.setItem(AUTH_KEY, 'true');
       setIsAuthenticated(true);
+      localStorage.setItem('kavon_auth', 'true');
       return true;
     }
     return false;
   };
 
   const signOut = () => {
-    localStorage.removeItem(AUTH_KEY);
     setIsAuthenticated(false);
+    localStorage.removeItem('kavon_auth');
   };
 
   return (
-    <AuthContext.Provider value={{
-      isAuthenticated,
-      loading,
-      adminLogin,
-      signOut
-    }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

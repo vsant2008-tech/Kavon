@@ -6,8 +6,6 @@ export default function Study() {
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
-      sessionStorage.setItem('supabase_url', import.meta.env.VITE_SUPABASE_URL || '');
-      sessionStorage.setItem('supabase_anon_key', import.meta.env.VITE_SUPABASE_ANON_KEY || '');
       window.location.href = '/trading.html';
     }
   }, [isAuthenticated, loading]);
