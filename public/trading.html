@@ -2476,9 +2476,8 @@ function renderLessons(filter='all') {
     if(l.module !== currentModule) return;
     if(filter !== 'all' && l.diff !== filter) return;
 
-    // Check if lesson is locked
-    const isLocked = (l.diff === 'intermediate' && !beginnerCompleted) ||
-                     (l.diff === 'advanced' && !intermediateCompleted);
+    // All lessons are unlocked
+    const isLocked = false;
 
     count++;
     const changeStr = (l.change>0?'+':'')+l.change+'%';
