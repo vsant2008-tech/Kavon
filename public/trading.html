@@ -6,6 +6,7 @@
 <title>Kavon — AI-Powered Trading Education</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Lora:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root {
   --navy:#0a1628;--navy-mid:#112240;--navy-light:#1a3a5c;
@@ -1215,6 +1216,39 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 </div>
 
 <script>
+// ═══════════════════════════════════════════════════════════════════════════
+// SUPABASE INITIALIZATION
+// ═══════════════════════════════════════════════════════════════════════════
+let supabaseClient = null;
+let currentUser = null;
+let isAdmin = false;
+
+// Initialize Supabase and check admin status
+(async function initSupabase() {
+  try {
+    const supabaseUrl = sessionStorage.getItem('supabase_url');
+    const supabaseAnonKey = sessionStorage.getItem('supabase_anon_key');
+
+    if (supabaseUrl && supabaseAnonKey && typeof supabase !== 'undefined') {
+      supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+      const { data: { session } } = await supabaseClient.auth.getSession();
+      if (session?.user) {
+        currentUser = session.user;
+        const { data } = await supabaseClient
+          .from('user_profiles')
+          .select('is_admin')
+          .eq('id', session.user.id)
+          .maybeSingle();
+
+        isAdmin = data?.is_admin ?? false;
+      }
+    }
+  } catch (error) {
+    console.error('Error initializing Supabase:', error);
+  }
+})();
+
 // ═══════════════════════════════════════════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2476,9 +2510,11 @@ function renderLessons(filter='all') {
     if(l.module !== currentModule) return;
     if(filter !== 'all' && l.diff !== filter) return;
 
-    // Check if lesson is locked
-    const isLocked = (l.diff === 'intermediate' && !beginnerCompleted) ||
-                     (l.diff === 'advanced' && !intermediateCompleted);
+    // Check if lesson is locked - admin users bypass all locks
+    const isLocked = !isAdmin && (
+      (l.diff === 'intermediate' && !beginnerCompleted) ||
+      (l.diff === 'advanced' && !intermediateCompleted)
+    );
 
     count++;
     const changeStr = (l.change>0?'+':'')+l.change+'%';
@@ -2587,6 +2623,9 @@ function closeLimitPopup(id, event) {
 
 // Called after each completed lesson — shows milestone popups
 function checkLessonMilestone() {
+  // Admin users bypass all milestone popups
+  if(isAdmin) return;
+
   const used = getLessonsUsed();
 
   if(used === 5 && !_shownMilestones.has('five')) {
@@ -2692,6 +2731,9 @@ function resetDailyLessons() {
 
 // On page load — if unlock time is stored and hasn't passed, restore lock state
 (function initDailyReset() {
+  // Admin users bypass daily reset
+  if(isAdmin) return;
+
   let unlockAt = 0;
   try { unlockAt = parseInt(localStorage.getItem('kavon_unlock_at')) || 0; } catch(e) {}
   if(unlockAt && Date.now() < unlockAt) {
@@ -2712,7 +2754,8 @@ function openLesson(idx, mode) {
   if(checkDailyReset()) return; // lessons just unlocked, allow through
 
   // ── HARD GATE: 10 lessons used → always show locked popup, never open modal ──
-  if(getLessonsUsed() >= LESSON_LIMIT) {
+  // Admin users bypass the lesson limit
+  if(!isAdmin && getLessonsUsed() >= LESSON_LIMIT) {
     const finalEl = document.getElementById('lockedFinalBalance');
     if(finalEl) finalEl.textContent = fmt(STATE.balance);
     showLimitPopup('popupLocked');

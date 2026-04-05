@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
-import { Lock, TrendingUp } from 'lucide-react';
+import { Lock, TrendingUp, Mail } from 'lucide-react';
 
 export default function Login() {
-  const { isAuthenticated, signIn, loading } = useAuth();
+  const { isAuthenticated, signIn, signUp, loading } = useAuth();
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -16,17 +19,23 @@ export default function Login() {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsSubmitting(true);
 
-    const success = signIn(password);
-    if (success) {
+    const result = isSignUp
+      ? await signUp(email, password)
+      : await signIn(email, password);
+
+    if (result.success) {
       navigate('/dashboard');
     } else {
-      setError('Incorrect password');
+      setError(result.error || 'An error occurred');
       setPassword('');
     }
+
+    setIsSubmitting(false);
   };
 
   if (loading) {
@@ -47,14 +56,33 @@ export default function Login() {
               <span className="text-2xl font-bold text-slate-900">Kavon</span>
             </div>
             <h1 className="text-3xl font-bold text-slate-900 mb-2">
-              Admin Access
+              {isSignUp ? 'Create Account' : 'Welcome Back'}
             </h1>
             <p className="text-slate-600">
-              Enter your password to access the dashboard
+              {isSignUp ? 'Sign up to start learning' : 'Sign in to continue learning'}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
+                Email
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoFocus
+                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                  placeholder="Enter your email"
+                />
+              </div>
+            </div>
+
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
                 Password
@@ -67,9 +95,8 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  autoFocus
                   className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder="Enter password"
+                  placeholder="Enter your password"
                 />
               </div>
             </div>
@@ -82,10 +109,24 @@ export default function Login() {
 
             <Button
               type="submit"
-              className="w-full h-12 text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200"
+              disabled={isSubmitting}
+              className="w-full h-12 text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 disabled:opacity-50"
             >
-              Access Dashboard
+              {isSubmitting ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
             </Button>
+
+            <div className="text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setError('');
+                }}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+              </button>
+            </div>
           </form>
         </div>
       </div>
