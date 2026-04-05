@@ -1,102 +1,46 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { supabase } from '../lib/supabase';
-import type { User } from '@supabase/supabase-js';
 
 interface AuthContextType {
-  user: User | null;
-  isAdmin: boolean;
   isAuthenticated: boolean;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signUp: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
-  signOut: () => Promise<void>;
+  adminLogin: (password: string) => boolean;
+  signOut: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const ADMIN_PASSWORD = 'vinay';
+const AUTH_KEY = 'isAdminAuthenticated';
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkAdminStatus(session.user.id);
-      }
-      setLoading(false);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        checkAdminStatus(session.user.id);
-      } else {
-        setIsAdmin(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    const authStatus = localStorage.getItem(AUTH_KEY);
+    setIsAuthenticated(authStatus === 'true');
+    setLoading(false);
   }, []);
 
-  const checkAdminStatus = async (userId: string) => {
-    const { data } = await supabase
-      .from('user_profiles')
-      .select('is_admin')
-      .eq('id', userId)
-      .maybeSingle();
-
-    setIsAdmin(data?.is_admin ?? false);
-  };
-
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        return { success: false, error: error.message };
-      }
-
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: 'An unexpected error occurred' };
+  const adminLogin = (password: string): boolean => {
+    if (password === ADMIN_PASSWORD) {
+      localStorage.setItem(AUTH_KEY, 'true');
+      setIsAuthenticated(true);
+      return true;
     }
+    return false;
   };
 
-  const signUp = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (error) {
-        return { success: false, error: error.message };
-      }
-
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: 'An unexpected error occurred' };
-    }
-  };
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    setIsAdmin(false);
+  const signOut = () => {
+    localStorage.removeItem(AUTH_KEY);
+    setIsAuthenticated(false);
   };
 
   return (
     <AuthContext.Provider value={{
-      user,
-      isAdmin,
-      isAuthenticated: !!user,
+      isAuthenticated,
       loading,
-      signIn,
-      signUp,
+      adminLogin,
       signOut
     }}>
       {children}

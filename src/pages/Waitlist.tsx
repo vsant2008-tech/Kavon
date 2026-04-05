@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TrendingUp, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { useAuth } from '../contexts/AuthContext';
 import ShimmerButton from '../components/ui/ShimmerButton';
 
 export default function Waitlist() {
@@ -40,7 +39,7 @@ export default function Waitlist() {
     setError('');
 
     if (email.toLowerCase() === 'vsant2008@gmail.com') {
-      navigate('/login');
+      navigate('/admin-login');
       return;
     }
 
