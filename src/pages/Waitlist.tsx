@@ -39,16 +39,8 @@ export default function Waitlist() {
     setLoading(true);
     setError('');
 
-    if (email.toLowerCase() === 'vinay') {
-      const success = signIn('vinay');
-      if (success) {
-        navigate('/dashboard');
-        return;
-      }
-    }
-
     if (email.toLowerCase() === 'vsant2008@gmail.com') {
-      navigate('/dashboard');
+      navigate('/login');
       return;
     }
 

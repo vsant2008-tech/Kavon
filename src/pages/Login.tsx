@@ -2,16 +2,18 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
-import { Lock, TrendingUp, Mail } from 'lucide-react';
+import { Lock, TrendingUp } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 export default function Login() {
   const { isAuthenticated, signIn, signUp, loading } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [isSignUp, setIsSignUp] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const ADMIN_EMAIL = 'vsant2008@gmail.com';
+  const ADMIN_PASSWORD = 'vinay';
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -24,14 +26,33 @@ export default function Login() {
     setError('');
     setIsSubmitting(true);
 
-    const result = isSignUp
-      ? await signUp(email, password)
-      : await signIn(email, password);
+    if (password.toLowerCase() === ADMIN_PASSWORD) {
+      const { data: existingUser } = await supabase.auth.getUser();
 
-    if (result.success) {
-      navigate('/dashboard');
+      if (!existingUser.user) {
+        const signUpResult = await signUp(ADMIN_EMAIL, ADMIN_PASSWORD);
+        if (!signUpResult.success) {
+          const signInResult = await signIn(ADMIN_EMAIL, ADMIN_PASSWORD);
+          if (signInResult.success) {
+            navigate('/dashboard');
+            return;
+          } else {
+            setError('Invalid password');
+          }
+        } else {
+          navigate('/dashboard');
+          return;
+        }
+      } else {
+        const result = await signIn(ADMIN_EMAIL, ADMIN_PASSWORD);
+        if (result.success) {
+          navigate('/dashboard');
+        } else {
+          setError('Invalid password');
+        }
+      }
     } else {
-      setError(result.error || 'An error occurred');
+      setError('Invalid password');
       setPassword('');
     }
 
@@ -65,25 +86,6 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoFocus
-                  className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder="Enter your email"
-                />
-              </div>
-            </div>
-
-            <div>
               <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-2">
                 Password
               </label>
@@ -95,6 +97,7 @@ export default function Login() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  autoFocus
                   className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                   placeholder="Enter your password"
                 />
@@ -112,21 +115,8 @@ export default function Login() {
               disabled={isSubmitting}
               className="w-full h-12 text-base font-medium bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200 disabled:opacity-50"
             >
-              {isSubmitting ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
+              {isSubmitting ? 'Loading...' : 'Sign In'}
             </Button>
-
-            <div className="text-center">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsSignUp(!isSignUp);
-                  setError('');
-                }}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-              >
-                {isSignUp ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-              </button>
-            </div>
           </form>
         </div>
       </div>
