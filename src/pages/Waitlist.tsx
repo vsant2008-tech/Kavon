@@ -13,7 +13,6 @@ export default function Waitlist() {
   const [showHeadline, setShowHeadline] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
-  const { signIn } = useAuth();
 
   const fullText = 'PRIVATE BETA';
 
@@ -44,27 +43,21 @@ export default function Waitlist() {
     }
 
     try {
-      const { data, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from('waitlist')
         .insert([{ email }])
         .select();
 
       if (insertError) {
-        console.error('Waitlist insert error:', insertError);
-        console.error('Error details:', JSON.stringify(insertError, null, 2));
-
         if (insertError.code === '23505') {
           setError("You're already on the list!");
-          console.log('Duplicate email attempt:', email);
         } else {
-          setError(`Error: ${insertError.message || insertError.code || 'Something went wrong'}`);
+          setError('Something went wrong. Please try again.');
         }
       } else {
-        console.log('Successfully added to waitlist:', data);
         setSubmitted(true);
       }
     } catch (err) {
-      console.error('Unexpected error during waitlist submission:', err);
       setError('Something went wrong. Please try again.');
     } finally {
       setLoading(false);

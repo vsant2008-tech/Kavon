@@ -1,46 +1,36 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
 import { Lock, TrendingUp } from 'lucide-react';
 
+const ADMIN_PASSWORD = 'vinay';
+
 export default function AdminLogin() {
-  const { isAuthenticated, adminLogin, loading } = useAuth();
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (localStorage.getItem('isAdmin') === 'true') {
       navigate('/dashboard');
     }
-  }, [isAuthenticated, navigate]);
+  }, [navigate]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsSubmitting(true);
 
-    const success = adminLogin(password);
-
-    if (success) {
+    if (password === ADMIN_PASSWORD) {
+      localStorage.setItem('isAdmin', 'true');
       navigate('/dashboard');
     } else {
       setError('Invalid password');
       setPassword('');
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
-        <div className="text-slate-600">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100 p-4">

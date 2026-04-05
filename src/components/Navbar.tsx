@@ -1,14 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { LogOut, TrendingUp } from 'lucide-react';
 
 export default function Navbar() {
-  const { isAuthenticated, signOut } = useAuth();
   const navigate = useNavigate();
+  const isAuthenticated = localStorage.getItem('isAdmin') === 'true';
 
   const handleSignOut = () => {
-    signOut();
+    localStorage.removeItem('isAdmin');
     navigate('/');
   };
 
