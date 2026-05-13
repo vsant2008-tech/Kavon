@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { TrendingUp, ArrowRight } from 'lucide-react';
 import ShimmerButton from '../components/ui/ShimmerButton';
 import ConstellationBackground from '../components/ui/ConstellationBackground';
 
-
 export default function Home() {
-  const { isAuthenticated, loading, signInWithGoogle } = useAuth();
+  const { signInWithGoogle } = useAuth();
   const [typewriterText, setTypewriterText] = useState('');
   const [showHeadline, setShowHeadline] = useState(false);
 
@@ -27,18 +25,6 @@ export default function Home() {
 
     return () => clearInterval(typewriterInterval);
   }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-neutral-400">Loading...</div>
-      </div>
-    );
-  }
-
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden font-inter">
@@ -129,7 +115,7 @@ export default function Home() {
             </p>
 
             <div className="flex justify-center mb-32 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.3s_forwards]">
-              <ShimmerButton onClick={() => signInWithGoogle()}>
+              <ShimmerButton onClick={signInWithGoogle}>
                 Start Learning Free
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
               </ShimmerButton>
@@ -184,7 +170,7 @@ export default function Home() {
             <p className="text-lg text-neutral-400 mb-10 font-light">
               Join thousands of traders who've elevated their skills with our platform.
             </p>
-            <ShimmerButton onClick={() => signInWithGoogle()}>
+            <ShimmerButton onClick={signInWithGoogle}>
               Get Started Now
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
             </ShimmerButton>
