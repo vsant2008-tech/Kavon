@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://kavon.trading/dashboard',
+        redirectTo: 'https://kavon.trading',
         queryParams: { prompt: 'select_account' },
       },
     });
