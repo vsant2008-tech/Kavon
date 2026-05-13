@@ -638,7 +638,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 <nav>
   <div class="nav-logo">Kav<span>on</span></div>
   <div class="nav-tabs">
-    <button class="nav-tab" onclick="showPage('home')">Home</button>
     <button class="nav-tab active" onclick="showPage('dashboard')">Dashboard</button>
     <button class="nav-tab" onclick="showPage('lessons')">Lessons</button>
   </div>
@@ -650,30 +649,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
   </div>
 </nav>
 
-<!-- ══ HOME PAGE ════════════════════════════════════════════════════════════ -->
-<div class="page active" id="page-home">
-  <section class="hero">
-    <div class="hero-grid"></div>
-    <div class="hero-glow"></div>
-    <div class="hero-content">
-      <div class="hero-tag">AI-Powered Trading Education</div>
-      <h1>Learn to Trade.<br><em>Without Missing</em><br>Class.</h1>
-      <p>Kavon teaches students real market skills using historical data and AI feedback — $10,000 in paper money to start. No live trading. No risk. Just real learning.</p>
-      <div class="hero-btns">
-        <button class="btn-primary" onclick="showPage('lessons')">Start Learning Free →</button>
-      </div>
-      <div class="hero-stats">
-        <div><div class="hero-stat-num">$10K</div><div class="hero-stat-label">Starting Paper Money</div></div>
-        <div><div class="hero-stat-num">20</div><div class="hero-stat-label">Real Market Scenarios</div></div>
-        <div><div class="hero-stat-num">38%</div><div class="hero-stat-label">Gen Z Fin-Lit Score</div></div>
-      </div>
-    </div>
-  </section>
-</div>
-
-
 <!-- ══ DASHBOARD PAGE ═══════════════════════════════════════════════════════ -->
-<div class="page" id="page-dashboard">
+<div class="page active" id="page-dashboard">
   <div class="dash-layout">
     <!-- LEFT -->
     <div class="dash-left">
@@ -1493,11 +1470,12 @@ const fmtK = (n) => n >= 1000 ? '$' + (n/1000).toFixed(1).replace(/\.0$/,'') + '
 // PAGE NAVIGATION
 // ═══════════════════════════════════════════════════════════════════════════
 function showPage(name) {
+  if(name==='home') name='dashboard';
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   const tabs = document.querySelectorAll('.nav-tab');
-  const names = ['home','dashboard','lessons','waitlist'];
+  const names = ['dashboard','lessons','waitlist'];
   const idx = names.indexOf(name);
   if(idx>=0) tabs[idx].classList.add('active');
   if(name==='dashboard') updateDashboard();
