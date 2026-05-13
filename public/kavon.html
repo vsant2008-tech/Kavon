@@ -294,6 +294,73 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 .hero-stat-num{font-size:1.7rem;font-weight:800;color:#fff;letter-spacing:-.03em;}
 .hero-stat-label{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:.15rem;}
 
+/* ── SETTINGS PAGE ───────────────────────────────────────────── */
+.settings-layout{padding:2rem;max-width:760px;margin:0 auto;}
+.settings-header{margin-bottom:2rem;}
+.settings-header h2{font-size:1.6rem;font-weight:800;letter-spacing:-.03em;color:var(--text-dark);}
+.settings-header p{font-size:.85rem;color:var(--text-muted);margin-top:.3rem;}
+.settings-section{background:var(--card-bg);border-radius:16px;border:1px solid var(--border);margin-bottom:1.4rem;overflow:hidden;}
+.settings-section-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.7rem;}
+.settings-section-icon{width:34px;height:34px;border-radius:9px;background:var(--sky);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.settings-section-icon svg{width:16px;height:16px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.settings-section-title{font-size:.9rem;font-weight:700;color:var(--text-dark);}
+.settings-section-body{padding:1.5rem;}
+.profile-row{display:flex;align-items:center;gap:1.4rem;margin-bottom:1.4rem;}
+.profile-avatar{width:68px;height:68px;border-radius:50%;object-fit:cover;border:3px solid var(--sky-mid);flex-shrink:0;}
+.profile-avatar-placeholder{width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy-light));display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:700;color:#fff;flex-shrink:0;letter-spacing:-.02em;}
+.profile-meta{flex:1;}
+.profile-name{font-size:1.1rem;font-weight:800;color:var(--text-dark);letter-spacing:-.02em;}
+.profile-email{font-size:.8rem;color:var(--text-muted);margin-top:.2rem;}
+.profile-badge{display:inline-flex;align-items:center;gap:.35rem;margin-top:.5rem;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:.2rem .6rem;border-radius:20px;background:var(--sky);color:var(--blue);}
+.settings-field{margin-bottom:1rem;}
+.settings-field:last-child{margin-bottom:0;}
+.settings-label{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:.4rem;}
+.settings-value{font-size:.9rem;color:var(--text-dark);font-weight:500;}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:.9rem 0;border-bottom:1px solid var(--border);}
+.settings-row:last-child{border-bottom:none;padding-bottom:0;}
+.settings-row:first-child{padding-top:0;}
+.settings-row-label{font-size:.88rem;font-weight:600;color:var(--text-dark);}
+.settings-row-sub{font-size:.75rem;color:var(--text-muted);margin-top:.15rem;}
+/* Toggle */
+.toggle-wrap{position:relative;width:48px;height:26px;flex-shrink:0;}
+.toggle-input{opacity:0;width:0;height:0;position:absolute;}
+.toggle-track{position:absolute;inset:0;border-radius:13px;background:#d1dae8;cursor:pointer;transition:background .25s;}
+.toggle-input:checked + .toggle-track{background:var(--blue-bright);}
+.toggle-track::after{content:'';position:absolute;width:20px;height:20px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .25s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.toggle-input:checked + .toggle-track::after{transform:translateX(22px);}
+/* Gear button */
+.gear-btn{width:38px;height:38px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;background:transparent;color:var(--text-muted);transition:all .15s;flex-shrink:0;}
+.gear-btn:hover{background:var(--sky);color:var(--blue);}
+.gear-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.gear-btn.active{background:var(--sky);color:var(--blue);}
+/* Sign out button in settings */
+.settings-signout-btn{display:flex;align-items:center;gap:.6rem;padding:.65rem 1.2rem;border-radius:9px;border:1.5px solid var(--red-light);background:var(--red-light);color:#c62828;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .15s;font-family:'Sora',sans-serif;}
+.settings-signout-btn:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.settings-signout-btn svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;}
+/* ── DARK MODE ───────────────────────────────────────────────── */
+body.dark{
+  --card-bg:#131e2e;--page-bg:#0d1724;--border:rgba(33,150,243,0.12);
+  --text-dark:#e8f0fe;--text-mid:#94b3d0;--text-muted:#5a7a96;
+  --off-white:#1a2538;--white:#131e2e;--sky:#1a2d42;--sky-mid:#1e3450;
+}
+body.dark nav{background:rgba(13,23,36,0.95);}
+body.dark .card{background:var(--card-bg);}
+body.dark .settings-section{background:var(--card-bg);}
+body.dark .lesson-card{background:var(--card-bg);}
+body.dark .lesson-modal{background:var(--card-bg);}
+body.dark .ind-box{background:#1a2538;}
+body.dark .news-item{background:#1a2538;}
+body.dark .trade-row{background:#1a2538;}
+body.dark .stat-box{background:#1a2538;}
+body.dark .module-tab{background:var(--card-bg);}
+body.dark .gear-btn:hover{background:#1a2d42;color:var(--blue-bright);}
+body.dark .gear-btn.active{background:#1a2d42;color:var(--blue-bright);}
+body.dark .toggle-track{background:#2a3d52;}
+body.dark .profile-field-bg{background:#1a2538;}
+body.dark .settings-row{border-bottom-color:rgba(33,150,243,0.1);}
+body.dark .nav-tab:hover{background:#1a2d42;color:var(--blue-bright);}
+body.dark .filter-btn{background:var(--card-bg);color:var(--text-muted);border-color:rgba(33,150,243,0.15);}
+
 /* ── RESPONSIVE ──────────────────────────────────────────────── */
 @media(max-width:1000px){.lessons-grid{grid-template-columns:repeat(2,1fr);}.dash-layout{grid-template-columns:1fr;}}
 @media(max-width:640px){.lessons-grid{grid-template-columns:1fr;}.decision-btns{flex-direction:column;}.pnl-reveal{grid-template-columns:1fr 1fr;}}
@@ -638,16 +705,129 @@ nav{position:fixed;top:0;left:0;right:0;z-index:300;
 <nav>
   <div class="nav-logo">Kav<span>on</span></div>
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="showPage('dashboard')">Dashboard</button>
-    <button class="nav-tab" onclick="showPage('lessons')">Lessons</button>
+    <button class="nav-tab active" id="tab-dashboard" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="nav-tab" id="tab-lessons" onclick="showPage('lessons')">Lessons</button>
   </div>
   <div class="nav-right">
     <div class="portfolio-pill">
       <span class="bal" id="navBalance">$10,000.00</span>
       <span class="ph-change-val change" id="navChange" style="color:var(--green)">+$0.00</span>
     </div>
+    <button class="gear-btn" id="gearBtn" onclick="showPage('settings')" title="Settings">
+      <svg viewBox="0 0 24 24"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
   </div>
 </nav>
+
+<!-- ══ SETTINGS PAGE ════════════════════════════════════════════════════════ -->
+<div class="page" id="page-settings">
+  <div class="settings-layout">
+    <div class="settings-header">
+      <h2>Settings</h2>
+      <p>Manage your profile, appearance, and account.</p>
+    </div>
+
+    <!-- Profile Section -->
+    <div class="settings-section">
+      <div class="settings-section-header">
+        <div class="settings-section-icon">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <span class="settings-section-title">Profile</span>
+      </div>
+      <div class="settings-section-body">
+        <div class="profile-row">
+          <div id="settingsAvatar" class="profile-avatar-placeholder">K</div>
+          <div class="profile-meta">
+            <div class="profile-name" id="settingsName">Kavon User</div>
+            <div class="profile-email" id="settingsEmail">—</div>
+            <div class="profile-badge">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              Google Account
+            </div>
+          </div>
+        </div>
+        <div class="settings-field">
+          <div class="settings-label">Display Name</div>
+          <div class="settings-value" id="settingsDisplayName">—</div>
+        </div>
+        <div class="settings-field">
+          <div class="settings-label">Email Address</div>
+          <div class="settings-value" id="settingsEmailField">—</div>
+        </div>
+        <div class="settings-field">
+          <div class="settings-label">Member Since</div>
+          <div class="settings-value" id="settingsMemberSince">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appearance Section -->
+    <div class="settings-section">
+      <div class="settings-section-header">
+        <div class="settings-section-icon">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </div>
+        <span class="settings-section-title">Appearance</span>
+      </div>
+      <div class="settings-section-body">
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Dark Mode</div>
+            <div class="settings-row-sub">Switch between light and dark interface</div>
+          </div>
+          <label class="toggle-wrap">
+            <input type="checkbox" class="toggle-input" id="darkModeToggle" onchange="applyDarkMode(this.checked)">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Section -->
+    <div class="settings-section">
+      <div class="settings-section-header">
+        <div class="settings-section-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <span class="settings-section-title">Account</span>
+      </div>
+      <div class="settings-section-body">
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Authentication Provider</div>
+            <div class="settings-row-sub">Signed in with Google OAuth</div>
+          </div>
+          <div style="font-size:.8rem;font-weight:600;color:var(--text-muted);">Google</div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Lessons Completed</div>
+            <div class="settings-row-sub">Total lessons finished across all sessions</div>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:.9rem;font-weight:600;color:var(--text-dark);" id="settingsLessonsCount">0</div>
+        </div>
+        <div class="settings-row">
+          <div>
+            <div class="settings-row-label">Account Status</div>
+            <div class="settings-row-sub">Free tier — unlimited access during beta</div>
+          </div>
+          <div style="font-size:.75rem;font-weight:700;padding:.2rem .65rem;border-radius:20px;background:#e8f5e9;color:#2e7d32;">Active</div>
+        </div>
+        <div class="settings-row" style="border-bottom:none;padding-bottom:0;">
+          <div>
+            <div class="settings-row-label">Sign Out</div>
+            <div class="settings-row-sub">You'll need to sign back in to access your account</div>
+          </div>
+          <button class="settings-signout-btn" onclick="handleSignOut()">
+            <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ══ DASHBOARD PAGE ═══════════════════════════════════════════════════════ -->
 <div class="page active" id="page-dashboard">
@@ -1472,15 +1652,76 @@ const fmtK = (n) => n >= 1000 ? '$' + (n/1000).toFixed(1).replace(/\.0$/,'') + '
 function showPage(name) {
   if(name==='home') name='dashboard';
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
-  const tabs = document.querySelectorAll('.nav-tab');
-  const names = ['dashboard','lessons','waitlist'];
-  const idx = names.indexOf(name);
-  if(idx>=0) tabs[idx].classList.add('active');
+  // nav tabs
+  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+  if(name==='dashboard') document.getElementById('tab-dashboard')?.classList.add('active');
+  if(name==='lessons') document.getElementById('tab-lessons')?.classList.add('active');
+  // gear button
+  const gear = document.getElementById('gearBtn');
+  if(gear) gear.classList.toggle('active', name==='settings');
   if(name==='dashboard') updateDashboard();
   if(name==='lessons') renderLessons();
+  if(name==='settings') populateSettings();
   window.scrollTo(0,0);
+}
+
+// ── DARK MODE ─────────────────────────────────────────────────────────────
+function applyDarkMode(on) {
+  document.body.classList.toggle('dark', on);
+  localStorage.setItem('kavon_dark', on ? '1' : '0');
+  const toggle = document.getElementById('darkModeToggle');
+  if(toggle) toggle.checked = on;
+}
+
+// ── SETTINGS ──────────────────────────────────────────────────────────────
+function populateSettings() {
+  // Pull user info from Supabase session stored in localStorage
+  const lsKeys = Object.keys(localStorage).filter(k=>k.startsWith('sb-') && k.endsWith('-auth-token'));
+  let user = null;
+  if(lsKeys.length) {
+    try { const s = JSON.parse(localStorage.getItem(lsKeys[0])); user = s?.user; } catch(e){}
+  }
+  if(!user) {
+    // fallback: try supabase session key pattern
+    const allKeys = Object.keys(localStorage);
+    for(const k of allKeys) {
+      try {
+        const v = JSON.parse(localStorage.getItem(k));
+        if(v?.user?.email) { user = v.user; break; }
+      } catch(e){}
+    }
+  }
+
+  const name = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Kavon User';
+  const email = user?.email || '—';
+  const avatarUrl = user?.user_metadata?.avatar_url || user?.user_metadata?.picture || null;
+  const createdAt = user?.created_at ? new Date(user.created_at).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}) : '—';
+
+  document.getElementById('settingsName').textContent = name;
+  document.getElementById('settingsEmail').textContent = email;
+  document.getElementById('settingsDisplayName').textContent = name;
+  document.getElementById('settingsEmailField').textContent = email;
+  document.getElementById('settingsMemberSince').textContent = createdAt;
+
+  // lessons count
+  const completed = STATE.trades ? STATE.trades.length : 0;
+  document.getElementById('settingsLessonsCount').textContent = completed;
+
+  // avatar
+  const avatarEl = document.getElementById('settingsAvatar');
+  if(avatarUrl) {
+    avatarEl.outerHTML = `<img id="settingsAvatar" class="profile-avatar" src="${avatarUrl}" alt="${name}" onerror="this.outerHTML='<div id=\\'settingsAvatar\\' class=\\'profile-avatar-placeholder\\'>${name[0].toUpperCase()}</div>'">`;
+  } else {
+    avatarEl.className = 'profile-avatar-placeholder';
+    avatarEl.textContent = name[0].toUpperCase();
+  }
+}
+
+function handleSignOut() {
+  // Clear supabase session keys
+  Object.keys(localStorage).filter(k=>k.startsWith('sb-')).forEach(k=>localStorage.removeItem(k));
+  window.location.href = '/';
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -3294,6 +3535,10 @@ function generateSmartAnswer(q, l) {
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
 window.addEventListener('DOMContentLoaded', ()=>{
+  // restore dark mode preference
+  const savedDark = localStorage.getItem('kavon_dark');
+  if(savedDark === '1') applyDarkMode(true);
+
   updateNavBar();
   updateDashboard();
   renderLessons();
