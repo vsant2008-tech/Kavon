@@ -4312,22 +4312,22 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
     this.render();
 
     try {
-      const apiKey = window.KAVON_CONFIG?.anthropicApiKey;
+      const supabaseUrl = window.KAVON_SUPABASE_URL;
+      const supabaseAnonKey = window.KAVON_SUPABASE_KEY;
 
-      if (!apiKey) {
-        this.history.push({ role: 'assistant', content: 'Configuration Error: Anthropic API key not found. Please check your environment setup.' });
+      if (!supabaseUrl || !supabaseAnonKey) {
+        this.history.push({ role: 'assistant', content: 'Configuration Error: Supabase credentials not found. Please check your environment setup.' });
         this.loading = false;
         this.render();
         return;
       }
 
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch(`${supabaseUrl}/functions/v1/kavon-ai`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Apikey': supabaseAnonKey,
         },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
@@ -4956,9 +4956,6 @@ window.addEventListener('DOMContentLoaded', async ()=>{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-  window.KAVON_CONFIG = {
-    anthropicApiKey: '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'
-  };
   window.KAVON_SUPABASE_URL = 'https://lcpopacnwluvdhfeupny.supabase.co';
   window.KAVON_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjcG9wYWNud2x1dmRoZmV1cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1Nzc1MjEsImV4cCI6MjA5MDE1MzUyMX0.bk418xRPT9UGMq9XBoLRAIPqYNcw3zdmpP6KSOAfiss';
 </script>

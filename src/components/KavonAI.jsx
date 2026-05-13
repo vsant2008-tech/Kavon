@@ -183,17 +183,15 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
     setHistory(nextHistory);
     setLoading(true);
     try {
-      const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
-      console.log('[KavonAI] API Key loaded:', apiKey ? `${apiKey.substring(0, 15)}...` : 'MISSING');
-      console.log('[KavonAI] Sending request to Anthropic API...');
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const res = await fetch(`${supabaseUrl}/functions/v1/kavon-ai`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
+          'Authorization': `Bearer ${supabaseAnonKey}`,
+          'Apikey': supabaseAnonKey,
         },
         body: JSON.stringify({
           model: 'claude-haiku-4-5-20251001',
@@ -203,9 +201,7 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
         }),
       });
 
-      console.log('[KavonAI] Response status:', res.status);
       const data = await res.json();
-      console.log('[KavonAI] Response data:', data);
 
       if (data.error) {
         setHistory(h => [...h, { role: 'assistant', content: `API Error: ${data.error.message || JSON.stringify(data.error)}` }]);
