@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
-import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Study from './pages/Study';
 import Waitlist from './pages/Waitlist';
@@ -13,7 +12,6 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/waitlist" element={<Waitlist />} />
           <Route
             path="/dashboard"

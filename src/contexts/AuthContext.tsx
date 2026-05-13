@@ -1,38 +1,58 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
-
-const ADMIN_PASSWORD = 'vinay';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { Session, User } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   loading: boolean;
-  signIn: (password: string) => boolean;
-  signOut: () => void;
+  user: User | null;
+  signInWithGoogle: () => Promise<void>;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('kavon_auth') === 'true';
-  });
-  const [loading] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const signIn = (password: string): boolean => {
-    if (password === ADMIN_PASSWORD) {
-      setIsAuthenticated(true);
-      localStorage.setItem('kavon_auth', 'true');
-      return true;
-    }
-    return false;
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setSession(session);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signInWithGoogle = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/dashboard`,
+        queryParams: { prompt: 'select_account' },
+      },
+    });
   };
 
-  const signOut = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem('kavon_auth');
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setSession(null);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, signIn, signOut }}>
+    <AuthContext.Provider value={{
+      isAuthenticated: !!session,
+      loading,
+      user: session?.user ?? null,
+      signInWithGoogle,
+      signOut,
+    }}>
       {children}
     </AuthContext.Provider>
   );

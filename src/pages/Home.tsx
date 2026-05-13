@@ -5,8 +5,9 @@ import { TrendingUp, ArrowRight } from 'lucide-react';
 import ShimmerButton from '../components/ui/ShimmerButton';
 import ConstellationBackground from '../components/ui/ConstellationBackground';
 
+
 export default function Home() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [typewriterText, setTypewriterText] = useState('');
   const [showHeadline, setShowHeadline] = useState(false);
@@ -85,7 +86,7 @@ export default function Home() {
               <span className="text-lg font-semibold text-white tracking-tight font-playfair">Kavon</span>
             </div>
             <button
-              onClick={() => isAuthenticated ? navigate('/dashboard') : navigate('/login')}
+              onClick={() => isAuthenticated ? navigate('/dashboard') : signInWithGoogle()}
               className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white border border-neutral-800 rounded-lg hover:border-neutral-700 transition-all duration-300 cursor-pointer"
             >
               {isAuthenticated ? 'Dashboard' : 'Sign In'}
@@ -121,7 +122,7 @@ export default function Home() {
             </p>
 
             <div className="flex justify-center mb-32 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.3s_forwards]">
-              <ShimmerButton onClick={() => navigate('/waitlist')}>
+              <ShimmerButton onClick={() => isAuthenticated ? navigate('/dashboard') : signInWithGoogle()}>
                 Start Learning Free
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
               </ShimmerButton>
@@ -176,7 +177,7 @@ export default function Home() {
             <p className="text-lg text-neutral-400 mb-10 font-light">
               Join thousands of traders who've elevated their skills with our platform.
             </p>
-            <ShimmerButton onClick={() => navigate('/waitlist')}>
+            <ShimmerButton onClick={() => isAuthenticated ? navigate('/dashboard') : signInWithGoogle()}>
               Get Started Now
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
             </ShimmerButton>

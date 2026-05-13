@@ -3417,6 +3417,7 @@ function makeDecision(choice) {
     timestamp: new Date()
   });
   STATE.completedLessons.add(idx);
+  saveLessonProgressToSupabase(idx);
   STATE.lessonsPlayed++;
 
   // Check for milestone / limit popups (shown after feedback so user sees result first)
@@ -4843,10 +4844,49 @@ function cancelAutoOpenKavonAI() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SUPABASE LESSON PROGRESS
+// ═══════════════════════════════════════════════════════════════════════════
+let _supabaseClient = null;
+
+function getSupabaseClient() {
+  if (_supabaseClient) return _supabaseClient;
+  const url = window.KAVON_SUPABASE_URL;
+  const key = window.KAVON_SUPABASE_KEY;
+  if (!url || !key || typeof window.supabase === 'undefined') return null;
+  _supabaseClient = window.supabase.createClient(url, key);
+  return _supabaseClient;
+}
+
+async function loadLessonProgressFromSupabase() {
+  const client = getSupabaseClient();
+  if (!client) return;
+  const { data: { session } } = await client.auth.getSession();
+  if (!session) return;
+  const { data, error } = await client
+    .from('lesson_progress')
+    .select('lesson_index')
+    .eq('user_id', session.user.id);
+  if (error || !data) return;
+  data.forEach(row => STATE.completedLessons.add(row.lesson_index));
+}
+
+async function saveLessonProgressToSupabase(lessonIndex) {
+  const client = getSupabaseClient();
+  if (!client) return;
+  const { data: { session } } = await client.auth.getSession();
+  if (!session) return;
+  await client.from('lesson_progress').upsert(
+    { user_id: session.user.id, lesson_index: lessonIndex },
+    { onConflict: 'user_id,lesson_index' }
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', ()=>{
+window.addEventListener('DOMContentLoaded', async ()=>{
   updateNavBar();
+  await loadLessonProgressFromSupabase();
   updateDashboard();
   renderLessons();
   showPage('dashboard');
@@ -4914,10 +4954,13 @@ window.addEventListener('DOMContentLoaded', ()=>{
 <!-- Kavon AI Mount Point -->
 <div id="kavon-ai-root"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
   window.KAVON_CONFIG = {
     anthropicApiKey: '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'
   };
+  window.KAVON_SUPABASE_URL = 'https://lcpopacnwluvdhfeupny.supabase.co';
+  window.KAVON_SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxjcG9wYWNud2x1dmRoZmV1cG55Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ1Nzc1MjEsImV4cCI6MjA5MDE1MzUyMX0.bk418xRPT9UGMq9XBoLRAIPqYNcw3zdmpP6KSOAfiss';
 </script>
 
 </body>
