@@ -183,15 +183,15 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
     setHistory(nextHistory);
     setLoading(true);
     try {
-      const supabaseUrl = 'https://bpzmcxkajxnjnvoemjlh.supabase.co';
-      const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwem1jeGthanhuam52b2VtamxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMTU2MzAsImV4cCI6MjA4OTc5MTYzMH0.rP9pAnm9GOSE2ZEgYRGF11SwoEgCHw-Y4r9O9ggeChE';
+      const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
 
-      const res = await fetch(`${supabaseUrl}/functions/v1/kavon-ai`, {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabaseAnonKey}`,
-          'Apikey': supabaseAnonKey,
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
         },
         body: JSON.stringify({
           model: 'claude-haiku-4-5',
