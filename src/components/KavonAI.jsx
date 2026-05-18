@@ -183,8 +183,8 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
     setHistory(nextHistory);
     setLoading(true);
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const supabaseUrl = 'https://bpzmcxkajxnjnvoemjlh.supabase.co';
+      const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwem1jeGthanhuam52b2VtamxoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMTU2MzAsImV4cCI6MjA4OTc5MTYzMH0.rP9pAnm9GOSE2ZEgYRGF11SwoEgCHw-Y4r9O9ggeChE';
 
       const res = await fetch(`${supabaseUrl}/functions/v1/kavon-ai`, {
         method: 'POST',
