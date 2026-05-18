@@ -183,23 +183,22 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
     setHistory(nextHistory);
     setLoading(true);
     try {
-      const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
-
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true',
-        },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5',
-          max_tokens: 600,
-          system: buildSystemPrompt(context, mode),
-          messages: nextHistory,
-        }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kavon-ai`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({
+            model: 'claude-haiku-4-5',
+            max_tokens: 600,
+            system: buildSystemPrompt(context, mode),
+            messages: nextHistory,
+          }),
+        }
+      );
 
       const data = await res.json();
 
