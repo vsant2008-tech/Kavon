@@ -1,7 +1,25 @@
 import { useState, useRef, useEffect } from 'react';
 
 function buildSystemPrompt(ctx, mode) {
-  const newsBlock = (ctx.news ?? []).map((n, i) => `  ${i + 1}. ${n}`).join('\n') || '  No major news at this time.';
+  const newsBlock = (ctx.news ?? []).map((n, i) => {
+    if (typeof n === 'object' && n !== null) {
+      return `  ${i + 1}. [${n.sentiment ?? ''}] ${n.headline ?? n.src ?? JSON.stringify(n)}`;
+    }
+    return `  ${i + 1}. ${n}`;
+  }).join('\n') || '  No major news at this time.';
+
+  const optionalFields = [
+    ctx.openPrice != null ? `- Opening price: $${ctx.openPrice}` : null,
+    ctx.weekHigh != null ? `- 52-week high / low: $${ctx.weekHigh} / $${ctx.weekLow}` : null,
+    ctx.pe != null ? `- P/E ratio: ${ctx.pe}` : null,
+    ctx.mktCap != null ? `- Market cap: ${ctx.mktCap}` : null,
+    ctx.volatility != null ? `- Volatility: ${ctx.volatility}` : null,
+    ctx.shortInterest != null ? `- Short interest: ${ctx.shortInterest}` : null,
+    ctx.putCallRatio != null ? `- Put/call ratio: ${ctx.putCallRatio}` : null,
+    ctx.institutionalFlow != null ? `- Institutional flow: ${ctx.institutionalFlow}` : null,
+    ctx.lessonContext != null ? `- Scenario background: ${ctx.lessonContext}` : null,
+  ].filter(Boolean).join('\n');
+
   const sharedContext = `
 SCENARIO CONTEXT — THIS IS YOUR ENTIRE KNOWLEDGE BOUNDARY:
 - Stock: ${ctx.ticker} (${ctx.companyName ?? ctx.ticker})
@@ -10,9 +28,10 @@ SCENARIO CONTEXT — THIS IS YOUR ENTIRE KNOWLEDGE BOUNDARY:
 - News & catalysts known at cutoff:
 ${newsBlock}
 - Sector / market conditions: ${ctx.sector ?? 'General market'}
-- Technical: RSI ${ctx.rsi ?? '—'}, MACD ${ctx.macd ?? '—'}, 50-Day MA ${ctx.ma50 ?? '—'}
+- Technical indicators: RSI ${ctx.rsi ?? '—'}, MACD ${ctx.macd ?? '—'}, 50-Day MA $${ctx.ma50 ?? '—'}
 - Analyst ratings: ${ctx.analystBuy ?? 0} Buy / ${ctx.analystHold ?? 0} Hold / ${ctx.analystSell ?? 0} Sell
 - Volume: ${ctx.volume ?? 'Not specified'}
+${optionalFields}
 `.trim();
 
   if (mode === 'pre') {
@@ -43,8 +62,20 @@ CRITICAL: You are TIME-LOCKED to ${ctx.date} at ${ctx.cutoffTime} ET. This is yo
 ${difficultyInstructions} Be conversational and simple — like a knowledgeable friend, not a professor. End every response with one short rhetorical question that makes the user think. Never use bullet points, bold text, or headers. Speak plainly.`;
   }
 
+  const outcomeBlock = ctx.actualMove != null
+    ? [
+        `\nOUTCOME DATA (known after cutoff):`,
+        `- Correct answer: ${ctx.correctAnswer ?? '—'}`,
+        `- Actual price move: ${ctx.actualMove}`,
+        ctx.closePrice != null ? `- Close price: $${ctx.closePrice}` : null,
+        ctx.lessonSummary != null ? `- Lesson takeaway: ${ctx.lessonSummary}` : null,
+        ctx.buyFeedback != null ? `- Buy feedback: ${ctx.buyFeedback}` : null,
+        ctx.sellFeedback != null ? `- Sell feedback: ${ctx.sellFeedback}` : null,
+      ].filter(Boolean).join('\n')
+    : '';
+
   const decisionNote = ctx.userDecision
-    ? `\nUser's decision: ${ctx.userDecision.action} · $${ctx.userDecision.amount} position`
+    ? `\nUser's decision: ${ctx.userDecision.action} · $${ctx.userDecision.amount} position · ${ctx.userDecision.wasCorrect ? 'CORRECT' : 'INCORRECT'}`
     : '';
 
   const difficulty = ctx.difficulty ?? 'intermediate';
@@ -117,7 +148,8 @@ POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
 
   return `You are Kavon AI, a trading education coach inside the Kavon platform.
 
-${sharedContext}${decisionNote}
+${sharedContext}
+${outcomeBlock}${decisionNote}
 
 YOUR RULES:
 ${phaseInstructions}
