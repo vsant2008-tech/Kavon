@@ -183,6 +183,8 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
     setHistory(nextHistory);
     setLoading(true);
     try {
+      const key = import.meta.env.VITE_ANTHROPIC_API_KEY ?? '';
+      console.log('API KEY:', key ? `${key.slice(0, 10)}...${key.slice(-4)}` : 'NOT SET');
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kavon-ai`,
         {
