@@ -1,9 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 
 function buildSystemPrompt(ctx, mode) {
+  const difficulty = ctx.difficulty ?? 'intermediate';
+  const lessonTopic = ctx.lessonContext ?? ctx.lessonSummary ?? 'reading technical indicators and market signals';
+
   const newsBlock = (ctx.news ?? []).map((n, i) => {
     if (typeof n === 'object' && n !== null) {
-      return `  ${i + 1}. [${n.sentiment ?? ''}] ${n.headline ?? n.src ?? JSON.stringify(n)}`;
+      return `  ${i + 1}. [${n.sentiment ?? 'neutral'}] ${n.headline ?? n.src ?? JSON.stringify(n)}`;
     }
     return `  ${i + 1}. ${n}`;
   }).join('\n') || '  No major news at this time.';
@@ -17,189 +20,170 @@ function buildSystemPrompt(ctx, mode) {
     ctx.shortInterest != null ? `- Short interest: ${ctx.shortInterest}` : null,
     ctx.putCallRatio != null ? `- Put/call ratio: ${ctx.putCallRatio}` : null,
     ctx.institutionalFlow != null ? `- Institutional flow: ${ctx.institutionalFlow}` : null,
-    ctx.lessonContext != null ? `- Scenario background: ${ctx.lessonContext}` : null,
   ].filter(Boolean).join('\n');
 
-  const sharedContext = `
-SCENARIO CONTEXT — THIS IS YOUR ENTIRE KNOWLEDGE BOUNDARY:
+  const scenarioBlock = `FULL SCENARIO CONTEXT:
 - Stock: ${ctx.ticker} (${ctx.companyName ?? ctx.ticker})
-- Scenario date/time: ${ctx.date} at ${ctx.cutoffTime} ET
-- Investor sentiment: ${ctx.sentiment?.label ?? 'Neutral'} (${ctx.sentiment?.score ?? 50}/100 greed)
-- News & catalysts known at cutoff:
-${newsBlock}
-- Sector / market conditions: ${ctx.sector ?? 'General market'}
-- Technical indicators: RSI ${ctx.rsi ?? '—'}, MACD ${ctx.macd ?? '—'}, 50-Day MA $${ctx.ma50 ?? '—'}
+- Date/time: ${ctx.date} at ${ctx.cutoffTime} ET
+- Opening price: $${ctx.openPrice ?? '—'}
+- Sector: ${ctx.sector ?? 'Technology'}
+- Lesson topic: ${lessonTopic}
+- Difficulty level: ${difficulty}
+- Investor sentiment: ${ctx.sentiment?.label ?? 'Neutral'} (${ctx.sentiment?.score ?? 50}/100 greed score)
+- Technical indicators: RSI ${ctx.rsi ?? '—'}, MACD ${ctx.macd ?? '—'}, 50-Day MA $${ctx.ma50 ?? '—'}, Volume ${ctx.volume ?? '—'}
 - Analyst ratings: ${ctx.analystBuy ?? 0} Buy / ${ctx.analystHold ?? 0} Hold / ${ctx.analystSell ?? 0} Sell
-- Volume: ${ctx.volume ?? 'Not specified'}
-${optionalFields}
-`.trim();
+${optionalFields ? optionalFields + '\n' : ''}- News & catalysts at cutoff:
+${newsBlock}`;
 
+  const difficultyVoice = {
+    beginner: 'Write like explaining to someone who has never traded before. No jargon — use everyday analogies. Short sentences.',
+    intermediate: 'Use basic terms like "bullish", "momentum", "analyst ratings" but keep it conversational. No Wall Street speak.',
+    advanced: 'Use full technical language: RSI, MACD, sentiment, risk/reward ratios. Be precise and analytical.',
+  }[difficulty] ?? '';
+
+  const bannedWords = 'NEVER use: hemorrhaging, contrarian, looming, red flags, technicals, fundamentals, catalyst, breakout, or Wall Street research report language. Write like a knowledgeable friend.';
+
+  // ── PRE-DECISION MODE ──────────────────────────────────────────────────────
   if (mode === 'pre') {
-    const difficulty = ctx.difficulty ?? 'intermediate';
-    let difficultyInstructions = '';
+    return `You are Kavon AI, an expert trading coach. The user is practicing on a real historical stock scenario. You have complete context — never ask the user for information you already have.
 
-    if (difficulty === 'beginner') {
-      difficultyInstructions = 'Respond like you\'re explaining to someone who has never traded before — no jargon, no terms like RSI/MACD/greed score, use everyday analogies. Max 2 sentences plus one simple question.';
-    } else if (difficulty === 'intermediate') {
-      difficultyInstructions = 'You can use basic terms like "bullish", "analyst ratings", "momentum" but keep it conversational. 3 sentences max.';
-    } else if (difficulty === 'advanced') {
-      difficultyInstructions = 'Use full trading language, RSI, MACD, sentiment scores, risk/reward. 3-4 sentences.';
+${scenarioBlock}
+
+YOUR ROLE — PRE-DECISION COACHING:
+You are TIME-LOCKED to ${ctx.date} at ${ctx.cutoffTime} ET. You do NOT know what happened after this moment.
+- Guide the user toward making their own trading decision by explaining what the indicators are showing
+- Walk through what each signal means in the context of THIS specific stock and setup
+- Highlight key factors to weigh: momentum, sentiment, analyst views, news catalysts
+- Ask one focused question at the end to push their thinking — never reveal the answer
+- If asked "what happened after?", say: "I'm locked to ${ctx.cutoffTime} on ${ctx.date} — figuring that out is the whole challenge"
+- NEVER ask the user what format or topic they want — dive straight into coaching this scenario
+
+${difficultyVoice}
+${bannedWords}
+Speak plainly, no bullet points or headers. End every response with one short question that makes the user think.`;
+  }
+
+  // ── OUTCOME DATA (post-decision modes) ────────────────────────────────────
+  const outcomeBlock = `OUTCOME DATA:
+- Correct answer: ${ctx.correctAnswer ?? '—'}
+- Actual price move: ${ctx.actualMove ?? '—'}${ctx.closePrice != null ? `\n- Close price: $${ctx.closePrice}` : ''}${ctx.lessonSummary ? `\n- Lesson takeaway: ${ctx.lessonSummary}` : ''}${ctx.buyFeedback ? `\n- If bought: ${ctx.buyFeedback}` : ''}${ctx.sellFeedback ? `\n- If sold: ${ctx.sellFeedback}` : ''}`;
+
+  const userDecisionLine = ctx.userDecision
+    ? `USER'S DECISION: ${ctx.userDecision.action} · $${ctx.userDecision.amount} position · ${ctx.userDecision.wasCorrect ? 'CORRECT' : 'INCORRECT'}`
+    : 'USER\'S DECISION: not yet recorded';
+
+  // ── LEARNING CHECK MODE ───────────────────────────────────────────────────
+  if (mode === 'learn' || mode === 'validation') {
+    const isComplete = ctx.learningCheckComplete;
+
+    if (isComplete) {
+      return `You are Kavon AI, an expert trading coach. The user has completed the learning check and can now explore freely.
+
+${scenarioBlock}
+
+${outcomeBlock}
+
+${userDecisionLine}
+
+YOUR ROLE — FREE EXPLORATION:
+The learning check is done. Answer any question the user has about this scenario fully and openly.
+- Explain what each indicator was signaling and why the correct answer was ${ctx.correctAnswer ?? 'what it was'}
+- Discuss what would have happened with different decisions
+- Connect the lesson to broader trading principles
+- Reference specific numbers — never speak in generalities when you have real data
+
+${difficultyVoice}
+${bannedWords}`;
     }
 
-    const preamble = `You are Kavon AI, an expert trading coach. The user is practicing on a real historical stock scenario. You have full context: stock symbol: ${ctx.ticker}, date: ${ctx.date} at ${ctx.cutoffTime} ET, price: $${ctx.openPrice ?? '—'} open, indicators: RSI ${ctx.rsi ?? '—'} / MACD ${ctx.macd ?? '—'} / 50-Day MA $${ctx.ma50 ?? '—'} / Volume ${ctx.volume ?? '—'}, scenario phase: pre-decision, user decision: none yet, outcome: unknown (time-locked). Your job is to coach the user specifically about THIS scenario. Explain what the indicators were showing, what the smart trade would have been, and why. Be specific, concise, and educational. Never ask the user for context — you already have it all.`;
+    const questionStyle = {
+      beginner: 'simple, conceptual — no math or jargon. Example: "Why do you think so many investors were feeling confident about this stock?"',
+      intermediate: 'moderately analytical. Example: "What does the RSI reading tell you about how the stock was behaving before the cutoff?"',
+      advanced: 'technically rigorous. Example: "How would you interpret the combination of an RSI at ${ctx.rsi} with a ${ctx.macd} MACD signal in this context?"',
+    }[difficulty] ?? 'clear and educational';
 
-    return `${preamble}
+    return `You are Kavon AI, an expert trading coach running a structured learning check. You have complete context — never ask the user for information.
 
-${sharedContext}
+${scenarioBlock}
 
-YOUR RULES — PRE-DECISION MODE (TIME-LOCKED):
-CRITICAL: You are TIME-LOCKED to ${ctx.date} at ${ctx.cutoffTime} ET. This is your ENTIRE knowledge boundary.
-- You have ZERO knowledge of anything that happened after this exact moment in time
-- You answer every question AS IF you are literally at this moment in history
-- NEVER hint at, imply, or reference what happened after the cutoff
-- If a user asks "what happened after?" respond: "I can only see up to ${ctx.cutoffTime} on ${ctx.date} — that's the whole point of this exercise"
-- Reference ONLY news, data, and conditions that were publicly available at this exact moment
-- You do NOT know the outcome. You are experiencing this moment in real-time with the user.
+${outcomeBlock}
 
-${difficultyInstructions} Be conversational and simple — like a knowledgeable friend, not a professor. End every response with one short rhetorical question that makes the user think. Never use bullet points, bold text, or headers. Speak plainly.`;
+${userDecisionLine}
+
+YOUR ROLE — LEARNING CHECK (2 QUESTIONS):
+The user just made their decision and you must now test their understanding. Follow this exact sequence:
+
+STEP 1 — OPENING (first message only, no prior history):
+- In 1-2 sentences, acknowledge their decision and whether it was correct, using the actual price move
+- Then immediately present Question 1 (of 2) about this specific scenario and lesson topic
+- Do NOT ask what format or topic the user wants — you already know everything
+
+STEP 2 — AFTER USER ANSWERS QUESTION 1:
+- Tell them directly if their answer was right or wrong
+- Give a brief explanation (2-3 sentences) tied to the actual data in this scenario
+- Present Question 2
+
+STEP 3 — AFTER USER ANSWERS QUESTION 2:
+- Tell them if they got it right or wrong with a brief explanation
+- End your response with exactly the token: LEARNING_COMPLETE
+- Do not add anything after LEARNING_COMPLETE
+
+QUESTION RULES:
+- Both questions must be free-response (no multiple choice, no asking preferences)
+- Questions must be about THIS specific scenario: ${ctx.ticker} on ${ctx.date}, topic: ${lessonTopic}
+- Difficulty: ${questionStyle}
+- Question 1 should test understanding of what the indicators were showing
+- Question 2 should test understanding of WHY the correct trade was ${ctx.correctAnswer ?? 'what it was'}
+- Do not reveal both questions at once — ask them one at a time
+
+${difficultyVoice}
+${bannedWords}`;
   }
 
-  const outcomeBlock = ctx.actualMove != null
-    ? [
-        `\nOUTCOME DATA (known after cutoff):`,
-        `- Correct answer: ${ctx.correctAnswer ?? '—'}`,
-        `- Actual price move: ${ctx.actualMove}`,
-        ctx.closePrice != null ? `- Close price: $${ctx.closePrice}` : null,
-        ctx.lessonSummary != null ? `- Lesson takeaway: ${ctx.lessonSummary}` : null,
-        ctx.buyFeedback != null ? `- Buy feedback: ${ctx.buyFeedback}` : null,
-        ctx.sellFeedback != null ? `- Sell feedback: ${ctx.sellFeedback}` : null,
-      ].filter(Boolean).join('\n')
-    : '';
+  // ── POST-DECISION / REVIEW MODE ───────────────────────────────────────────
+  return `You are Kavon AI, an expert trading coach. The user has made their decision and you are now debriefing the trade.
 
-  const decisionNote = ctx.userDecision
-    ? `\nUser's decision: ${ctx.userDecision.action} · $${ctx.userDecision.amount} position · ${ctx.userDecision.wasCorrect ? 'CORRECT' : 'INCORRECT'}`
-    : '';
+${scenarioBlock}
 
-  const difficulty = ctx.difficulty ?? 'intermediate';
-  let postDecisionDifficultyRules = '';
+${outcomeBlock}
 
-  if (difficulty === 'beginner') {
-    postDecisionDifficultyRules = `
-BEGINNER MODE — STRICT PLAIN ENGLISH RULES:
-- Write like you're explaining to a smart 16 year old who just downloaded the app
-- ZERO finance terms. Everyday language only
-- NEVER mention a financial term without immediately defining it in the SAME sentence in plain English
-- Define terms naturally within the sentence — NOT as a separate definition. Like a friend explaining, not a textbook
-- Every financial concept must be translated into an everyday analogy. Use phrases like "imagine if..." or "think of it like..."
-- This rule applies to EVERY message you send — opening AND all follow-ups
-- Example: Instead of "the sentiment (72/100 greed)" say "most investors were feeling confident about this stock — like a 72 out of 100 on a confidence scale"
-- Test every response: "Would a smart person with zero finance knowledge understand every word?" If not, rewrite it`;
-  } else if (difficulty === 'intermediate') {
-    postDecisionDifficultyRules = `
-INTERMEDIATE MODE — CONVERSATIONAL RULES:
-- Use only common words everyone knows: "buy", "sell", "price went up/down", "investors felt confident/nervous", "the news was good/bad"
-- Nothing more technical than that. Keep it simple and conversational
-- Test every response: "Would a smart person with zero finance knowledge understand every word?" If not, rewrite it`;
-  } else if (difficulty === 'advanced') {
-    postDecisionDifficultyRules = `
-ADVANCED MODE — CLEAR TECHNICAL LANGUAGE:
-- You can use standard terms: RSI, MACD, sentiment, analyst ratings
-- Write in clear complete sentences
-- Still avoid Wall Street jargon that sounds pretentious`;
-  }
+${userDecisionLine}
 
-  const bannedWords = `
-BANNED WORDS FOR ALL DIFFICULTY LEVELS:
-- NEVER use: hemorrhaging, contrarian, looming, red flags, technicals, fundamentals, catalyst, breakout, or any word that sounds like it belongs in a Wall Street research report
-- Write like a knowledgeable friend, not a finance textbook`;
+YOUR ROLE — POST-DECISION DEBRIEF:
+- Explain what happened: the stock moved ${ctx.actualMove ?? '—'} and the correct answer was ${ctx.correctAnswer ?? '—'}
+- Walk through what each indicator was signaling and whether it pointed toward the right answer
+- Explain what the user should take away from this specific scenario
+- Be direct about what the smart trade was and exactly why — reference the actual numbers
+- If the user was wrong, explain what they might have misread; if right, explain what they read correctly
+- Answer follow-up questions freely using your full knowledge of what happened
 
-  // Determine if this is the learning check phase or free chat phase
-  // Learning check = AI knows outcome but is asking questions to test understanding
-  // Free chat = AI knows outcome and answers freely about what happened
-  const isLearningCheck = mode === 'learn' && !ctx.learningCheckComplete;
-  const isFreeChat = mode === 'learn' && ctx.learningCheckComplete;
-
-  let phaseInstructions = '';
-  if (isLearningCheck) {
-    phaseInstructions = `
-POST-DECISION LEARNING CHECK PHASE:
-- You KNOW what happened after ${ctx.cutoffTime} on ${ctx.date}
-- Use the outcome to teach: explain what the signals were saying and why they mattered
-- Ask the user questions to test their understanding of the scenario
-- The user must answer at least one question correctly before they can proceed
-- DO NOT reveal the exact price outcome yet — that comes after they answer correctly
-- Focus on: What did the signals mean? What were the key risk factors? What should they have focused on?`;
-  } else if (isFreeChat) {
-    phaseInstructions = `
-POST-DECISION FREE CHAT PHASE (LEARNING CHECK COMPLETE):
-- The user has completed the learning check and seen the outcome
-- You can now answer ANY question about what happened after ${ctx.cutoffTime}
-- Discuss freely: what the stock did after, why it moved that way, what would have happened if they held longer
-- Answer general trading questions related to this scenario
-- This is the "learn from the trade" phase where curiosity is encouraged
-- Reference specific numbers and outcomes from the actual historical data`;
-  } else {
-    phaseInstructions = `
-POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
-- You KNOW what happened after ${ctx.cutoffTime} on ${ctx.date}
-- The user has made their decision and seen the outcome
-- Discuss what the signals meant analytically and what actually happened
-- Use the outcome to teach lessons about reading market signals
-- Answer questions freely about what happened and why`;
-  }
-
-  const phase = isLearningCheck ? 'post-decision (learning check)' : isFreeChat ? 'post-decision (free chat)' : `post-decision (${mode})`;
-  const userDecisionSummary = ctx.userDecision
-    ? `${ctx.userDecision.action} · $${ctx.userDecision.amount} · ${ctx.userDecision.wasCorrect ? 'correct' : 'incorrect'}`
-    : 'none';
-  const outcomeSummary = ctx.actualMove != null
-    ? `${ctx.actualMove} (correct answer: ${ctx.correctAnswer ?? '—'})`
-    : 'unknown';
-
-  const preamble = `You are Kavon AI, an expert trading coach. The user is practicing on a real historical stock scenario. You have full context: stock symbol: ${ctx.ticker}, date: ${ctx.date} at ${ctx.cutoffTime} ET, price: $${ctx.openPrice ?? '—'} open / $${ctx.closePrice ?? '—'} close, indicators: RSI ${ctx.rsi ?? '—'} / MACD ${ctx.macd ?? '—'} / 50-Day MA $${ctx.ma50 ?? '—'} / Volume ${ctx.volume ?? '—'}, scenario phase: ${phase}, user decision: ${userDecisionSummary}, outcome: ${outcomeSummary}. Your job is to coach the user specifically about THIS scenario. Explain what the indicators were showing, what the smart trade would have been, and why. Be specific, concise, and educational. Never ask the user for context — you already have it all.`;
-
-  return `${preamble}
-
-${sharedContext}
-${outcomeBlock}${decisionNote}
-
-YOUR RULES:
-${phaseInstructions}
-
-CORE PRINCIPLES:
-1. ${isLearningCheck ? 'Ask questions to test understanding — the user must demonstrate they learned something' : 'Answer questions freely using your knowledge of what happened'}
-2. Discuss what each indicator was saying and what the risk/reward looked like
-3. Reference actual numbers from context. Never speak in generalities when you have real data
-4. If asked something unrelated, redirect back to the ${ctx.ticker} scenario
-5. Tone: ${mode === 'learn' ? 'patient educator unpacking a real case study' : 'analytical peer reviewing a trade together'}
-6. The congrats sentence must make sense on its own without any context
-
-${bannedWords}
-
-${postDecisionDifficultyRules}`;
+${difficultyVoice}
+${bannedWords}`;
 }
 
 function getChips(ctx, mode) {
   const t = ctx.ticker ?? 'this stock';
   if (mode === 'pre') return [
-    `What is the sentiment telling us about ${t} right now?`,
-    `Which news headline matters most here?`,
-    `What do the analyst ratings suggest?`,
-    `What signals should I focus on before deciding?`,
+    `What are the key signals to focus on for ${t} right now?`,
+    `What is the sentiment score telling us here?`,
+    `How should I interpret the analyst rating split?`,
+    `Walk me through the indicators one by one`,
   ];
-  if (mode === 'learn') return [
-    `Explain what the RSI reading means for ${t}`,
-    `How do I interpret the analyst rating split?`,
-    `What does investor sentiment score actually measure?`,
-    `Walk me through how to read this setup`,
+  if (mode === 'learn' || mode === 'validation') return [
+    `Explain what the RSI was showing for ${t}`,
+    `Why was the correct answer what it was?`,
+    `What was the most important signal in this scenario?`,
+    `What should I watch for next time I see this setup?`,
   ];
   return [
+    `Why was ${ctx.correctAnswer ?? 'that'} the right call here?`,
     `What were the strongest signals in this scenario?`,
-    `How significant were those news catalysts?`,
     `What would an experienced trader have focused on?`,
-    `Was the risk/reward favorable here?`,
+    `What should I take away from this trade?`,
   ];
 }
+
+const LEARNING_CHECK_INIT = '__INIT_LEARNING_CHECK__';
 
 export default function KavonAI({ context, mode = 'pre', onClose }) {
   const [history, setHistory] = useState([]);
@@ -218,17 +202,33 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
     setInput('');
   }, [context?.ticker, context?.date, context?.cutoffTime, mode]);
 
+  // Auto-fire opening message in learning check mode
+  useEffect(() => {
+    const isLearningCheck = (mode === 'learn' || mode === 'validation') && !context?.learningCheckComplete;
+    if (isLearningCheck && history.length === 0 && !loading) {
+      send(LEARNING_CHECK_INIT);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, context?.learningCheckComplete]);
+
   async function send(text) {
-    const q = (text ?? input).trim();
-    if (!q || loading) return;
+    const raw = text ?? input;
+    const isInit = raw === LEARNING_CHECK_INIT;
+    const q = isInit ? '' : raw.trim();
+    if (!isInit && (!q || loading)) return;
     setInput('');
     setStarted(true);
-    const nextHistory = [...history, { role: 'user', content: q }];
-    setHistory(nextHistory);
+
+    // For the init message we inject a hidden trigger — the AI sees no user message,
+    // which signals it to deliver the opening learning-check message unprompted.
+    const nextHistory = isInit
+      ? [{ role: 'user', content: 'Begin.' }]
+      : [...history, { role: 'user', content: q }];
+
+    setHistory(isInit ? [] : nextHistory);
     setLoading(true);
+
     try {
-      const key = import.meta.env.VITE_ANTHROPIC_API_KEY ?? '';
-      console.log('API KEY:', key ? `${key.slice(0, 10)}...${key.slice(-4)}` : 'NOT SET');
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/kavon-ai`,
         {
@@ -239,7 +239,7 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
           },
           body: JSON.stringify({
             model: 'claude-haiku-4-5',
-            max_tokens: 600,
+            max_tokens: 700,
             system: buildSystemPrompt(context, mode),
             messages: nextHistory,
           }),
@@ -249,10 +249,14 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
       const data = await res.json();
 
       if (data.error) {
-        setHistory(h => [...h, { role: 'assistant', content: `API Error: ${data.error.message || JSON.stringify(data.error)}` }]);
+        setHistory(h => [...h, { role: 'assistant', content: `Error: ${data.error.message || JSON.stringify(data.error)}` }]);
       } else {
         const reply = data.content?.find(b => b.type === 'text')?.text ?? 'No response.';
-        setHistory(h => [...h, { role: 'assistant', content: reply }]);
+        if (isInit) {
+          setHistory([{ role: 'assistant', content: reply }]);
+        } else {
+          setHistory(h => [...h, { role: 'assistant', content: reply }]);
+        }
       }
     } catch (err) {
       console.error('[KavonAI] Error:', err);
@@ -263,7 +267,8 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
   }
 
   const chips = getChips(context, mode);
-  const modeLabel = mode === 'pre' ? 'PRE-DECISION' : mode === 'learn' ? 'LEARN MODE' : 'POST-DECISION';
+  const isLearningCheck = (mode === 'learn' || mode === 'validation') && !context?.learningCheckComplete;
+  const modeLabel = mode === 'pre' ? 'PRE-DECISION' : isLearningCheck ? 'LEARNING CHECK' : mode === 'learn' ? 'LEARN MODE' : 'POST-DECISION';
   const isPreMode = mode === 'pre';
 
   return (
@@ -278,7 +283,7 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
             </div>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-            <span style={{ ...s.badge, background: isPreMode ? 'rgba(255,209,102,0.12)' : 'rgba(0,229,160,0.1)', color: isPreMode ? '#ffd166' : '#00e5a0', border: isPreMode ? '1px solid rgba(255,209,102,0.25)' : '1px solid rgba(0,229,160,0.2)' }}>
+            <span style={{ ...s.badge, background: isPreMode ? 'rgba(255,209,102,0.12)' : isLearningCheck ? 'rgba(0,180,255,0.1)' : 'rgba(0,229,160,0.1)', color: isPreMode ? '#ffd166' : isLearningCheck ? '#00b4ff' : '#00e5a0', border: isPreMode ? '1px solid rgba(255,209,102,0.25)' : isLearningCheck ? '1px solid rgba(0,180,255,0.2)' : '1px solid rgba(0,229,160,0.2)' }}>
               {modeLabel}
             </span>
             <button onClick={onClose} style={s.closeBtn}>✕</button>
@@ -286,17 +291,17 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
         </div>
 
         <div style={s.messages}>
-          {!started && (
+          {!started && !isLearningCheck && (
             <div style={s.welcome}>
               <div style={s.welcomeTitle}>
-                {mode === 'pre' ? `Analyze ${context?.ticker} at the cutoff` : mode === 'learn' ? `Learn from this ${context?.ticker} scenario` : `Review your ${context?.ticker} decision`}
+                {mode === 'pre'
+                  ? `Coach me through ${context?.ticker} at the cutoff`
+                  : `Debrief: ${context?.ticker} — ${context?.actualMove ?? ''}`}
               </div>
               <div style={s.welcomeSub}>
                 {mode === 'pre'
-                  ? `Ask me about what was visible at ${context?.cutoffTime} on ${context?.date}. I won't reveal anything after the cutoff.`
-                  : mode === 'learn'
-                  ? `Ask me anything — I'll explain the signals, concepts, and reasoning in full depth.`
-                  : `Now that you've committed, let's break down what the data was saying.`}
+                  ? `I'll walk you through what the indicators are showing at ${context?.cutoffTime} on ${context?.date}. I won't reveal what happened after.`
+                  : `Let's break down what the data was saying and what the right trade was.`}
               </div>
               <div style={s.divider} />
               <div style={s.chipsLabel}>Suggested questions</div>
@@ -306,6 +311,10 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
                 ))}
               </div>
             </div>
+          )}
+
+          {isLearningCheck && !started && loading && (
+            <div style={s.initMsg}>Generating your learning check questions...</div>
           )}
 
           {history.map((m, i) => (
@@ -336,7 +345,13 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }}}
-              placeholder={`Ask about ${context?.ticker ?? 'this stock'} at the cutoff…`}
+              placeholder={
+                isLearningCheck
+                  ? 'Type your answer…'
+                  : mode === 'pre'
+                  ? `Ask about ${context?.ticker ?? 'this stock'} at the cutoff…`
+                  : `Ask about this ${context?.ticker ?? 'trade'}…`
+              }
               rows={1}
               style={s.textarea}
               disabled={loading}
@@ -348,7 +363,7 @@ export default function KavonAI({ context, mode = 'pre', onClose }) {
             </button>
           </div>
           <div style={s.footer}>
-            Context-locked · {context?.date} {context?.cutoffTime}
+            {isLearningCheck ? 'Learning check · answer both questions to continue' : `Context-locked · ${context?.date} ${context?.cutoffTime}`}
             {mode === 'pre' && <span style={s.footerWarn}> · future data off-limits</span>}
           </div>
         </div>
@@ -368,6 +383,7 @@ const s = {
   badge: { fontSize:10, padding:'3px 8px', borderRadius:4, fontFamily:'monospace', letterSpacing:'0.08em', fontWeight:500 },
   closeBtn: { background:'none', border:'none', color:'#3d5470', fontSize:16, cursor:'pointer', padding:'2px 6px' },
   messages: { flex:1, overflowY:'auto', padding:'16px 14px', display:'flex', flexDirection:'column', gap:12 },
+  initMsg: { fontSize:13, color:'#3d5470', fontStyle:'italic', textAlign:'center', paddingTop:20 },
   welcome: { display:'flex', flexDirection:'column', gap:12 },
   welcomeTitle: { fontWeight:700, fontSize:15, color:'#dde6f0', lineHeight:1.4 },
   welcomeSub: { fontSize:13, color:'#7a9ab8', lineHeight:1.6 },
