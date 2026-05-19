@@ -4328,6 +4328,7 @@ YOUR RULES — POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
         return;
       }
 
+      console.log('SYSTEM PROMPT:', this.buildSystemPrompt(this.currentContext, this.currentMode));
       const res = await fetch(`${supabaseUrl}/functions/v1/kavon-ai`, {
         method: 'POST',
         headers: {
