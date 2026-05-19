@@ -46,7 +46,9 @@ ${optionalFields}
       difficultyInstructions = 'Use full trading language, RSI, MACD, sentiment scores, risk/reward. 3-4 sentences.';
     }
 
-    return `You are Kavon AI, a trading education coach inside the Kavon platform.
+    const preamble = `You are Kavon AI, an expert trading coach. The user is practicing on a real historical stock scenario. You have full context: stock symbol: ${ctx.ticker}, date: ${ctx.date} at ${ctx.cutoffTime} ET, price: $${ctx.openPrice ?? '—'} open, indicators: RSI ${ctx.rsi ?? '—'} / MACD ${ctx.macd ?? '—'} / 50-Day MA $${ctx.ma50 ?? '—'} / Volume ${ctx.volume ?? '—'}, scenario phase: pre-decision, user decision: none yet, outcome: unknown (time-locked). Your job is to coach the user specifically about THIS scenario. Explain what the indicators were showing, what the smart trade would have been, and why. Be specific, concise, and educational. Never ask the user for context — you already have it all.`;
+
+    return `${preamble}
 
 ${sharedContext}
 
@@ -146,7 +148,17 @@ POST-DECISION / ${mode === 'learn' ? 'LEARN' : 'REVIEW'} MODE:
 - Answer questions freely about what happened and why`;
   }
 
-  return `You are Kavon AI, a trading education coach inside the Kavon platform.
+  const phase = isLearningCheck ? 'post-decision (learning check)' : isFreeChat ? 'post-decision (free chat)' : `post-decision (${mode})`;
+  const userDecisionSummary = ctx.userDecision
+    ? `${ctx.userDecision.action} · $${ctx.userDecision.amount} · ${ctx.userDecision.wasCorrect ? 'correct' : 'incorrect'}`
+    : 'none';
+  const outcomeSummary = ctx.actualMove != null
+    ? `${ctx.actualMove} (correct answer: ${ctx.correctAnswer ?? '—'})`
+    : 'unknown';
+
+  const preamble = `You are Kavon AI, an expert trading coach. The user is practicing on a real historical stock scenario. You have full context: stock symbol: ${ctx.ticker}, date: ${ctx.date} at ${ctx.cutoffTime} ET, price: $${ctx.openPrice ?? '—'} open / $${ctx.closePrice ?? '—'} close, indicators: RSI ${ctx.rsi ?? '—'} / MACD ${ctx.macd ?? '—'} / 50-Day MA $${ctx.ma50 ?? '—'} / Volume ${ctx.volume ?? '—'}, scenario phase: ${phase}, user decision: ${userDecisionSummary}, outcome: ${outcomeSummary}. Your job is to coach the user specifically about THIS scenario. Explain what the indicators were showing, what the smart trade would have been, and why. Be specific, concise, and educational. Never ask the user for context — you already have it all.`;
+
+  return `${preamble}
 
 ${sharedContext}
 ${outcomeBlock}${decisionNote}
