@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { TrendingUp, ArrowRight } from 'lucide-react';
 import ShimmerButton from '../components/ui/ShimmerButton';
 import ConstellationBackground from '../components/ui/ConstellationBackground';
 
 export default function Home() {
-  const { signInWithGoogle } = useAuth();
+  const navigate = useNavigate();
   const [typewriterText, setTypewriterText] = useState('');
   const [showHeadline, setShowHeadline] = useState(false);
 
@@ -79,7 +79,7 @@ export default function Home() {
               <span className="text-lg font-semibold text-white tracking-tight font-playfair">Kavon</span>
             </div>
             <button
-              onClick={signInWithGoogle}
+              onClick={() => navigate('/dashboard')}
               className="px-4 py-2 text-sm font-medium text-neutral-400 hover:text-white border border-neutral-800 rounded-lg hover:border-neutral-700 transition-all duration-300 cursor-pointer"
             >
               Sign In
@@ -115,7 +115,7 @@ export default function Home() {
             </p>
 
             <div className="flex justify-center mb-32 opacity-0 animate-[fadeInUp_0.8s_ease-out_1.3s_forwards]">
-              <ShimmerButton onClick={signInWithGoogle}>
+              <ShimmerButton onClick={() => navigate('/dashboard')}>
                 Start Learning Free
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
               </ShimmerButton>
@@ -170,7 +170,7 @@ export default function Home() {
             <p className="text-lg text-neutral-400 mb-10 font-light">
               Join thousands of traders who've elevated their skills with our platform.
             </p>
-            <ShimmerButton onClick={signInWithGoogle}>
+            <ShimmerButton onClick={() => navigate('/dashboard')}>
               Get Started Now
               <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2} />
             </ShimmerButton>

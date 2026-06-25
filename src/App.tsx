@@ -21,14 +21,7 @@ function App() {
         <Routes>
           <Route path="/" element={<RootRoute />} />
           <Route path="/waitlist" element={<Waitlist />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route
             path="/study"
             element={
