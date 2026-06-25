@@ -22,14 +22,7 @@ function App() {
           <Route path="/" element={<RootRoute />} />
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route
-            path="/study"
-            element={
-              <ProtectedRoute>
-                <Study />
-              </ProtectedRoute>
-            }
-          />
+          <Route path="/study" element={<Study />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
